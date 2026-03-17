@@ -77,31 +77,31 @@ class Song {
 
         $query = "
 
-        SELECT C.nombre_cancion AS resultado,'cancion' AS tipo
+        SELECT C.id_cancion AS id, C.nombre_cancion AS resultado,'cancion' AS tipo
         FROM Canciones C
         WHERE C.nombre_cancion LIKE :term
 
         UNION
 
-        SELECT A.nombre_artistico,'artista'
+        SELECT A.id_usuario AS id, A.nombre_artistico AS resultado,'artista' AS tipo
         FROM Artista A
         WHERE A.nombre_artistico LIKE :term
 
         UNION
 
-        SELECT AL.nombre_album,'album'
+        SELECT AL.id_album AS id, AL.nombre_album AS resultado,'album' AS tipo
         FROM Albumes AL
         WHERE AL.nombre_album LIKE :term
 
         UNION
 
-        SELECT T.nombre_tag,'tag'
+        SELECT T.nombre_tag AS id, T.nombre_tag AS resultado,'tag' AS tipo
         FROM Tags T
         WHERE T.nombre_tag LIKE :term
 
         UNION
 
-        SELECT U.nombre_usuario,'usuario'
+        SELECT U.id_usuario AS id, U.nombre_usuario AS resultado,'usuario' AS tipo
         FROM Usuarios U
         WHERE U.nombre_usuario LIKE :term
         ";
