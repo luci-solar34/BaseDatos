@@ -63,7 +63,7 @@ Editar bio
         <?= $playlist['nombre_playlist'] ?>
     </a>
 
-    <?php if($playlist['privacidad_playlist'] == 0): ?>
+    <?php if($playlist['privacidad_playlist'] == 1): ?>
         (Privada)
     <?php endif; ?>
 

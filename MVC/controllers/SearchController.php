@@ -23,4 +23,19 @@ class SearchController {
 
         require "../MVC/views/search.php";
     }
+
+    public function autocomplete(){
+
+        $term = $_GET['q'] ?? '';
+
+        if(strlen($term) < 2){
+            echo json_encode([]);
+            return;
+        }
+
+        $results = $this->song->search($term);
+
+        header('Content-Type: application/json');
+        echo json_encode($results);
+    }
 }

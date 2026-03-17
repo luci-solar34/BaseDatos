@@ -59,8 +59,6 @@ class Playlist {
     }
     public function changePrivacy($playlist,$privacy){
 
-    $privacy = $privacy ? 1 : 0;
-
     $query = "UPDATE Playlists
               SET privacidad_playlist = :privacy
               WHERE id_playlist = :playlist";
@@ -111,6 +109,18 @@ public function getUserPlaylists($user,$viewer){
     $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function getPlaylist($id){
+
+    $query = "SELECT * FROM Playlists WHERE id_playlist = :id";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":id", $id);
+
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 }
