@@ -63,16 +63,16 @@ class User {
 
     public function updateBio($id,$bio){
 
-        $query = "UPDATE Usuarios
-                  SET bio = :bio
-                  WHERE id_usuario = :id";
+    $query = "UPDATE Usuarios
+              SET bio = :bio
+              WHERE id_usuario = :id";
 
-        $stmt = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":bio",$bio);
-        $stmt->bindParam(":id",$id);
+    $stmt->bindParam(":bio",$bio);
+    $stmt->bindParam(":id",$id);
 
-        return $stmt->execute();
+    return $stmt->execute();
     }
 
     public function createArtist($user_id, $nombre_artistico){
@@ -101,5 +101,7 @@ class User {
     $stmt->bindParam(":id",$id);
 
     return $stmt->execute();
-}
+    }
+
+    
 }

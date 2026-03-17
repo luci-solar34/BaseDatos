@@ -28,7 +28,7 @@ class MessageController {
             die("Datos inválidos");
         }
 
-        if($this->follow->mutualFollow($emisor,$receptor)){
+        if($this->follow->areMutual($emisor,$receptor)){
 
             $this->message->send($emisor,$receptor,$texto);
 
@@ -50,4 +50,16 @@ class MessageController {
 
         require "../MVC/views/messages.php";
     }
+    public function index(){
+
+    $user = $_SESSION['user_id'] ?? null;
+
+    if(!$user){
+        die("No autenticado");
+    }
+
+    $conversations = $this->message->getConversations($user);
+
+    require "../MVC/views/messages_list.php";
+}
 }

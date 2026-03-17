@@ -10,18 +10,24 @@ class Playlist {
 
     public function create($name,$privacy,$user){
 
-        $query = "INSERT INTO Playlists
-        (nombre_playlist,privacidad_playlist,id_usuario)
-        VALUES (:name,:privacy,:user)";
+    $query = "INSERT INTO Playlists
+    (nombre_playlist,privacidad_playlist,id_usuario)
+    VALUES (:name,:privacy,:user)";
 
-        $stmt = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":name",$name);
-        $stmt->bindParam(":privacy",$privacy);
-        $stmt->bindParam(":user",$user);
+    $stmt->bindParam(":name",$name);
+    $stmt->bindParam(":privacy",$privacy);
+    $stmt->bindParam(":user",$user);
 
-        return $stmt->execute();
+    $stmt->execute();
+
+    return $this->conn->lastInsertId(); 
     }
+    public function getLastId(){
+        return $this->conn->lastInsertId();
+    }
+
 
     public function addSong($playlist,$song){
 
@@ -78,6 +84,33 @@ public function removeSong($playlist,$song){
     $stmt->bindParam(":song",$song);
 
     return $stmt->execute();
+}
+
+public function getUserPlaylists($user,$viewer){
+
+    if($user == $viewer){
+
+        
+        $query = "SELECT *
+                  FROM Playlists
+                  WHERE id_usuario = :user
+                  ORDER BY fecha_playlist DESC";
+
+    } else {
+
+        
+        $query = "SELECT *
+                  FROM Playlists
+                  WHERE id_usuario = :user
+                  AND privacidad_playlist = 1
+                  ORDER BY fecha_playlist DESC";
+    }
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":user",$user);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 }

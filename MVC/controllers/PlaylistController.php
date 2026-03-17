@@ -15,6 +15,7 @@ class PlaylistController {
         $this->playlist = new Playlist($db);
     }
 
+    // 🔥 CREAR PLAYLIST
     public function create(){
 
         $name = $_POST['name'] ?? null;
@@ -26,8 +27,23 @@ class PlaylistController {
         }
 
         $this->playlist->create($name,$privacy,$user);
+
+        $playlist_id = $this->playlist->getLastId();
+
+        header("Location: /LASK/public/index.php/playlist?id=".$playlist_id);
+        exit;
     }
 
+    // 🔥 VER PLAYLIST
+    public function show($id){
+
+        $songs = $this->playlist->getPlaylistSongs($id);
+        $playlist_id = $id;
+
+        require "../MVC/views/playlist.php";
+    }
+
+    // 🔥 AGREGAR CANCIÓN
     public function addSong(){
 
         $playlist = $_POST['playlist'] ?? null;
@@ -38,8 +54,12 @@ class PlaylistController {
         }
 
         $this->playlist->addSong($playlist,$song);
+
+        header("Location: /LASK/public/index.php/playlist?id=".$playlist);
+        exit;
     }
 
+    // 🔥 ELIMINAR CANCIÓN
     public function removeSong(){
 
         $playlist = $_POST['playlist'] ?? null;
@@ -50,8 +70,12 @@ class PlaylistController {
         }
 
         $this->playlist->removeSong($playlist,$song);
+
+        header("Location: /LASK/public/index.php/playlist?id=".$playlist);
+        exit;
     }
 
+    // 🔥 PRIVACIDAD
     public function changePrivacy(){
 
         $playlist = $_POST['playlist'] ?? null;

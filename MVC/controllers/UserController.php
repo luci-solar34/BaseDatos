@@ -3,11 +3,13 @@
 require_once "../config/database.php";
 require_once "../MVC/models/User.php";
 require_once "../MVC/models/Follow.php";
+require_once "../MVC/models/Playlist.php";
 
 class UserController {
 
     private $user;
     private $follow;
+    private $playlist; // 🔥 NUEVO
 
     public function __construct(){
 
@@ -16,26 +18,37 @@ class UserController {
 
         $this->user = new User($db);
         $this->follow = new Follow($db);
+        $this->playlist = new Playlist($db); // 🔥 GUARDAR
     }
 
     public function profile($id){
 
         $user = $this->user->getById($id);
+        $followers = $this->follow->countFollowers($id);
+        $following = $this->follow->countFollowing($id);
+
+        $viewer = $_SESSION['user_id'] ?? null;
+
+        $playlists = $this->playlist->getUserPlaylists($id,$viewer);
 
         require "../MVC/views/profile.php";
     }
 
     public function updateBio(){
 
-        $bio = $_POST['bio'] ?? null;
-        $id = $_SESSION['user_id'] ?? null;
+    $bio = $_POST['bio'] ?? null;
+    $id = $_SESSION['user_id'] ?? null;
 
-        if(!$bio || !$id){
-            die("Datos inválidos");
-        }
-
-        $this->user->updateBio($id,$bio);
+    if(!$id){
+        die("Datos inválidos");
     }
+
+    $this->user->updateBio($id,$bio);
+
+    header("Location: /LASK/public/index.php/profile?id=".$id);
+    exit;
+    }
+
 
     public function updatePfp(){
 
@@ -86,4 +99,6 @@ class UserController {
 
         $this->follow->unfollow($seguidor,$seguido);
     }
+
+    
 }

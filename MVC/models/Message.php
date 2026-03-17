@@ -23,25 +23,42 @@ class Message {
         return $stmt->execute();
     }
 
-    public function getChat($user1,$user2){
+    public function getConversations($user){
 
-        $query = "SELECT M.*, 
-                         U1.nombre_usuario AS emisor,
-                         U2.nombre_usuario AS receptor
-                  FROM Mensajes M
-                  INNER JOIN Usuarios U1 ON M.id_emisor = U1.id_usuario
-                  INNER JOIN Usuarios U2 ON M.id_receptor = U2.id_usuario
-                  WHERE (M.id_emisor = :u1 AND M.id_receptor = :u2)
-                     OR (M.id_emisor = :u2 AND M.id_receptor = :u1)
-                  ORDER BY fecha_mensaje ASC";
+    $query = "
+        SELECT DISTINCT 
+            u.id_usuario,
+            u.nombre_usuario,
+            u.pfp
+        FROM Mensajes m
+        JOIN Usuarios u 
+            ON (u.id_usuario = m.id_emisor AND m.id_receptor = :user)
+            OR (u.id_usuario = m.id_receptor AND m.id_emisor = :user)
+    ";
 
-        $stmt = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":user",$user);
+    $stmt->execute();
 
-        $stmt->bindParam(":u1",$user1);
-        $stmt->bindParam(":u2",$user2);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function getChat($user1,$user2){
 
-        $stmt->execute();
+    $query = "
+        SELECT *
+        FROM Mensajes
+        WHERE (id_emisor = :u1 AND id_receptor = :u2)
+           OR (id_emisor = :u2 AND id_receptor = :u1)
+        ORDER BY fecha_mensaje ASC
+    ";
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->conn->prepare($query);
+
+    $stmt->bindParam(":u1",$user1);
+    $stmt->bindParam(":u2",$user2);
+
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

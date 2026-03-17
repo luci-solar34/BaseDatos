@@ -16,7 +16,9 @@
 <?php endif; ?>
 
 <a href="/LASK/public/index.php/profile?id=<?= $_SESSION['user_id'] ?>">Ver perfil</a>
-
+<a href="/LASK/public/index.php/messages">
+    <button>Mensajes</button>
+</a>
 <a href="/LASK/public/index.php/logout">Cerrar sesión</a>
 
 <?php endif; ?>
