@@ -1,5 +1,10 @@
 <?php
 
+// Enable error reporting for development (remove/disable in production)
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 session_start();
 
 require_once "../config/database.php";
@@ -134,19 +139,6 @@ break;
 
     break;
 
-
-    case "/song":
-
-        if(isset($_GET['id'])){
-
-            require_once "../MVC/controllers/SongController.php";
-
-            $controller = new SongController();
-            $controller->listen($_GET['id']);
-
-        }
-
-    break;
 
 
     case "/search":
@@ -311,7 +303,14 @@ case "/playlist/remove-song":
 
 break;
 
-   case "/chat":
+case "/messages":
+
+    $controller = new MessageController();
+    $controller->index();
+
+break;
+
+case "/chat":
 
     if(isset($_GET['user'])){
         $controller = new MessageController();
@@ -320,10 +319,12 @@ break;
 
 break;
 
-case "/messages":
+case "/message/send":
 
-    $controller = new MessageController();
-    $controller->index();
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new MessageController();
+        $controller->send();
+    }
 
 break;
 
