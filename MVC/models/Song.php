@@ -98,6 +98,12 @@ class Song {
         SELECT T.nombre_tag,'tag'
         FROM Tags T
         WHERE T.nombre_tag LIKE :term
+
+        UNION
+
+        SELECT U.nombre_usuario,'usuario'
+        FROM Usuarios U
+        WHERE U.nombre_usuario LIKE :term
         ";
 
         $stmt = $this->conn->prepare($query);
@@ -127,5 +133,8 @@ class Song {
 
         return $stmt->execute();
     }
+public function getConnection(){
+    return $this->conn;
+}
 }
 

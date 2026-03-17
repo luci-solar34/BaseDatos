@@ -32,6 +32,68 @@ switch ($uri) {
 
     break;
 
+// Agrega estas rutas después de las existentes:
+
+case "/song":
+
+    if(isset($_GET['id'])){
+
+        require_once "../MVC/controllers/DetailController.php";
+
+        $controller = new DetailController();
+        $controller->song($_GET['id']);
+
+    }
+
+break;
+
+case "/album":
+
+    if(isset($_GET['id'])){
+
+        require_once "../MVC/controllers/DetailController.php";
+
+        $controller = new DetailController();
+        $controller->album($_GET['id']);
+
+    }
+
+break;
+
+case "/artist":
+
+    if(isset($_GET['id'])){
+
+        require_once "../MVC/controllers/DetailController.php";
+
+        $controller = new DetailController();
+        $controller->artist($_GET['id']);
+
+    }
+
+break;
+
+case "/new-releases":
+
+    require_once "../MVC/controllers/DetailController.php";
+
+    $controller = new DetailController();
+    $controller->newReleases();
+
+break;
+
+case "/like":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        require_once "../MVC/controllers/DetailController.php";
+
+        $controller = new DetailController();
+        $controller->like();
+
+    }
+
+break;
 
     case "/login":
 
@@ -91,6 +153,13 @@ switch ($uri) {
 
         $controller = new SearchController();
         $controller->search();
+
+    break;
+
+    case "/search/autocomplete":
+
+        $controller = new SearchController();
+        $controller->autocomplete();
 
     break;
 
@@ -205,8 +274,42 @@ switch ($uri) {
 
 break;
 
+case "/playlist/edit":
 
+    if(isset($_GET['id'])){
 
+        $controller = new PlaylistController();
+        $controller->edit($_GET['id']);
+
+    } else {
+
+        echo "Playlist no especificada";
+
+    }
+
+break;
+
+case "/playlist/change-privacy":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new PlaylistController();
+        $controller->changePrivacy();
+
+    }
+
+break;
+
+case "/playlist/remove-song":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new PlaylistController();
+        $controller->removeSong();
+
+    }
+
+break;
 
    case "/chat":
 

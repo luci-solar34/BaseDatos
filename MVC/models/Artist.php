@@ -36,5 +36,7 @@ class Artist {
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
+public function getConnection(){
+    return $this->conn;
+}
 }
