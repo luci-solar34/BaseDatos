@@ -15,7 +15,7 @@ class PlaylistController {
         $this->playlist = new Playlist($db);
     }
 
-    // 🔥 CREAR PLAYLIST
+    
     public function create(){
 
         $name = $_POST['name'] ?? null;
@@ -34,7 +34,7 @@ class PlaylistController {
         exit;
     }
 
-    // 🔥 VER PLAYLIST
+    
     public function show($id){
 
         $songs = $this->playlist->getPlaylistSongs($id);
@@ -43,7 +43,7 @@ class PlaylistController {
         require "../MVC/views/playlist.php";
     }
 
-    // 🔥 AGREGAR CANCIÓN
+   
     public function addSong(){
 
         $playlist = $_POST['playlist'] ?? null;
@@ -59,7 +59,7 @@ class PlaylistController {
         exit;
     }
 
-    // 🔥 ELIMINAR CANCIÓN
+    
     public function removeSong(){
 
         $playlist = $_POST['playlist'] ?? null;
@@ -75,7 +75,7 @@ class PlaylistController {
         exit;
     }
 
-    // 🔥 PRIVACIDAD
+    
     public function changePrivacy(){
 
         $playlist = $_POST['playlist'] ?? null;

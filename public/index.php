@@ -73,24 +73,20 @@ switch ($uri) {
     break;
 
 
-    case "/song":
-
-        if(isset($_GET['id'])){
-
-            require_once "../MVC/controllers/SongController.php";
-
-            $controller = new SongController();
-            $controller->listen($_GET['id']);
-
-        }
-
-    break;
+    
 
 
     case "/search":
 
         $controller = new SearchController();
         $controller->search();
+
+    break;
+
+    case "/releases":
+
+    $controller = new HomeController();
+    $controller->releases();
 
     break;
 
@@ -148,6 +144,20 @@ switch ($uri) {
 
     break;
 
+    case "/artist/album/create":
+
+        $controller = new ArtistController();
+        $controller->createAlbum();
+
+    break;
+
+    case "/artist/song/create":
+
+        $controller = new ArtistController();
+        $controller->createSong();
+
+    break;
+
 
     case "/playlist/create":
 
@@ -164,7 +174,7 @@ switch ($uri) {
 
     break;
 
-    break;
+    
 
     case "/playlist":
 
@@ -202,13 +212,17 @@ switch ($uri) {
 
         require "../MVC/views/add_song.php";
     }
+break;
+
+case "/messages":
+
+    $controller = new MessageController();
+    $controller->index();
 
 break;
 
 
-
-
-   case "/chat":
+case "/chat":
 
     if(isset($_GET['user'])){
         $controller = new MessageController();
@@ -217,10 +231,12 @@ break;
 
 break;
 
-case "/messages":
+case "/message/send":
 
-    $controller = new MessageController();
-    $controller->index();
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new MessageController();
+        $controller->send();
+    }
 
 break;
 

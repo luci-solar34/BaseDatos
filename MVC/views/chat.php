@@ -1,26 +1,31 @@
-<h1>Chat</h1>
+<a href="/LASK/public/index.php/messages" style="display: inline-block; margin-bottom: 10px;">← Volver a mensajes</a>
 
-<?php foreach($messages as $msg): ?>
+<h1>Chat con <?= htmlspecialchars($otherUser['nombre_usuario'] ?? 'usuario') ?></h1>
 
-<div>
+<?php if(empty($messages)): ?>
+    <p>No hay mensajes aún. Envía el primero.</p>
+<?php else: ?>
+    <?php foreach($messages as $msg): ?>
 
-    <strong>
-        <?= $msg['id_emisor'] == $_SESSION['user_id'] ? 'Yo' : 'Ellos' ?>:
-    </strong>
+    <div style="margin-bottom: 10px;">
+        <strong>
+            <?= $msg['id_emisor'] == $_SESSION['user_id'] ? 'Yo' : htmlspecialchars($otherUser['nombre_usuario']) ?>:
+        </strong>
+        <?= htmlspecialchars($msg['texto']) ?>
+        <br>
+        <small style="color:#666;"><?= $msg['fecha_mensaje'] ?></small>
+    </div>
 
-    <?= $msg['texto'] ?>
-
-</div>
-
-<?php endforeach; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <hr>
 
 <form method="POST" action="/LASK/public/index.php/message/send">
 
-    <input type="hidden" name="user_id" value="<?= $_GET['user'] ?>">
+    <input type="hidden" name="user_id" value="<?= htmlspecialchars($_GET['user']) ?>">
 
-    <input type="text" name="texto" placeholder="Escribe mensaje">
+    <input type="text" name="texto" placeholder="Escribe mensaje" required>
 
     <button>Enviar</button>
 

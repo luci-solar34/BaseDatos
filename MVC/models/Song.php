@@ -113,9 +113,10 @@ class Song {
 
     public function create($data){
 
-        $query = "INSERT INTO Canciones
-                  (nombre_cancion,numero_pista,path_link,id_album,id_artista)
-                  VALUES (:nombre,:pista,:path,:album,:artista)";
+        $columns = ['nombre_cancion', 'numero_pista', 'path_link', 'id_album', 'id_artista', 'portada_cancion'];
+        $placeholders = [':nombre', ':pista', ':path', ':album', ':artista', ':portada'];
+
+        $query = "INSERT INTO Canciones (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
 
         $stmt = $this->conn->prepare($query);
 
@@ -124,8 +125,90 @@ class Song {
         $stmt->bindParam(":path",$data['path']);
         $stmt->bindParam(":album",$data['album']);
         $stmt->bindParam(":artista",$data['artista']);
+        $stmt->bindParam(":portada",$data['portada']);
 
-        return $stmt->execute();
+        if($stmt->execute()){
+            $songId = $this->conn->lastInsertId();
+            if(!empty($data['tags'])){
+                $this->addTags($songId, $data['tags']);
+            }
+            return $songId;
+        }
+
+        return false;
+    }
+
+    private function tableExists($table){
+        try {
+            $query = "SHOW TABLES LIKE :table";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':table', $table);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function addTags($songId, $tags){
+        if(!$this->tableExists('Cancion_Tags')){
+            return false;
+        }
+
+        $query = "INSERT INTO Cancion_Tags (id_cancion, id_tag) VALUES (:song, :tag)";
+        $stmt = $this->conn->prepare($query);
+
+        foreach($tags as $tag){
+            $stmt->bindValue(':song', $songId);
+            $stmt->bindValue(':tag', $tag);
+            $stmt->execute();
+        }
+
+        return true;
+    }
+    public function getById($id){
+
+    $query = "SELECT C.*, A.nombre_artistico
+              FROM Canciones C
+              INNER JOIN Artista A ON C.id_artista = A.id_usuario
+              WHERE C.id_cancion = :id";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":id",$id);
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+public function getByTag($tag){
+
+    $query = "SELECT C.*
+              FROM Canciones C
+              INNER JOIN Cancion_Tags CT ON C.id_cancion = CT.id_cancion
+              WHERE CT.id_tag = :tag";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":tag",$tag);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function getRecentSongs(){
+
+    $query = "SELECT C.id_cancion,
+                     C.nombre_cancion,
+                     C.portada_cancion,
+                     C.path_link,
+                     A.nombre_artistico
+              FROM Canciones C
+              INNER JOIN Artista A ON C.id_artista = A.id_usuario
+              ORDER BY C.id_cancion DESC
+              LIMIT 20";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 

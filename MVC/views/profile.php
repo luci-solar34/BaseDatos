@@ -33,6 +33,13 @@
 Editar bio
 </button>
 
+<?php if(!empty($isArtist)): ?>
+    <div style="margin-top: 10px;">
+        <a href="/LASK/public/index.php/artist/album/create"><button type="button">Publicar álbum</button></a>
+        <a href="/LASK/public/index.php/artist/song/create"><button type="button">Publicar canción</button></a>
+    </div>
+<?php endif; ?>
+
 <form id="editBio" action="/LASK/public/index.php/update_bio" method="POST" style="display:none; margin-top:10px;">
 
 <textarea name="bio" rows="4" cols="50" placeholder="Escribe tu bio"><?= $user['bio'] ?></textarea>

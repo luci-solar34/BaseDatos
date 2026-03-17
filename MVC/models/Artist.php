@@ -37,4 +37,13 @@ class Artist {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function exists($id){
+        $query = "SELECT 1 FROM Artista WHERE id_usuario = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id",$id);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
+
 }

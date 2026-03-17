@@ -4,12 +4,14 @@ require_once "../config/database.php";
 require_once "../MVC/models/User.php";
 require_once "../MVC/models/Follow.php";
 require_once "../MVC/models/Playlist.php";
+require_once "../MVC/models/Artist.php";
 
 class UserController {
 
     private $user;
     private $follow;
-    private $playlist; // 🔥 NUEVO
+    private $playlist;
+    private $artist;
 
     public function __construct(){
 
@@ -18,7 +20,8 @@ class UserController {
 
         $this->user = new User($db);
         $this->follow = new Follow($db);
-        $this->playlist = new Playlist($db); // 🔥 GUARDAR
+        $this->playlist = new Playlist($db);
+        $this->artist = new Artist($db);
     }
 
     public function profile($id){
@@ -30,6 +33,8 @@ class UserController {
         $viewer = $_SESSION['user_id'] ?? null;
 
         $playlists = $this->playlist->getUserPlaylists($id,$viewer);
+
+        $isArtist = $this->artist->exists($id);
 
         require "../MVC/views/profile.php";
     }

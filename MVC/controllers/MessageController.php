@@ -3,11 +3,13 @@
 require_once "../config/database.php";
 require_once "../MVC/models/Message.php";
 require_once "../MVC/models/Follow.php";
+require_once "../MVC/models/User.php";
 
 class MessageController {
 
     private $message;
     private $follow;
+    private $userModel;
 
     public function __construct(){
 
@@ -16,26 +18,20 @@ class MessageController {
 
         $this->message = new Message($db);
         $this->follow = new Follow($db);
+        $this->userModel = new User($db);
     }
 
-    public function send(){
+    public function index(){
 
-        $emisor = $_SESSION['user_id'] ?? null;
-        $receptor = $_POST['user_id'] ?? null;
-        $texto = $_POST['texto'] ?? null;
+        $user = $_SESSION['user_id'] ?? null;
 
-        if(!$emisor || !$receptor || !$texto){
-            die("Datos inválidos");
+        if(!$user){
+            die("No autenticado");
         }
 
-        if($this->follow->areMutual($emisor,$receptor)){
+        $conversations = $this->message->getConversations($user);
 
-            $this->message->send($emisor,$receptor,$texto);
-
-        }else{
-
-            echo "Debes seguir a este usuario para enviar mensajes";
-        }
+        require "../MVC/views/messages_list.php";
     }
 
     public function chat($user_id){
@@ -47,19 +43,29 @@ class MessageController {
         }
 
         $messages = $this->message->getChat($user,$user_id);
+        $otherUser = $this->userModel->getById($user_id);
 
-        require "../MVC/views/messages.php";
-    }
-    public function index(){
-
-    $user = $_SESSION['user_id'] ?? null;
-
-    if(!$user){
-        die("No autenticado");
+        require "../MVC/views/chat.php";
     }
 
-    $conversations = $this->message->getConversations($user);
+    public function send(){
+        $user = $_SESSION['user_id'] ?? null;
 
-    require "../MVC/views/messages_list.php";
-}
+        if(!$user){
+            die("Usuario no autenticado");
+        }
+
+        $receptor = $_POST['user_id'] ?? null;
+        $texto = trim($_POST['texto'] ?? '');
+
+        if (!$receptor || $texto === '') {
+            header("Location: /LASK/public/index.php/chat?user=" . urlencode($receptor));
+            exit;
+        }
+
+        $this->message->send($user, $receptor, $texto);
+
+        header("Location: /LASK/public/index.php/chat?user=" . urlencode($receptor));
+        exit;
+    }
 }

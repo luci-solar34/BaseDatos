@@ -1,4 +1,4 @@
-<h1>LASk</h1>
+<h1>LASK</h1>
 
 <?php if(!isset($_SESSION['user_id'])): ?>
 
@@ -7,7 +7,7 @@
 
 <?php else: ?>
 
-<p>Bienvenido <?= $_SESSION['username'] ?></p>
+<p>Bienvenid@ <?= $_SESSION['username'] ?></p>
 
 <?php if($_SESSION['role'] == 2): ?>
 <p>Artista</p>
@@ -29,21 +29,15 @@
 <?php if(isset($_SESSION['user_id'])): ?>
 
 <form action="/LASK/public/search" method="GET">
-
 <input type="text" name="q" placeholder="Buscar canciones, artistas, álbumes o tags">
-
 <button type="submit">Buscar</button>
-
 </form>
 
 <?php else: ?>
 
 <form onsubmit="alert('Debes iniciar sesión para buscar'); return false;">
-
 <input type="text" placeholder="Buscar canciones, artistas, álbumes o tags">
-
 <button type="submit">Buscar</button>
-
 </form>
 
 <?php endif; ?>
@@ -78,23 +72,33 @@
 
 <?php $songs = $songs ?? []; ?>
 
-<?php foreach($songs as $song): ?>
-
-<?php if(isset($_SESSION['user_id'])): ?>
-
-<a href="/LASK/public/song?id=<?= $song['id_cancion'] ?>">
-<img src="/LASK/<?= $song['portada_cancion'] ?>" width="120">
-</a>
-
+<?php if(isset($songs) && !empty($songs)): ?>
+    <div style="display: flex; gap: 10px; overflow-x: auto;">
+        <?php foreach($songs as $song): ?>
+            <div style="min-width: 120px;">
+                <?php if(isset($_SESSION['user_id'])): ?>
+                    <a href="/LASK/public/song?id=<?= $song['id_cancion'] ?>">
+                        <img src="/LASK/<?= $song['portada_cancion'] ?? 'Photos/banner_default.png' ?>" 
+                             width="120" height="120"
+                             style="border-radius: 8px;">
+                        <p><?= $song['nombre_cancion'] ?></p>
+                        <small><?= $song['nombre_artistico'] ?? 'Artista' ?></small>
+                    </a>
+                <?php else: ?>
+                    <div onclick="alert('Debes iniciar sesión');">
+                        <img src="/LASK/<?= $song['portada_cancion'] ?? 'Photos/banner_default.png' ?>" 
+                             width="120" height="120"
+                             style="border-radius: 8px;">
+                        <p><?= $song['nombre_cancion'] ?></p>
+                        <small><?= $song['nombre_artistico'] ?? 'Artista' ?></small>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
 <?php else: ?>
-
-<a href="#" onclick="alert('Debes iniciar sesión'); return false;">
-<img src="/LASK/<?= $song['portada_cancion'] ?>" width="120">
-</a>
-
+    <p>No hay nuevos lanzamientos disponibles</p>
 <?php endif; ?>
-
-<?php endforeach; ?>
 
 
 <?php $albums = $albums ?? []; ?>

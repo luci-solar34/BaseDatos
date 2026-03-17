@@ -39,4 +39,23 @@ class HomeController {
 
     require "../MVC/views/home.php";
 }
+
+public function releases(){
+
+    require_once "../MVC/models/Song.php";
+    require_once "../MVC/models/Album.php";
+
+    $database = new Database();
+    $db = $database->connect();
+
+    $songModel = new Song($db);
+    $albumModel = new Album($db);
+
+    $songs = $songModel->getRecentSongs();
+    $albums = $albumModel->getRecentAlbums();
+
+    require "../MVC/views/releases.php";
+    }
+
+
 }
