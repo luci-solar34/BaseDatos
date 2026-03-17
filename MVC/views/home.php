@@ -201,7 +201,22 @@ document.getElementById('search-input').addEventListener('input', function() {
                     div.style.padding = '5px';
                     div.style.cursor = 'pointer';
                     div.addEventListener('click', function() {
-                        document.getElementById('search-input').value = item.resultado;
+                        // Navegar al link correspondiente
+                        let url = '';
+                        if (item.tipo === 'cancion') {
+                            url = '/LASK/public/index.php/song?id=' + item.id;
+                        } else if (item.tipo === 'artista') {
+                            url = '/LASK/public/index.php/artist?id=' + item.id;
+                        } else if (item.tipo === 'album') {
+                            url = '/LASK/public/index.php/album?id=' + item.id;
+                        } else if (item.tipo === 'usuario') {
+                            url = '/LASK/public/index.php/profile?id=' + item.id;
+                        } else if (item.tipo === 'tag') {
+                            url = '/LASK/public/index.php/search?q=' + encodeURIComponent(item.resultado);
+                        }
+                        if (url) {
+                            window.location.href = url;
+                        }
                         suggestionsDiv.style.display = 'none';
                     });
                     suggestionsDiv.appendChild(div);
