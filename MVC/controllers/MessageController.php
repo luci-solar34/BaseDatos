@@ -23,16 +23,24 @@ class MessageController {
 
     public function index(){
 
-        $user = $_SESSION['user_id'] ?? null;
+    $user = $_SESSION['user_id'] ?? null;
 
-        if(!$user){
-            die("No autenticado");
-        }
-
-        $conversations = $this->message->getConversations($user);
-
-        require "../MVC/views/messages_list.php";
+    if(!$user){
+        die("No autenticado");
     }
+
+    $conversations = $this->message->getConversations($user);
+    $mutuals = $this->follow->getMutuals($user);
+
+    // 🔥 evitar duplicados (IMPORTANTE)
+    $conversationIds = array_column($conversations, 'id_usuario');
+
+    $mutuals = array_filter($mutuals, function($m) use ($conversationIds){
+        return !in_array($m['id_usuario'], $conversationIds);
+    });
+
+    require "../MVC/views/messages_list.php";
+}
 
     public function chat($user_id){
 
