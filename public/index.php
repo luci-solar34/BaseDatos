@@ -212,6 +212,17 @@ break;
     break;
 
 
+    case "/profile/followers":
+
+        if(isset($_GET['id'])){
+            $controller = new UserController();
+            $controller->followers($_GET['id']);
+        } else {
+            echo "Usuario no especificado";
+        }
+
+    break;
+
     case "/profile":
 
         if (isset($_GET['id'])) {

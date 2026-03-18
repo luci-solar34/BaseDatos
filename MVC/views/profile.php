@@ -29,7 +29,7 @@
 </form>
 <?php endif; ?>
 
-<?= $followers ?> Seguidores
+<a href="/LASK/public/index.php/profile/followers?id=<?= $user['id_usuario'] ?>"><?= $followers ?> Seguidores</a>
 <?= $following ?> Siguiendo
 
 
