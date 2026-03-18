@@ -43,6 +43,11 @@ class UserController {
         $hasBlocked = $this->block->hasBlocked($viewer, $id);
     }
 
+    $canReport = false;
+    if($viewer && $viewer != $id && $viewerData['id_rol'] != 1 && $user['id_rol'] != 1){
+        $canReport = true;
+    }
+
     if($isBlocked){
         $canUnblock = $hasBlocked; // 👈 para la vista
         require "../MVC/views/profile_blocked.php";
@@ -64,11 +69,6 @@ class UserController {
     }
 
     $playlists = $this->playlist->getUserPlaylists($id,$viewer);
-
-    $canReport = false;
-    if($viewer && $viewer != $id && $viewerData['id_rol'] != 1 && $user['id_rol'] != 1){
-        $canReport = true;
-    }
 
     $flashMessage = $_SESSION['flash_message'] ?? null;
     unset($_SESSION['flash_message']);
@@ -218,6 +218,35 @@ class UserController {
 
     // 👇 REDIRECCIÓN CORRECTA
     header("Location: /LASK/public/index.php/profile?id=" . $seguido);
+    exit;
+}
+public function block(){
+
+    $bloqueador = $_SESSION['user_id'] ?? null;
+    $bloqueado = $_POST['user_id'] ?? null;
+
+    if(!$bloqueador || !$bloqueado){
+        die("Datos inválidos");
+    }
+
+    $this->block->block($bloqueador,$bloqueado);
+
+    header("Location: /LASK/public/index.php/profile?id=".$bloqueado);
+    exit;
+}
+
+public function unblock(){
+
+    $bloqueador = $_SESSION['user_id'] ?? null;
+    $bloqueado = $_POST['user_id'] ?? null;
+
+    if(!$bloqueador || !$bloqueado){
+        die("Datos inválidos");
+    }
+
+    $this->block->unblock($bloqueador,$bloqueado);
+
+    header("Location: /LASK/public/index.php/profile?id=".$bloqueado);
     exit;
 }
 

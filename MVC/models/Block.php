@@ -10,14 +10,16 @@ class Block {
 
     public function block($bloqueador, $bloqueado){
 
-        $query = "INSERT INTO Bloquea (id_bloqueador,id_bloqueado)
+        // Inserta el bloqueo (IGNORAR si ya existe) y retorna si el bloqueo está activo.
+        $query = "INSERT IGNORE INTO Bloquea (id_bloqueador,id_bloqueado)
                   VALUES (:b1,:b2)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":b1",$bloqueador);
         $stmt->bindParam(":b2",$bloqueado);
+        $stmt->execute();
 
-        return $stmt->execute();
+        return $this->hasBlocked($bloqueador, $bloqueado);
     }
 
     public function unblock($bloqueador, $bloqueado){
@@ -45,7 +47,8 @@ class Block {
         $stmt->bindParam(":u2",$user2);
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        // rowCount() puede ser impreciso en algunos drivers. Usar fetch() es más confiable.
+        return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function hasBlocked($bloqueador, $bloqueado){
@@ -59,6 +62,6 @@ class Block {
         $stmt->bindParam(":b2",$bloqueado);
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
