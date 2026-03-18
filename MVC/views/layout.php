@@ -45,11 +45,10 @@
         }
 
         .footer {
-            background: #333;
-            color: white;
+            background-color: #1a1a1a;
+            color: #fff;
             text-align: center;
-            padding: 20px;
-            margin-top: 40px;
+            padding: 15px;
         }
 
         .btn {
@@ -121,8 +120,5 @@
         <?= $content ?>
     </div>
 
-    <footer class="footer">
-        <p>&copy; 2024 LASK - Tu plataforma de música</p>
-    </footer>
 </body>
 </html>
