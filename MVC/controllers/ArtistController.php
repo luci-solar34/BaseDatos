@@ -4,12 +4,14 @@ require_once "../config/database.php";
 require_once "../MVC/models/Song.php";
 require_once "../MVC/models/Album.php";
 require_once "../MVC/models/Comment.php";
+require_once "../MVC/models/Tag.php";
 
 class ArtistController {
 
     private $song;
     private $album;
     private $comment;
+    private $tag;
 
     public function __construct(){
 
@@ -19,6 +21,7 @@ class ArtistController {
         $this->song = new Song($db);
         $this->album = new Album($db);
         $this->comment = new Comment($db);
+        $this->tag = new Tag($db);
     }
 
     public function profile($id){
@@ -79,6 +82,8 @@ class ArtistController {
     }
 
     public function showCreateSong($artist_id){
+
+        $tags = $this->tag->getAllTags();
 
         require "../MVC/views/create_song.php";
     }
@@ -160,7 +165,13 @@ class ArtistController {
             "artista" => $artista
         ];
 
-        $this->song->create($data);
+        $created = $this->song->create($data);
+
+        if($created){
+            $songId = (int) $this->song->getConnection()->lastInsertId();
+            $tagIds = $_POST['tags'] ?? [];
+            $this->tag->syncSongTags($songId, $tagIds);
+        }
 
         header("Location: /LASK/public/index.php/artist?id=" . $artista);
         exit;
@@ -176,6 +187,8 @@ class ArtistController {
         }
 
         $albums = $this->album->getByArtist($artistId);
+        $tags = $this->tag->getAllTags();
+        $selectedTagIds = $this->tag->getSongTagIds($song_id);
 
         require "../MVC/views/edit_song.php";
     }
@@ -208,6 +221,9 @@ class ArtistController {
         ];
 
         $this->song->update($data);
+
+        $tagIds = $_POST['tags'] ?? [];
+        $this->tag->syncSongTags($songId, $tagIds);
 
         header("Location: /LASK/public/index.php/song?id=" . $songId);
         exit;

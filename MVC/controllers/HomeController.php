@@ -32,7 +32,7 @@ class HomeController {
     $songs = $this->song->getLatestSongs();
     $albums = $this->album->getLatestAlbums();
     $artists = $this->artist->getLatestArtists();
-    $tags = $this->tag->getAllTags();
+    $tags = $this->tag->getRandomTags();
 
     $likedSongs = [];
     $followingArtists = [];

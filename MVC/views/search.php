@@ -46,7 +46,7 @@
 
         <?php elseif($result['tipo'] == 'tag'): ?>
 
-            <a href="/LASK/public/index.php/search?q=<?= urlencode($result['resultado']) ?>">
+            <a href="/LASK/public/index.php/tag?id=<?= $result['id'] ?>">
 
                 <?= htmlspecialchars($result['resultado']) ?> (Tag)
 

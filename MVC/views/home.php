@@ -44,29 +44,23 @@
 <?php endif; ?>
 
 
-<h2>Encuentra tus favoritos</h2>
+<h2>Explora Tags</h2>
 
-<?php $tags = $tags ?? []; ?>
+<p>
+    <?= isset($_SESSION['user_id']) ? 'Explora tags para descubrir canciones con una vibe parecida.' : 'Explora algunos tags populares para descubrir la vibe de la plataforma.' ?>
+</p>
 
 <?php foreach($tags as $tag): ?>
-
-<?php if(isset($_SESSION['user_id'])): ?>
-
-<a href="/LASK/public/tag?id=<?= $tag['id_tag'] ?>">
-<?= $tag['nombre_tag'] ?>
-</a>
-
-<?php else: ?>
-
-<a href="#" onclick="alert('Debes iniciar sesión'); return false;">
-<?= $tag['nombre_tag'] ?>
-</a>
-
-<?php endif; ?>
-
-<br>
-
+    <div>
+        <a href="/LASK/public/index.php/tag?id=<?= $tag['id_tag'] ?>">
+            <?= htmlspecialchars($tag['nombre_tag']) ?>
+        </a>
+    </div>
 <?php endforeach; ?>
+
+<p>
+    <a href="/LASK/public/index.php/tags">Explorar tags</a>
+</p>
 
 
 <h2>Nuevos Lanzamientos</h2>
@@ -183,7 +177,7 @@ document.getElementById('search-input').addEventListener('input', function() {
                         } else if (item.tipo === 'usuario') {
                             url = '/LASK/public/index.php/profile?id=' + item.id;
                         } else if (item.tipo === 'tag') {
-                            url = '/LASK/public/index.php/search?q=' + encodeURIComponent(item.resultado);
+                            url = '/LASK/public/index.php/tag?id=' + item.id;
                         }
                         if (url) {
                             window.location.href = url;

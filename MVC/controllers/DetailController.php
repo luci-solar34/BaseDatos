@@ -6,6 +6,7 @@ require_once "../MVC/models/Album.php";
 require_once "../MVC/models/Artist.php";
 require_once "../MVC/models/Like.php";
 require_once "../MVC/models/Follow.php";
+require_once "../MVC/models/Tag.php";
 
 class DetailController {
 
@@ -14,6 +15,7 @@ class DetailController {
     private $artist;
     private $like;
     private $follow;
+    private $tag;
 
     public function __construct(){
 
@@ -25,6 +27,7 @@ class DetailController {
         $this->artist = new Artist($db);
         $this->like = new Like($db);
         $this->follow = new Follow($db);
+        $this->tag = new Tag($db);
     }
 
     public function song($id){
@@ -50,6 +53,7 @@ class DetailController {
 
         // Contar likes
         $likes = $this->like->countLikes($id);
+        $tags = $this->tag->getSongTags($id);
 
         // Verificar si el usuario actual le dio like
         $user_liked = false;

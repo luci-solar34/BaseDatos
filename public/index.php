@@ -12,6 +12,7 @@ require_once "../MVC/controllers/MessageController.php";
 require_once "../MVC/controllers/AdminController.php";
 require_once "../MVC/controllers/HomeController.php";
 require_once "../MVC/controllers/SearchController.php";
+require_once "../MVC/controllers/TagController.php";
 
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -50,6 +51,24 @@ case "/song":
 
     }
 
+
+break;
+
+case "/tags":
+
+    $controller = new TagController();
+    $controller->index();
+
+break;
+
+case "/tag":
+
+    if(isset($_GET['id'])){
+        $controller = new TagController();
+        $controller->show($_GET['id']);
+    } else {
+        echo "Tag no especificado";
+    }
 
 break;
 
@@ -431,6 +450,22 @@ case "/message/send":
     if($_SERVER['REQUEST_METHOD'] === "POST"){
         $controller = new MessageController();
         $controller->send();
+    }
+
+break;
+
+case "/admin/tag-requests":
+
+    $controller = new AdminController();
+    $controller->tagRequests();
+
+break;
+
+case "/admin/tag-request/resolve":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new AdminController();
+        $controller->resolveTagRequest();
     }
 
 break;

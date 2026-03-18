@@ -20,6 +20,15 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
     </p>
 <?php endif; ?>
 
+<?php if(!empty($tags)): ?>
+    <p>
+        <strong>Tags:</strong>
+        <?php foreach($tags as $index => $tag): ?>
+            <?= $index > 0 ? ', ' : '' ?><a href="/LASK/public/index.php/tag?id=<?= $tag['id_tag'] ?>"><?= htmlspecialchars($tag['nombre_tag']) ?></a>
+        <?php endforeach; ?>
+    </p>
+<?php endif; ?>
+
 <audio controls>
     <source src="/LASK/<?= $song['path_link'] ?>" type="audio/mpeg">
 </audio>
