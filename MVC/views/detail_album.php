@@ -4,10 +4,10 @@ $pageTitle = $album['nombre_album'] . ' - LASK';
 
 <h1><?= $album['nombre_album'] ?></h1>
 
-<?php if($album['nombre_artistico']): ?>
+<?php if(!empty($album['nombre_artistico'])): ?>
     <p>
         <strong>Artista:</strong> 
-        <a href="/LASK/public/index.php/artist?id=<?= $album['id_usuario'] ?? '' ?>">
+        <a href="/LASK/public/index.php/artist?id=<?= $album['id_artista'] ?? '' ?>">
             <?= $album['nombre_artistico'] ?>
         </a>
     </p>

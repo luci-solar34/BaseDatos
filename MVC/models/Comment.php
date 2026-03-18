@@ -10,14 +10,14 @@ class Comment {
 
     public function create($data){
 
-        $query = "INSERT INTO Comentarios (id_usuario, id_artista, comentario, fecha_comentario)
-                  VALUES (:usuario, :artista, :comentario, NOW())";
+        $query = "INSERT INTO Comentarios_Artista (id_usuario, id_artista, texto, fecha_comentario)
+                  VALUES (:usuario, :artista, :texto, NOW())";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":usuario", $data['usuario']);
         $stmt->bindParam(":artista", $data['artista']);
-        $stmt->bindParam(":comentario", $data['comentario']);
+        $stmt->bindParam(":texto", $data['comentario']);
 
         return $stmt->execute();
     }

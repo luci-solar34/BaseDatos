@@ -68,17 +68,23 @@ class DetailController {
     public function album($id){
 
         // Obtener información del álbum
-        $query = "SELECT A.*, 
-                         (SELECT AR.nombre_artistico 
-                          FROM Canciones C2 
-                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario 
-                          WHERE C2.id_album = A.id_album 
+        // Nota: Albumes no siempre contiene el id del artista directamente.
+        // Usamos una subconsulta que toma el primer artista de las canciones del álbum.
+        $query = "SELECT A.*,
+                         (SELECT C2.id_artista
+                          FROM Canciones C2
+                          WHERE C2.id_album = A.id_album
+                          LIMIT 1) as id_artista,
+                         (SELECT AR.nombre_artistico
+                          FROM Canciones C2
+                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario
+                          WHERE C2.id_album = A.id_album
                           LIMIT 1) as nombre_artistico,
-                         (SELECT U.nombre_usuario 
-                          FROM Canciones C2 
-                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario 
-                          INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario 
-                          WHERE C2.id_album = A.id_album 
+                         (SELECT U.nombre_usuario
+                          FROM Canciones C2
+                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario
+                          INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario
+                          WHERE C2.id_album = A.id_album
                           LIMIT 1) as nombre_usuario
                   FROM Albumes A
                   WHERE A.id_album = :id";
@@ -118,6 +124,13 @@ class DetailController {
             die("Artista no encontrado");
         }
 
+        // Verificar si el usuario actual sigue a este artista
+        $viewerId = $_SESSION['user_id'] ?? null;
+        $isFollowing = false;
+        if($viewerId && $viewerId != $id){
+            $isFollowing = $this->follow->isFollowing($viewerId, $id);
+        }
+
         // Obtener canciones del artista
         $query = "SELECT C.*, AL.nombre_album
                   FROM Canciones C
@@ -148,8 +161,8 @@ class DetailController {
         $followers = $this->follow->countFollowers($id);
 
         // Obtener comentarios
-        $query = "SELECT C.comentario, C.fecha_comentario, U.nombre_usuario
-                  FROM Comentarios C
+        $query = "SELECT C.texto AS comentario, C.fecha_comentario, U.nombre_usuario
+                  FROM Comentarios_Artista C
                   INNER JOIN Usuarios U ON C.id_usuario = U.id_usuario
                   WHERE C.id_artista = :id
                   ORDER BY C.fecha_comentario DESC";

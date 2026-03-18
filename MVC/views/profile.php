@@ -18,6 +18,16 @@
 
 <p>Email: <?= $user['email'] ?></p>
 
+<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id_usuario']): ?>
+    <form method="POST" action="/LASK/public/index.php">
+    <input type="hidden" name="route" value="<?= $isFollowing ? 'unfollow' : 'follow' ?>">
+    <input type="hidden" name="user_id" value="<?= $user['id_usuario'] ?>">
+    <input type="hidden" name="redirect_id" value="<?= $user['id_usuario'] ?>">
+    <button type="submit">
+        <?= $isFollowing ? 'Dejar de seguir' : 'Seguir' ?>
+    </button>
+</form>
+<?php endif; ?>
 
 <?= $followers ?> Seguidores
 <?= $following ?> Siguiendo

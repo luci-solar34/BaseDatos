@@ -5,6 +5,7 @@ require_once "../MVC/models/Song.php";
 require_once "../MVC/models/Album.php";
 require_once "../MVC/models/Artist.php";
 require_once "../MVC/models/Tag.php";
+require_once "../MVC/models/Follow.php";
 
 class HomeController {
 
@@ -12,6 +13,7 @@ class HomeController {
     private $album;
     private $artist;
     private $tag;
+    private $follow;
 
     public function __construct(){
 
@@ -22,6 +24,7 @@ class HomeController {
         $this->album = new Album($db);
         $this->artist = new Artist($db);
         $this->tag = new Tag($db);
+        $this->follow = new Follow($db);
     }
 
     public function home(){
@@ -32,9 +35,11 @@ class HomeController {
     $tags = $this->tag->getAllTags();
 
     $likedSongs = [];
+    $followingArtists = [];
 
     if(isset($_SESSION['user_id'])){
         $likedSongs = $this->song->getUserLikedSongs($_SESSION['user_id']);
+        $followingArtists = $this->follow->getFollowingIds($_SESSION['user_id']);
     }
 
     require "../MVC/views/home.php";

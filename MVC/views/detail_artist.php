@@ -5,7 +5,21 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
 <h1><?= $artist['nombre_artistico'] ?></h1>
 <p>@<?= $artist['nombre_usuario'] ?></p>
 
+<?php if(!empty($artist['pfp'])): ?>
+    <img src="/LASK/<?= $artist['pfp'] ?>" width="120" style="border-radius: 50%;">
+<?php endif; ?>
+
 <p><strong>Seguidores:</strong> <?= $followers ?></p>
+
+<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != $artist['id_usuario']): ?>
+    <form method="POST" action="/LASK/public/index.php">
+    <input type="hidden" name="route" value="<?= $isFollowing ? 'unfollow' : 'follow' ?>">
+    <input type="hidden" name="user_id" value="<?= $artist['id_usuario'] ?>">
+    <button type="submit">
+        <?= $isFollowing ? 'Dejar de seguir' : 'Seguir' ?>
+    </button>
+</form>
+<?php endif; ?>
 
 <?php if($artist['bio']): ?>
     <h3>Biografía</h3>
@@ -16,7 +30,7 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
     <p><strong>Email:</strong> <?= $artist['email'] ?></p>
 <?php endif; ?>
 
-<?php if($artist['nombre_pais']): ?>
+<?php if(!empty($artist['nombre_pais'])): ?>
     <p><strong>País:</strong> <?= $artist['nombre_pais'] ?></p>
 <?php endif; ?>
 
@@ -50,6 +64,8 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
         </li>
     <?php endforeach; ?>
     </ul>
+<?php endif; ?>
+
 <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $artist['id_usuario']): ?>
 
 <a href="/LASK/public/index.php/artist/create-album?id=<?= $artist['id_usuario'] ?>">
