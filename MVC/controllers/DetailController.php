@@ -185,7 +185,14 @@ class DetailController {
             $user_id = $_SESSION['user_id'];
 
             if($song_id){
-                $this->like->likeSong($user_id, $song_id);
+                // Chequear si ya existe el like
+                if($this->like->isLiked($user_id, $song_id)){
+                    // Si existe, borrar
+                    $this->like->unlikeSong($user_id, $song_id);
+                } else {
+                    // Si no existe, crear
+                    $this->like->likeSong($user_id, $song_id);
+                }
             }
 
             header("Location: /LASK/public/index.php/song?id=" . $song_id);
