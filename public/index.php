@@ -238,6 +238,24 @@ break;
 
     break;
 
+    case "/report":
+
+        if($_SERVER['REQUEST_METHOD'] === "POST"){
+            $controller = new UserController();
+            $controller->submitReport();
+        } else {
+            echo "Método no permitido";
+        }
+
+    break;
+
+    case "/admin/denuncias":
+
+        $controller = new AdminController();
+        $controller->denuncias();
+
+    break;
+
     case "/update_pfp":
 
     if($_SERVER['REQUEST_METHOD'] === "POST"){

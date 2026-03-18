@@ -13,6 +13,7 @@ class DetailController {
     private $song;
     private $album;
     private $artist;
+    private $user;
     private $like;
     private $follow;
     private $tag;
@@ -25,6 +26,8 @@ class DetailController {
         $this->song = new Song($db);
         $this->album = new Album($db);
         $this->artist = new Artist($db);
+        require_once "../MVC/models/User.php";
+        $this->user = new User($db);
         $this->like = new Like($db);
         $this->follow = new Follow($db);
         $this->tag = new Tag($db);
@@ -147,6 +150,16 @@ class DetailController {
 
         // Contar seguidores
         $followers = $this->follow->countFollowers($id);
+
+        $viewerId = $_SESSION['user_id'] ?? null;
+        $viewer = $viewerId ? $this->user->getById($viewerId) : null;
+        $canReport = false;
+        if($viewerId && $viewerId != $id && $viewer && $viewer['id_rol'] != 1 && $artist['id_rol'] != 1){
+            $canReport = true;
+        }
+
+        $flashMessage = $_SESSION['flash_message'] ?? null;
+        unset($_SESSION['flash_message']);
 
         // Obtener comentarios
         $query = "SELECT C.texto AS comentario, C.fecha_comentario, U.nombre_usuario
