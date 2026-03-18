@@ -35,6 +35,35 @@ class Song {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getById($id){
+
+        $query = "SELECT *
+                  FROM Canciones
+                  WHERE id_cancion = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getByArtistOutsideAlbum($artist, $albumId){
+
+        $query = "SELECT *
+                  FROM Canciones
+                  WHERE id_artista = :artist
+                  AND (id_album IS NULL OR id_album != :album)
+                  ORDER BY id_cancion DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":artist", $artist);
+        $stmt->bindParam(":album", $albumId);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getLatestSongs(){
 
         $query = "SELECT C.id_cancion,
@@ -119,6 +148,15 @@ class Song {
 
     public function create($data){
 
+        $album = $data['album'] ?? null;
+        $track = $data['numero_pista'] ?? null;
+
+        if($album){
+            $track = $track ?? $this->getNextTrackNumber($album);
+        } else {
+            $track = null;
+        }
+
         $query = "INSERT INTO Canciones
                   (nombre_cancion,numero_pista,path_link,id_album,id_artista)
                   VALUES (:nombre,:pista,:path,:album,:artista)";
@@ -126,12 +164,140 @@ class Song {
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":nombre",$data['nombre']);
-        $stmt->bindParam(":pista",$data['numero_pista']);
+        $stmt->bindParam(":pista",$track);
         $stmt->bindParam(":path",$data['path']);
-        $stmt->bindParam(":album",$data['album']);
+        $stmt->bindParam(":album",$album);
         $stmt->bindParam(":artista",$data['artista']);
 
         return $stmt->execute();
+    }
+
+    public function update($data){
+
+        $current = $this->getById($data['song']);
+
+        if(!$current || (int)$current['id_artista'] !== (int)$data['artista']){
+            return false;
+        }
+
+        $album = $data['album'];
+        $previousAlbum = $current['id_album'];
+        $track = $current['numero_pista'];
+
+        if(empty($album)){
+            $album = null;
+            $track = null;
+        } elseif((int)$current['id_album'] !== (int)$album){
+            $track = $this->getNextTrackNumber($album);
+        }
+
+        $query = "UPDATE Canciones
+                  SET nombre_cancion = :nombre,
+                      id_album = :album,
+                      numero_pista = :pista
+                  WHERE id_cancion = :song
+                  AND id_artista = :artista";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(":nombre", $data['nombre']);
+        $stmt->bindParam(":album", $album);
+        $stmt->bindParam(":pista", $track);
+        $stmt->bindParam(":song", $data['song']);
+        $stmt->bindParam(":artista", $data['artista']);
+
+        $updated = $stmt->execute();
+
+        if($updated && $previousAlbum && (int)$previousAlbum !== (int)$album){
+            $this->normalizeAlbumTracks($previousAlbum);
+        }
+
+        return $updated;
+    }
+
+    public function moveToAlbum($songId, $albumId, $artistId){
+
+        $song = $this->getById($songId);
+
+        if(!$song || (int)$song['id_artista'] !== (int)$artistId){
+            return false;
+        }
+
+        $previousAlbum = $song['id_album'];
+        $track = $albumId ? $this->getNextTrackNumber($albumId) : null;
+
+        $query = "UPDATE Canciones
+                  SET id_album = :album,
+                      numero_pista = :pista
+                  WHERE id_cancion = :song
+                  AND id_artista = :artista";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":album", $albumId);
+        $stmt->bindParam(":pista", $track);
+        $stmt->bindParam(":song", $songId);
+        $stmt->bindParam(":artista", $artistId);
+
+        $moved = $stmt->execute();
+
+        if($moved && $previousAlbum && (int)$previousAlbum !== (int)$albumId){
+            $this->normalizeAlbumTracks($previousAlbum);
+        }
+
+        return $moved;
+    }
+
+    private function getNextTrackNumber($albumId){
+
+        $query = "SELECT COALESCE(MAX(numero_pista), 0) + 1 AS next_track
+                  FROM Canciones
+                  WHERE id_album = :album";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":album", $albumId);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int) ($result['next_track'] ?? 1);
+    }
+
+    private function normalizeAlbumTracks($albumId){
+
+        $query = "SELECT id_cancion
+                  FROM Canciones
+                  WHERE id_album = :album
+                  ORDER BY numero_pista ASC,
+                           id_cancion ASC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":album", $albumId);
+        $stmt->execute();
+
+        $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $tempTrack = 1000;
+        $tempQuery = "UPDATE Canciones
+                      SET numero_pista = :track
+                      WHERE id_cancion = :song";
+        $tempStmt = $this->conn->prepare($tempQuery);
+
+        foreach($songs as $song){
+            $tempStmt->bindValue(":track", $tempTrack, PDO::PARAM_INT);
+            $tempStmt->bindValue(":song", $song['id_cancion'], PDO::PARAM_INT);
+            $tempStmt->execute();
+            $tempTrack++;
+        }
+
+        $finalTrack = 1;
+        $finalStmt = $this->conn->prepare($tempQuery);
+
+        foreach($songs as $song){
+            $finalStmt->bindValue(":track", $finalTrack, PDO::PARAM_INT);
+            $finalStmt->bindValue(":song", $song['id_cancion'], PDO::PARAM_INT);
+            $finalStmt->execute();
+            $finalTrack++;
+        }
     }
 public function getConnection(){
     return $this->conn;

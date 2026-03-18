@@ -26,8 +26,8 @@ class UserController {
         $user = $this->user->getById($id);
         $viewer = $_SESSION['user_id'] ?? null;
 
-        // Si el viewer no es el propietario y el user es artista, redirigir a página de artista
-        if($viewer != $id && $user['id_rol'] == 2){
+        // Si es artista, su perfil principal es detail_artist
+        if($user['id_rol'] == 2){
             header("Location: /LASK/public/index.php/artist?id=" . $id);
             exit;
         }

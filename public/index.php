@@ -50,6 +50,33 @@ case "/song":
 
     }
 
+
+break;
+
+case "/album/add-songs":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        require_once "../MVC/controllers/DetailController.php";
+
+        $controller = new DetailController();
+        $controller->addSongToAlbum();
+
+    } else {
+
+        if(isset($_GET['id'])){
+
+            require_once "../MVC/controllers/DetailController.php";
+
+            $controller = new DetailController();
+            $controller->addSongToAlbum();
+
+        } else {
+
+            echo "Álbum no especificado";
+        }
+    }
+
 break;
 
 case "/album":
@@ -231,6 +258,38 @@ break;
                 $controller->showCreateSong($_GET['id']);
             } else {
                 echo "Artista no especificado";
+            }
+        }
+
+    break;
+
+    case "/artist/edit-album":
+
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            $controller = new ArtistController();
+            $controller->editAlbum();
+        } else {
+            if (isset($_GET['id'])) {
+                $controller = new ArtistController();
+                $controller->showEditAlbum($_GET['id']);
+            } else {
+                echo "Álbum no especificado";
+            }
+        }
+
+    break;
+
+    case "/artist/edit-song":
+
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            $controller = new ArtistController();
+            $controller->editSong();
+        } else {
+            if (isset($_GET['id'])) {
+                $controller = new ArtistController();
+                $controller->showEditSong($_GET['id']);
+            } else {
+                echo "Canción no especificada";
             }
         }
 

@@ -42,6 +42,9 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
             <a href="/LASK/public/index.php/album?id=<?= $album['id_album'] ?>">
                 <?= $album['nombre_album'] ?>
             </a>
+            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $artist['id_usuario']): ?>
+                <a href="/LASK/public/index.php/artist/edit-album?id=<?= $album['id_album'] ?>">Editar</a>
+            <?php endif; ?>
         </li>
     <?php endforeach; ?>
     </ul>
@@ -60,6 +63,9 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
             </a>
             <?php if($song['nombre_album']): ?>
                 (álbum: <?= $song['nombre_album'] ?>)
+            <?php endif; ?>
+            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $artist['id_usuario']): ?>
+                <a href="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>">Editar</a>
             <?php endif; ?>
         </li>
     <?php endforeach; ?>

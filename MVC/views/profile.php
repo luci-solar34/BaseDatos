@@ -57,12 +57,6 @@ Editar bio
     <button>Crear Playlist</button>
 </a>
 
-<?php if($user['id_rol'] == 2): ?>
-<a href="/LASK/public/index.php/artist?id=<?= $user['id_usuario'] ?>">
-    <button>Ir a mi página de artista</button>
-</a>
-<?php endif; ?>
-
 <h2>Playlists públicas</h2>
 
 <?php if(empty($playlists)): ?>
