@@ -172,6 +172,32 @@ class Song {
         return $stmt->execute();
     }
 
+    public function saveLyrics($songId, $lyrics, $phonetic){
+
+        $lyrics = trim((string) $lyrics);
+        $phonetic = trim((string) $phonetic);
+
+        if($lyrics === '' && $phonetic === ''){
+            $query = "DELETE FROM Letras WHERE id_cancion = :song";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":song", $songId);
+            return $stmt->execute();
+        }
+
+        $query = "INSERT INTO Letras (id_cancion, letra_cancion, texto_fonetico)
+                  VALUES (:song, :lyrics, :phonetic)
+                  ON DUPLICATE KEY UPDATE
+                      letra_cancion = VALUES(letra_cancion),
+                      texto_fonetico = VALUES(texto_fonetico)";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":song", $songId);
+        $stmt->bindParam(":lyrics", $lyrics);
+        $stmt->bindParam(":phonetic", $phonetic);
+
+        return $stmt->execute();
+    }
+
     public function update($data){
 
         $current = $this->getById($data['song']);

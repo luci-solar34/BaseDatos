@@ -50,12 +50,12 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
 
 <?php if($song['letra_cancion']): ?>
     <h3>Letra</h3>
-    <pre><?= $song['letra_cancion'] ?></pre>
+    <pre><?= htmlspecialchars($song['letra_cancion']) ?></pre>
 <?php endif; ?>
 
 <?php if($song['texto_fonetico']): ?>
     <h3>Pronunciación (fonético)</h3>
-    <pre><?= $song['texto_fonetico'] ?></pre>
+    <pre><?= htmlspecialchars($song['texto_fonetico']) ?></pre>
 <?php endif; ?>
 
 <br>

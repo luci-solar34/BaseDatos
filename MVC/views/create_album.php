@@ -13,5 +13,4 @@
     <button type="submit">Crear Álbum</button>
 </form>
 
-<a href="/LASK/public/index.php/artist?id=<?= $_GET['id'] ?>">Volver</a></content>
-<parameter name="filePath">c:\laragon\www\lask\MVC\views\create_album.php
+<a href="/LASK/public/index.php/artist?id=<?= $_GET['id'] ?>">Volver</a>

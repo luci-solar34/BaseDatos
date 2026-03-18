@@ -7,6 +7,12 @@
     <label>Archivo de Música (mp3):</label>
     <input type="file" name="archivo" accept=".mp3" required><br>
 
+    <label>Letra:</label><br>
+    <textarea name="letra_cancion" rows="8" cols="60" placeholder="Escribe la letra de la canción"></textarea><br><br>
+
+    <label>Letra fonética:</label><br>
+    <textarea name="texto_fonetico" rows="8" cols="60" placeholder="Escribe la pronunciación fonética"></textarea><br><br>
+
     <label>Tags (puedes elegir varios):</label>
     <select name="tags[]" multiple size="6">
         <?php foreach($tags as $tag): ?>

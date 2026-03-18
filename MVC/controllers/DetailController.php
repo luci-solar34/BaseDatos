@@ -7,6 +7,7 @@ require_once "../MVC/models/Artist.php";
 require_once "../MVC/models/Like.php";
 require_once "../MVC/models/Follow.php";
 require_once "../MVC/models/Tag.php";
+require_once "../MVC/models/Playlist.php";
 
 class DetailController {
 
@@ -17,6 +18,7 @@ class DetailController {
     private $like;
     private $follow;
     private $tag;
+    private $playlist;
 
     public function __construct(){
 
@@ -31,6 +33,7 @@ class DetailController {
         $this->like = new Like($db);
         $this->follow = new Follow($db);
         $this->tag = new Tag($db);
+        $this->playlist = new Playlist($db);
     }
 
     public function song($id){
@@ -150,6 +153,8 @@ class DetailController {
 
         // Contar seguidores
         $followers = $this->follow->countFollowers($id);
+        $following = $this->follow->countFollowing($id);
+        $playlists = $this->playlist->getUserPlaylists($id, $viewerId);
 
         $viewerId = $_SESSION['user_id'] ?? null;
         $viewer = $viewerId ? $this->user->getById($viewerId) : null;

@@ -144,6 +144,8 @@ class ArtistController {
 
         $nombre = $_POST['nombre'];
         $artista = $_SESSION['user_id'];
+        $letra = $_POST['letra_cancion'] ?? '';
+        $fonetica = $_POST['texto_fonetico'] ?? '';
 
         // Subir archivo
         $path = '';
@@ -171,6 +173,7 @@ class ArtistController {
             $songId = (int) $this->song->getConnection()->lastInsertId();
             $tagIds = $_POST['tags'] ?? [];
             $this->tag->syncSongTags($songId, $tagIds);
+            $this->song->saveLyrics($songId, $letra, $fonetica);
         }
 
         header("Location: /LASK/public/index.php/artist?id=" . $artista);

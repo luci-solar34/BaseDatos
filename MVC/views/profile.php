@@ -66,7 +66,7 @@
 <?php endif; ?>
 
 <a href="/LASK/public/index.php/profile/followers?id=<?= $user['id_usuario'] ?>"><?= $followers ?> Seguidores</a>
-<?= $following ?> Siguiendo
+<a href="/LASK/public/index.php/profile/following?id=<?= $user['id_usuario'] ?>"><?= $following ?> Siguiendo</a>
 
 
 <h3>Bio</h3>
