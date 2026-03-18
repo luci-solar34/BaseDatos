@@ -105,4 +105,25 @@ public function countFollowing($user_id){
 
         return array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id_seguido');
     }
+    public function getMutuals($user_id){
+
+    $query = "
+        SELECT u.id_usuario, u.nombre_usuario, u.pfp
+        FROM Usuarios u
+        WHERE u.id_usuario IN (
+            SELECT s1.id_seguido
+            FROM Siguen s1
+            INNER JOIN Siguen s2
+                ON s1.id_seguido = s2.id_seguidor
+            WHERE s1.id_seguidor = :user
+              AND s2.id_seguido = :user
+        )
+    ";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":user", $user_id);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

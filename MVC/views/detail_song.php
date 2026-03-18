@@ -24,6 +24,14 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
     <source src="/LASK/<?= $song['path_link'] ?>" type="audio/mpeg">
 </audio>
 
+<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $song['id_artista']): ?>
+    <p>
+        <a href="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>">
+            <button>Editar Canción</button>
+        </a>
+    </p>
+<?php endif; ?>
+
 <form action="/LASK/public/index.php/like" method="POST">
     <input type="hidden" name="song_id" value="<?= $song['id_cancion'] ?>">
     <button type="submit">

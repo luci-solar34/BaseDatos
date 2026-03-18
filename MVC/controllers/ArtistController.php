@@ -31,8 +31,6 @@ class ArtistController {
 
     public function uploadSong(){
 
-        session_start();
-
         $data = [
             "nombre" => $_POST['nombre'],
             "numero_pista" => $_POST['pista'],
@@ -50,8 +48,6 @@ class ArtistController {
     }
 
     public function createAlbum(){
-
-        session_start();
 
         $nombre = $_POST['nombre'];
         $descripcion = $_POST['descripcion'];
@@ -87,9 +83,59 @@ class ArtistController {
         require "../MVC/views/create_song.php";
     }
 
-    public function createSong(){
+    public function showEditAlbum($album_id){
 
-        session_start();
+        $album = $this->album->getById($album_id);
+        $artistId = $_SESSION['user_id'] ?? null;
+
+        if(!$album || !$artistId || (int)$album['id_artista'] !== (int)$artistId){
+            die("Álbum no encontrado o sin permisos");
+        }
+
+        $availableSongs = $this->song->getByArtistOutsideAlbum($artistId, $album_id);
+
+        require "../MVC/views/edit_album.php";
+    }
+
+    public function editAlbum(){
+
+        $albumId = $_POST['album_id'] ?? null;
+        $artistId = $_SESSION['user_id'] ?? null;
+        $album = $this->album->getById($albumId);
+
+        if(!$album || !$artistId || (int)$album['id_artista'] !== (int)$artistId){
+            die("Álbum no encontrado o sin permisos");
+        }
+
+        $portada = $album['portada_album'];
+        if(isset($_FILES['portada']) && $_FILES['portada']['error'] == 0){
+
+            $ext = pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION);
+            if(in_array($ext, ['jpg', 'png'])){
+                $portada = 'Photos/' . uniqid() . '.' . $ext;
+                move_uploaded_file($_FILES['portada']['tmp_name'], '../' . $portada);
+            }
+        }
+
+        $data = [
+            "album" => $albumId,
+            "artista" => $artistId,
+            "nombre" => $_POST['nombre'],
+            "descripcion" => $_POST['descripcion'],
+            "portada" => $portada
+        ];
+
+        $this->album->update($data);
+
+        if(!empty($_POST['existing_song_id'])){
+            $this->song->moveToAlbum($_POST['existing_song_id'], $albumId, $artistId);
+        }
+
+        header("Location: /LASK/public/index.php/album?id=" . $albumId);
+        exit;
+    }
+
+    public function createSong(){
 
         $nombre = $_POST['nombre'];
         $artista = $_SESSION['user_id'];
@@ -108,6 +154,8 @@ class ArtistController {
 
         $data = [
             "nombre" => $nombre,
+            "numero_pista" => null,
+            "album" => null,
             "path" => $path,
             "artista" => $artista
         ];
@@ -118,9 +166,54 @@ class ArtistController {
         exit;
     }
 
-    public function addComment(){
+    public function showEditSong($song_id){
 
-        session_start();
+        $song = $this->song->getById($song_id);
+        $artistId = $_SESSION['user_id'] ?? null;
+
+        if(!$song || !$artistId || (int)$song['id_artista'] !== (int)$artistId){
+            die("Canción no encontrada o sin permisos");
+        }
+
+        $albums = $this->album->getByArtist($artistId);
+
+        require "../MVC/views/edit_song.php";
+    }
+
+    public function editSong(){
+
+        $songId = $_POST['song_id'] ?? null;
+        $artistId = $_SESSION['user_id'] ?? null;
+        $song = $this->song->getById($songId);
+
+        if(!$song || !$artistId || (int)$song['id_artista'] !== (int)$artistId){
+            die("Canción no encontrada o sin permisos");
+        }
+
+        $albumId = $_POST['album_id'] !== '' ? $_POST['album_id'] : null;
+
+        if($albumId){
+            $targetAlbum = $this->album->getById($albumId);
+
+            if(!$targetAlbum || (int)$targetAlbum['id_artista'] !== (int)$artistId){
+                die("Álbum inválido para esta canción");
+            }
+        }
+
+        $data = [
+            "song" => $songId,
+            "artista" => $artistId,
+            "nombre" => $_POST['nombre'],
+            "album" => $albumId
+        ];
+
+        $this->song->update($data);
+
+        header("Location: /LASK/public/index.php/song?id=" . $songId);
+        exit;
+    }
+
+    public function addComment(){
 
         $artista = $_POST['artist_id'];
         $comentario = $_POST['comment'];

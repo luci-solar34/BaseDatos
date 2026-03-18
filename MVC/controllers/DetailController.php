@@ -68,26 +68,11 @@ class DetailController {
     public function album($id){
 
         // Obtener información del álbum
-        // Nota: Albumes no siempre contiene el id del artista directamente.
-        // Usamos una subconsulta que toma el primer artista de las canciones del álbum.
-        $query = "SELECT A.*,
-                         (SELECT C2.id_artista
-                          FROM Canciones C2
-                          WHERE C2.id_album = A.id_album
-                          LIMIT 1) as id_artista,
-                         (SELECT AR.nombre_artistico
-                          FROM Canciones C2
-                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario
-                          WHERE C2.id_album = A.id_album
-                          LIMIT 1) as nombre_artistico,
-                         (SELECT U.nombre_usuario
-                          FROM Canciones C2
-                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario
-                          INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario
-                          WHERE C2.id_album = A.id_album
-                          LIMIT 1) as nombre_usuario
-                  FROM Albumes A
-                  WHERE A.id_album = :id";
+        $query = "SELECT A.*, AR.id_usuario AS id_artista, AR.nombre_artistico, U.nombre_usuario
+              FROM Albumes A
+              INNER JOIN Artista AR ON A.id_artista = AR.id_usuario
+              INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario
+              WHERE A.id_album = :id";
 
         $stmt = $this->album->getConnection()->prepare($query);
         $stmt->bindParam(":id", $id);
@@ -145,10 +130,9 @@ class DetailController {
         $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Obtener álbumes del artista
-        $query = "SELECT DISTINCT AL.*
-                  FROM Albumes AL
-                  INNER JOIN Canciones C ON AL.id_album = C.id_album
-                  WHERE C.id_artista = :id
+        $query = "SELECT AL.*
+              FROM Albumes AL
+              WHERE AL.id_artista = :id
                   ORDER BY AL.fecha_lanzamiento DESC";
 
         $stmt = $this->artist->getConnection()->prepare($query);
@@ -228,6 +212,71 @@ class DetailController {
         $albums = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         require "../MVC/views/new_releases.php";
+    }
+
+    public function addSongToAlbum(){
+
+        if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+            $album_id = $_POST['album_id'] ?? null;
+            $nombre = $_POST['nombre'] ?? null;
+            $artista = $_SESSION['user_id'] ?? null;
+
+            $album = $this->album->getById($album_id);
+
+            if(!$album_id || !$nombre || !$artista || !$album || (int)$album['id_artista'] !== (int)$artista){
+                die("Datos incompletos");
+            }
+
+            // Subir archivo
+            $path = '';
+            if(isset($_FILES['archivo']) && $_FILES['archivo']['error'] == 0){
+
+                $ext = pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION);
+                if($ext == 'mp3'){
+
+                    $path = 'music/' . uniqid() . '.' . $ext;
+                    move_uploaded_file($_FILES['archivo']['tmp_name'], '../' . $path);
+                }
+            }
+
+            $data = [
+                "nombre" => $nombre,
+                "numero_pista" => null,
+                "path" => $path,
+                "album" => $album_id,
+                "artista" => $artista
+            ];
+
+            $this->song->create($data);
+
+            header("Location: /LASK/public/index.php/album?id=" . $album_id);
+            exit;
+
+        } else {
+
+            if(isset($_GET['id'])){
+
+                $album_id = $_GET['id'];
+
+                $album = $this->album->getById($album_id);
+
+                if(!$album){
+                    die("Álbum no encontrado");
+                }
+
+                $viewerId = $_SESSION['user_id'] ?? null;
+                if(!$viewerId || (int)$album['id_artista'] !== (int)$viewerId){
+                    die("Sin permisos para editar este álbum");
+                }
+
+                require "../MVC/views/add_songs_to_album.php";
+
+            } else {
+
+                echo "Álbum no especificado";
+            }
+        }
     }
 }
 ?>
