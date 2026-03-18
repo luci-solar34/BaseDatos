@@ -494,22 +494,6 @@ case "/message/send":
 
 break;
 
-case "/admin/tag-requests":
-
-    $controller = new AdminController();
-    $controller->tagRequests();
-
-break;
-
-case "/admin/tag-request/resolve":
-
-    if($_SERVER['REQUEST_METHOD'] === "POST"){
-        $controller = new AdminController();
-        $controller->resolveTagRequest();
-    }
-
-break;
-
 
     default:
 
