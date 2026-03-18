@@ -7,6 +7,9 @@
     <label>Archivo de Música (mp3):</label>
     <input type="file" name="archivo" accept=".mp3" required><br>
 
+    <label>Portada de la Canción (jpg/png/webp):</label>
+    <input type="file" name="portada" accept=".jpg,.jpeg,.png,.webp"><br><br>
+
     <label>Letra:</label><br>
     <textarea name="letra_cancion" rows="8" cols="60" placeholder="Escribe la letra de la canción"></textarea><br><br>
 

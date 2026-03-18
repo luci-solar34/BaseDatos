@@ -151,11 +151,21 @@ class ArtistController {
         $path = '';
         if(isset($_FILES['archivo']) && $_FILES['archivo']['error'] == 0){
 
-            $ext = pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION);
+            $ext = strtolower(pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION));
             if($ext == 'mp3'){
 
                 $path = 'music/' . uniqid() . '.' . $ext;
                 move_uploaded_file($_FILES['archivo']['tmp_name'], '../' . $path);
+            }
+        }
+
+        // Subir portada de canción
+        $portada = null;
+        if(isset($_FILES['portada']) && $_FILES['portada']['error'] == 0){
+            $extPortada = strtolower(pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION));
+            if(in_array($extPortada, ['jpg', 'jpeg', 'png', 'webp'])){
+                $portada = 'Photos/' . uniqid() . '.' . $extPortada;
+                move_uploaded_file($_FILES['portada']['tmp_name'], '../' . $portada);
             }
         }
 
@@ -164,6 +174,7 @@ class ArtistController {
             "numero_pista" => null,
             "album" => null,
             "path" => $path,
+            "portada" => $portada,
             "artista" => $artista
         ];
 
@@ -216,11 +227,21 @@ class ArtistController {
             }
         }
 
+        $portada = $song['portada_cancion'] ?? null;
+        if(isset($_FILES['portada']) && $_FILES['portada']['error'] == 0){
+            $extPortada = strtolower(pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION));
+            if(in_array($extPortada, ['jpg', 'jpeg', 'png', 'webp'])){
+                $portada = 'Photos/' . uniqid() . '.' . $extPortada;
+                move_uploaded_file($_FILES['portada']['tmp_name'], '../' . $portada);
+            }
+        }
+
         $data = [
             "song" => $songId,
             "artista" => $artistId,
             "nombre" => $_POST['nombre'],
-            "album" => $albumId
+            "album" => $albumId,
+            "portada" => $portada
         ];
 
         $this->song->update($data);
