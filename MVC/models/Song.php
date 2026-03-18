@@ -158,14 +158,15 @@ class Song {
         }
 
         $query = "INSERT INTO Canciones
-                  (nombre_cancion,numero_pista,path_link,id_album,id_artista)
-                  VALUES (:nombre,:pista,:path,:album,:artista)";
+              (nombre_cancion,numero_pista,path_link,portada_cancion,id_album,id_artista)
+              VALUES (:nombre,:pista,:path,:portada,:album,:artista)";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":nombre",$data['nombre']);
         $stmt->bindParam(":pista",$track);
         $stmt->bindParam(":path",$data['path']);
+        $stmt->bindParam(":portada",$data['portada']);
         $stmt->bindParam(":album",$album);
         $stmt->bindParam(":artista",$data['artista']);
 
@@ -219,6 +220,7 @@ class Song {
 
         $query = "UPDATE Canciones
                   SET nombre_cancion = :nombre,
+                      portada_cancion = :portada,
                       id_album = :album,
                       numero_pista = :pista
                   WHERE id_cancion = :song
@@ -227,6 +229,7 @@ class Song {
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(":nombre", $data['nombre']);
+        $stmt->bindParam(":portada", $data['portada']);
         $stmt->bindParam(":album", $album);
         $stmt->bindParam(":pista", $track);
         $stmt->bindParam(":song", $data['song']);

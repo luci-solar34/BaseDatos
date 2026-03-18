@@ -1,6 +1,6 @@
 <h1>Editar Canción</h1>
 
-<form action="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>" method="POST">
+<form action="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="song_id" value="<?= $song['id_cancion'] ?>">
 
     <label>Nombre de la Canción:</label>
@@ -15,6 +15,12 @@
             </option>
         <?php endforeach; ?>
     </select><br><br>
+
+    <label>Portada actual:</label><br>
+    <img src="/LASK/<?= htmlspecialchars($song['portada_cancion'] ?? 'Photos/banner_default.png') ?>" width="160" style="border-radius:8px;"><br><br>
+
+    <label>Nueva portada (jpg/png/webp):</label>
+    <input type="file" name="portada" accept=".jpg,.jpeg,.png,.webp"><br><br>
 
     <label>Tags (puedes elegir varios):</label>
     <select name="tags[]" multiple size="6">

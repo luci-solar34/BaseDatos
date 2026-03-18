@@ -20,6 +20,10 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
     </p>
 <?php endif; ?>
 
+<p>
+    <img src="/LASK/<?= htmlspecialchars($song['portada_cancion'] ?? 'Photos/banner_default.png') ?>" alt="Portada de la canción" width="220" style="border-radius:8px; object-fit:cover;">
+</p>
+
 <?php if(!empty($tags)): ?>
     <p>
         <strong>Tags:</strong>
