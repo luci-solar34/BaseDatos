@@ -62,5 +62,4 @@
 
 <?php endif; ?>
 
-<a href="/LASK/public">Volver al Home</a></content>
-<parameter name="filePath">c:\laragon\www\lask\MVC\views\search.php
+<a href="/LASK/public/index.php">Volver al Home</a>
