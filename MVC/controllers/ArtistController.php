@@ -22,10 +22,11 @@ class ArtistController {
     }
 
     public function profile($id){
+        // En caso de que esta ruta se use, redirigimos a la vista de artista estándar.
+        require_once "../MVC/controllers/DetailController.php";
 
-        $songs = $this->song->getByArtist($id);
-
-        require "../MVC/views/artist.php";
+        $controller = new DetailController();
+        $controller->artist($id);
     }
 
     public function uploadSong(){

@@ -35,6 +35,11 @@ class UserController {
         $followers = $this->follow->countFollowers($id);
         $following = $this->follow->countFollowing($id);
 
+        $isFollowing = false;
+        if($viewer && $viewer != $id){
+            $isFollowing = $this->follow->isFollowing($viewer, $id);
+        }
+
         $playlists = $this->playlist->getUserPlaylists($id,$viewer);
 
         require "../MVC/views/profile.php";
@@ -82,29 +87,36 @@ class UserController {
 
     public function follow(){
 
-        $seguidor = $_SESSION['user_id'] ?? null;
-        $seguido = $_POST['user_id'] ?? null;
+    $seguidor = $_SESSION['user_id'] ?? null;
+    $seguido = $_POST['user_id'] ?? null;
 
-        if(!$seguidor || !$seguido){
-            die("Datos inválidos");
-        }
-
-        if(!$this->follow->isFollowing($seguidor,$seguido)){
-            $this->follow->follow($seguidor,$seguido);
-        }
+    if(!$seguidor || !$seguido){
+        die("Datos inválidos");
     }
 
+    if(!$this->follow->isFollowing($seguidor,$seguido)){
+        $this->follow->follow($seguidor,$seguido);
+    }
+
+    // 👇 REDIRECCIÓN CORRECTA
+    header("Location: /LASK/public/index.php/profile?id=" . $seguido);
+    exit;
+}
     public function unfollow(){
 
-        $seguidor = $_SESSION['user_id'] ?? null;
-        $seguido = $_POST['user_id'] ?? null;
+    $seguidor = $_SESSION['user_id'] ?? null;
+    $seguido = $_POST['user_id'] ?? null;
 
-        if(!$seguidor || !$seguido){
-            die("Datos inválidos");
-        }
-
-        $this->follow->unfollow($seguidor,$seguido);
+    if(!$seguidor || !$seguido){
+        die("Datos inválidos");
     }
+
+    $this->follow->unfollow($seguidor,$seguido);
+
+    // 👇 REDIRECCIÓN CORRECTA
+    header("Location: /LASK/public/index.php/profile?id=" . $seguido);
+    exit;
+}
 
     
 }

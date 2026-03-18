@@ -94,5 +94,15 @@ public function countFollowing($user_id){
 
     return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 }
+    public function getFollowingIds($user_id){
+        $query = "SELECT id_seguido
+                  FROM Siguen
+                  WHERE id_seguidor = :id";
 
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $user_id);
+        $stmt->execute();
+
+        return array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id_seguido');
+    }
 }

@@ -1,10 +1,5 @@
 <?php
 
-// Enable error reporting for development (remove/disable in production)
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
 session_start();
 
 require_once "../config/database.php";
@@ -18,7 +13,12 @@ require_once "../MVC/controllers/AdminController.php";
 require_once "../MVC/controllers/HomeController.php";
 require_once "../MVC/controllers/SearchController.php";
 
+
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['route'])){
+    $uri = '/' . $_POST['route'];
+}
 
 $uri = str_replace("/LASK/public/index.php", "", $uri);
 $uri = str_replace("/LASK/public", "", $uri);
@@ -37,84 +37,110 @@ switch ($uri) {
 
     break;
 
-    // ================= DETALLE =================
+// Agrega estas rutas después de las existentes:
 
-    case "/song":
+case "/song":
 
-        if(isset($_GET['id'])){
-            require_once "../MVC/controllers/DetailController.php";
-            $controller = new DetailController();
-            $controller->song($_GET['id']);
-        }
-
-    break;
-
-    case "/album":
-
-        if(isset($_GET['id'])){
-            require_once "../MVC/controllers/DetailController.php";
-            $controller = new DetailController();
-            $controller->album($_GET['id']);
-        }
-
-    break;
-
-    case "/album/add-songs":
-
-        if(isset($_GET['id'])){
-            require_once "../MVC/controllers/DetailController.php";
-            $controller = new DetailController();
-
-            if($_SERVER['REQUEST_METHOD'] === "POST"){
-                $controller->addSongToAlbum();
-            } else {
-                $controller->showAddSongs($_GET['id']);
-            }
-        }
-
-    break;
-
-    case "/new-releases":
+    if(isset($_GET['id'])){
 
         require_once "../MVC/controllers/DetailController.php";
+
         $controller = new DetailController();
-        $controller->newReleases();
+        $controller->song($_GET['id']);
 
-    break;
+    }
 
-    case "/like":
+break;
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            require_once "../MVC/controllers/DetailController.php";
-            $controller = new DetailController();
-            $controller->like();
-        }
+case "/album":
 
-    break;
+    if(isset($_GET['id'])){
 
-    // ================= AUTH =================
+        require_once "../MVC/controllers/DetailController.php";
+
+        $controller = new DetailController();
+        $controller->album($_GET['id']);
+
+    }
+
+break;
+
+
+case "/new-releases":
+
+    require_once "../MVC/controllers/DetailController.php";
+
+    $controller = new DetailController();
+    $controller->newReleases();
+
+break;
+
+case "/like":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        require_once "../MVC/controllers/DetailController.php";
+
+        $controller = new DetailController();
+        $controller->like();
+
+    }
+
+break;
+
+case "/follow":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new UserController();
+        $controller->follow();
+
+    }
+
+break;
+
+case "/unfollow":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new UserController();
+        $controller->unfollow();
+
+    }
+
+break;
 
     case "/login":
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
             $controller = new AuthController();
             $controller->login();
+
         } else {
+
             require "../MVC/views/login.php";
+
         }
 
     break;
+
 
     case "/register":
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
             $controller = new AuthController();
             $controller->register();
+
         } else {
+
             require "../MVC/views/register.php";
+
         }
 
     break;
+
 
     case "/logout":
 
@@ -123,7 +149,7 @@ switch ($uri) {
 
     break;
 
-    // ================= SEARCH =================
+
 
     case "/search":
 
@@ -139,59 +165,56 @@ switch ($uri) {
 
     break;
 
-    // ================= USER =================
 
     case "/profile":
 
         if (isset($_GET['id'])) {
+
             $controller = new UserController();
             $controller->profile($_GET['id']);
+
         } else {
+
             echo "Usuario no especificado";
+
         }
 
     break;
 
     case "/update_pfp":
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            $controller = new UserController();
-            $controller->updatePfp();
-        }
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new UserController();
+        $controller->updatePfp();
+
+    }
 
     break;
 
     case "/update_bio":
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            $controller = new UserController();
-            $controller->updateBio();
-        }
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new UserController();
+        $controller->updateBio();
+
+    }
 
     break;
 
-    // ================= ARTIST =================
-
-    case "/artist":
-
-        if (isset($_GET['id'])) {
-            $controller = new ArtistController();
-            $controller->profile($_GET['id']);
-        } else {
-            echo "Artista no especificado";
-        }
-
-    break;
 
     case "/artist/create-album":
 
-        if(isset($_GET['id'])){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $controller = new ArtistController();
-
-            if($_SERVER['REQUEST_METHOD'] === "POST"){
-                $controller->createAlbum();
-            } else {
+            $controller->createAlbum();
+        } else {
+            if (isset($_GET['id'])) {
+                $controller = new ArtistController();
                 $controller->showCreateAlbum($_GET['id']);
+            } else {
+                echo "Artista no especificado";
             }
         }
 
@@ -199,13 +222,15 @@ switch ($uri) {
 
     case "/artist/create-song":
 
-        if(isset($_GET['id'])){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $controller = new ArtistController();
-
-            if($_SERVER['REQUEST_METHOD'] === "POST"){
-                $controller->createSong();
-            } else {
+            $controller->createSong();
+        } else {
+            if (isset($_GET['id'])) {
+                $controller = new ArtistController();
                 $controller->showCreateSong($_GET['id']);
+            } else {
+                echo "Artista no especificado";
             }
         }
 
@@ -213,117 +238,146 @@ switch ($uri) {
 
     case "/artist/add-comment":
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $controller = new ArtistController();
             $controller->addComment();
         }
 
     break;
 
-    // ================= PLAYLIST =================
+    case "/artist":
+
+        if (isset($_GET['id'])) {
+            require_once "../MVC/controllers/DetailController.php";
+            $controller = new DetailController();
+            $controller->artist($_GET['id']);
+        } else {
+            echo "Artista no especificado";
+        }
+
+    break;
+
 
     case "/playlist/create":
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            $controller = new PlaylistController();
-            $controller->create();
-        } else {
-            require "../MVC/views/playlist_create.php";
-        }
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new PlaylistController();
+        $controller->create();
+
+    } else {
+
+        require "../MVC/views/playlist_create.php";
+
+    }
+
+    break;
 
     break;
 
     case "/playlist":
 
-        if(isset($_GET['id'])){
-            $controller = new PlaylistController();
-            $controller->show($_GET['id']);
-        } else {
-            echo "Playlist no especificada";
-        }
+    if(isset($_GET['id'])){
+
+        $controller = new PlaylistController();
+        $controller->show($_GET['id']);
+
+    } else {
+
+        echo "Playlist no especificada";
+
+    }
 
     break;
 
     case "/playlist/add-song":
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            $controller = new PlaylistController();
-            $controller->addSong();
-        } else {
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
 
-            require_once "../MVC/models/Song.php";
+        $controller = new PlaylistController();
+        $controller->addSong();
 
-            $database = new Database();
-            $db = $database->connect();
+    } else {
 
-            $songModel = new Song($db);
+        require_once "../MVC/models/Song.php";
 
-            $songs = $songModel->getAll();
-            $playlist = $_GET['playlist'];
+        $database = new Database();
+        $db = $database->connect();
 
-            require "../MVC/views/add_song.php";
-        }
+        $songModel = new Song($db);
 
-    break;
+        $songs = $songModel->getAll();
+        $playlist = $_GET['playlist'];
 
-    case "/playlist/edit":
+        require "../MVC/views/add_song.php";
+    }
 
-        if(isset($_GET['id'])){
-            $controller = new PlaylistController();
-            $controller->edit($_GET['id']);
-        } else {
-            echo "Playlist no especificada";
-        }
+break;
 
-    break;
+case "/playlist/edit":
 
-    case "/playlist/change-privacy":
+    if(isset($_GET['id'])){
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            $controller = new PlaylistController();
-            $controller->changePrivacy();
-        }
+        $controller = new PlaylistController();
+        $controller->edit($_GET['id']);
 
-    break;
+    } else {
 
-    case "/playlist/remove-song":
+        echo "Playlist no especificada";
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            $controller = new PlaylistController();
-            $controller->removeSong();
-        }
+    }
 
-    break;
+break;
 
-    // ================= MENSAJES =================
+case "/playlist/change-privacy":
 
-    case "/messages":
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
 
+        $controller = new PlaylistController();
+        $controller->changePrivacy();
+
+    }
+
+break;
+
+case "/playlist/remove-song":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+
+        $controller = new PlaylistController();
+        $controller->removeSong();
+
+    }
+
+break;
+
+case "/messages":
+
+    $controller = new MessageController();
+    $controller->index();
+
+break;
+
+case "/chat":
+
+    if(isset($_GET['user'])){
         $controller = new MessageController();
-        $controller->index();
+        $controller->chat($_GET['user']);
+    }
 
-    break;
+break;
 
-    case "/chat":
+case "/message/send":
 
-        if(isset($_GET['user'])){
-            $controller = new MessageController();
-            $controller->chat($_GET['user']);
-        }
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new MessageController();
+        $controller->send();
+    }
 
-    break;
+break;
 
-    case "/message/send":
-
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-            $controller = new MessageController();
-            $controller->send();
-        }
-
-    break;
-
-    // ================= DEFAULT =================
 
     default:
+
         echo "404 Página no encontrada";
 }
