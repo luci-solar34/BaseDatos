@@ -124,7 +124,7 @@ class Song {
 
         UNION
 
-        SELECT T.nombre_tag AS id, T.nombre_tag AS resultado,'tag' AS tipo
+        SELECT T.id_tag AS id, T.nombre_tag AS resultado,'tag' AS tipo
         FROM Tags T
         WHERE T.nombre_tag LIKE :term
 

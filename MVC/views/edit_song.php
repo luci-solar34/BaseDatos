@@ -16,6 +16,16 @@
         <?php endforeach; ?>
     </select><br><br>
 
+    <label>Tags (puedes elegir varios):</label>
+    <select name="tags[]" multiple size="6">
+        <?php foreach($tags as $tag): ?>
+            <option value="<?= $tag['id_tag'] ?>" <?= in_array((int) $tag['id_tag'], $selectedTagIds, true) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($tag['nombre_tag']) ?>
+            </option>
+        <?php endforeach; ?>
+    </select><br>
+    <small>Tip: Ctrl + click para seleccionar varios.</small><br><br>
+
     <button type="submit">Guardar Cambios</button>
 </form>
 
