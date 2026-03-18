@@ -94,6 +94,20 @@ public function countFollowing($user_id){
 
     return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 }
+    public function getFollowers($user_id){
+        $query = "SELECT u.id_usuario, u.nombre_usuario, u.pfp
+                  FROM Siguen s
+                  INNER JOIN Usuarios u ON s.id_seguidor = u.id_usuario
+                  WHERE s.id_seguido = :id
+                  ORDER BY u.nombre_usuario ASC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $user_id);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getFollowingIds($user_id){
         $query = "SELECT id_seguido
                   FROM Siguen

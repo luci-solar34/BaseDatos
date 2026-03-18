@@ -45,6 +45,15 @@ class UserController {
         require "../MVC/views/profile.php";
     }
 
+    public function followers($id){
+        $user = $this->user->getById($id);
+        if(!$user){
+            die("Usuario no encontrado");
+        }
+        $followers = $this->follow->getFollowers($id);
+        require "../MVC/views/followers.php";
+    }
+
     public function updateBio(){
 
     $bio = $_POST['bio'] ?? null;

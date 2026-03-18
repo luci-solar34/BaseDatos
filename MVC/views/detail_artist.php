@@ -9,7 +9,7 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
     <img src="/LASK/<?= $artist['pfp'] ?>" width="120" style="border-radius: 50%;">
 <?php endif; ?>
 
-<p><strong>Seguidores:</strong> <?= $followers ?></p>
+<p><strong>Seguidores:</strong> <a href="/LASK/public/index.php/profile/followers?id=<?= $artist['id_usuario'] ?>"><?= $followers ?></a></p>
 
 <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != $artist['id_usuario']): ?>
     <form method="POST" action="/LASK/public/index.php">

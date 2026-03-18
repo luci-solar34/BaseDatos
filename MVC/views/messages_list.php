@@ -23,10 +23,11 @@
 
 <hr>
 
-<h2>...</h2>
+<h2>Recomendados</h2>
+<p style="color: gray; font-size: 0.9em;">Amigos — se siguen mutuamente</p>
 
 <?php if(empty($mutuals)): ?>
-    <p>...</p>
+    <p>No tienes amigos mutuos por ahora.</p>
 <?php else: ?>
 
     <?php foreach($mutuals as $m): ?>
