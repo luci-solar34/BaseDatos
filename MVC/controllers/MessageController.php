@@ -4,6 +4,7 @@ require_once "../config/database.php";
 require_once "../MVC/models/Message.php";
 require_once "../MVC/models/Follow.php";
 require_once "../MVC/models/User.php";
+require_once "../MVC/models/Block.php";
 
 class MessageController {
 
@@ -31,8 +32,7 @@ class MessageController {
 
     $conversations = $this->message->getConversations($user);
     $mutuals = $this->follow->getMutuals($user);
-
-    // 🔥 evitar duplicados (IMPORTANTE)
+    
     $conversationIds = array_column($conversations, 'id_usuario');
 
     $mutuals = array_filter($mutuals, function($m) use ($conversationIds){
