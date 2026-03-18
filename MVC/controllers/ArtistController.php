@@ -203,8 +203,9 @@ class ArtistController {
         $albums = $this->album->getByArtist($artistId);
         $tags = $this->tag->getAllTags();
         $selectedTagIds = $this->tag->getSongTagIds($song_id);
+    $lyrics = $this->song->getLyrics($song_id);
 
-        require "../MVC/views/edit_song.php";
+    require "../MVC/views/edit_song.php";
     }
 
     public function editSong(){
@@ -248,6 +249,8 @@ class ArtistController {
 
         $tagIds = $_POST['tags'] ?? [];
         $this->tag->syncSongTags($songId, $tagIds);
+
+        $this->song->saveLyrics($songId, $_POST['letra_cancion'] ?? '', $_POST['texto_fonetico'] ?? '');
 
         header("Location: /LASK/public/index.php/song?id=" . $songId);
         exit;

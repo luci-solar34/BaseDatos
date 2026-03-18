@@ -37,6 +37,8 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
     <source src="/LASK/<?= $song['path_link'] ?>" type="audio/mpeg">
 </audio>
 
+
+
 <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $song['id_artista']): ?>
     <p>
         <a href="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>">
@@ -52,15 +54,11 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
     </button>
 </form>
 
-<?php if($song['letra_cancion']): ?>
-    <h3>Letra</h3>
-    <pre><?= htmlspecialchars($song['letra_cancion']) ?></pre>
-<?php endif; ?>
+<h3>Letra</h3>
+<pre style="white-space:pre-wrap; background:#f8f8f8; padding:8px; border-radius:6px;"><?= $song['letra_cancion'] ? htmlspecialchars($song['letra_cancion']) : 'Texto no disponible' ?></pre>
 
-<?php if($song['texto_fonetico']): ?>
-    <h3>Pronunciación (fonético)</h3>
-    <pre><?= htmlspecialchars($song['texto_fonetico']) ?></pre>
-<?php endif; ?>
+<h3>Texto fonético</h3>
+<pre style="white-space:pre-wrap; background:#f8f8f8; padding:8px; border-radius:6px;"><?= $song['texto_fonetico'] ? htmlspecialchars($song['texto_fonetico']) : 'Texto no disponible' ?></pre>
 
 <br>
 <a href="/LASK/public">← Volver al inicio</a>

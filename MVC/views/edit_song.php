@@ -32,6 +32,12 @@
     </select><br>
     <small>Tip: Ctrl + click para seleccionar varios.</small><br><br>
 
+    <label>Letra de la canción:</label><br>
+    <textarea name="letra_cancion" rows="8" style="width:100%; max-width:520px;"><?= htmlspecialchars($lyrics['letra_cancion'] ?? '') ?></textarea><br><br>
+
+    <label>Texto fonético:</label><br>
+    <textarea name="texto_fonetico" rows="8" style="width:100%; max-width:520px;"><?= htmlspecialchars($lyrics['texto_fonetico'] ?? '') ?></textarea><br><br>
+
     <button type="submit">Guardar Cambios</button>
 </form>
 

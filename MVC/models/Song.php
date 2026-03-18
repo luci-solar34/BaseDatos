@@ -173,6 +173,14 @@ class Song {
         return $stmt->execute();
     }
 
+    public function getLyrics($songId){
+        $query = "SELECT letra_cancion, texto_fonetico FROM Letras WHERE id_cancion = :song";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":song", $songId);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: ['letra_cancion' => '', 'texto_fonetico' => ''];
+    }
+
     public function saveLyrics($songId, $lyrics, $phonetic){
 
         $lyrics = trim((string) $lyrics);

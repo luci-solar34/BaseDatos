@@ -94,10 +94,11 @@ class DetailController {
             die("Álbum no encontrado");
         }
 
-        // Obtener canciones del álbum
-        $query = "SELECT C.*, A.nombre_artistico
+        // Obtener canciones del álbum con letras
+        $query = "SELECT C.*, A.nombre_artistico, L.letra_cancion, L.texto_fonetico
                   FROM Canciones C
                   INNER JOIN Artista A ON C.id_artista = A.id_usuario
+                  LEFT JOIN Letras L ON C.id_cancion = L.id_cancion
                   WHERE C.id_album = :id
                   ORDER BY C.numero_pista";
 
