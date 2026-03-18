@@ -50,6 +50,39 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
         </li>
     <?php endforeach; ?>
     </ul>
+<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $artist['id_usuario']): ?>
+
+<a href="/LASK/public/index.php/artist/create-album?id=<?= $artist['id_usuario'] ?>">
+    <button>Crear Álbum</button>
+</a>
+
+<a href="/LASK/public/index.php/artist/create-song?id=<?= $artist['id_usuario'] ?>">
+    <button>Crear Canción</button>
+</a>
+
+<?php endif; ?>
+
+<h2>Comentarios</h2>
+
+<?php if(isset($_SESSION['user_id'])): ?>
+<form action="/LASK/public/index.php/artist/add-comment" method="POST">
+    <input type="hidden" name="artist_id" value="<?= $artist['id_usuario'] ?>">
+    <textarea name="comment" placeholder="Escribe un comentario..." required></textarea>
+    <button type="submit">Comentar</button>
+</form>
+<?php endif; ?>
+
+<?php if(!empty($comments)): ?>
+<ul>
+<?php foreach($comments as $comment): ?>
+    <li>
+        <strong><?= $comment['nombre_usuario'] ?>:</strong> <?= nl2br($comment['comentario']) ?>
+        <small>(<?= $comment['fecha_comentario'] ?>)</small>
+    </li>
+<?php endforeach; ?>
+</ul>
+<?php else: ?>
+<p>No hay comentarios aún.</p>
 <?php endif; ?>
 
 <br>

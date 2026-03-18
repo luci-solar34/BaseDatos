@@ -9,7 +9,7 @@ class UserController {
 
     private $user;
     private $follow;
-    private $playlist; // 🔥 NUEVO
+    private $playlist;
 
     public function __construct(){
 
@@ -18,16 +18,22 @@ class UserController {
 
         $this->user = new User($db);
         $this->follow = new Follow($db);
-        $this->playlist = new Playlist($db); // 🔥 GUARDAR
+        $this->playlist = new Playlist($db);
     }
 
     public function profile($id){
 
         $user = $this->user->getById($id);
+        $viewer = $_SESSION['user_id'] ?? null;
+
+        // Si el viewer no es el propietario y el user es artista, redirigir a página de artista
+        if($viewer != $id && $user['id_rol'] == 2){
+            header("Location: /LASK/public/index.php/artist?id=" . $id);
+            exit;
+        }
+
         $followers = $this->follow->countFollowers($id);
         $following = $this->follow->countFollowing($id);
-
-        $viewer = $_SESSION['user_id'] ?? null;
 
         $playlists = $this->playlist->getUserPlaylists($id,$viewer);
 

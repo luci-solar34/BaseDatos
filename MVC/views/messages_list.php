@@ -1,12 +1,20 @@
-public function index(){
+<a href="/LASK/public/index.php" style="display: inline-block; margin-bottom: 10px;">← Volver al inicio</a>
 
-    $user = $_SESSION['user_id'] ?? null;
+<h1>Mensajes</h1>
 
-    if(!$user){
-        die("No autenticado");
-    }
+<?php if(empty($conversations)): ?>
+    <p>No tienes conversaciones</p>
+<?php else: ?>
 
-    $conversations = $this->message->getConversations($user);
+    <?php foreach($conversations as $conv): ?>
+        
+        <div style="margin-bottom: 10px;">
+            <a href="/LASK/public/index.php/chat?user=<?= $conv['id_usuario'] ?>">
+                <strong><?= htmlspecialchars($conv['username'] ?? $conv['nombre_usuario'] ?? '') ?></strong><br>
+                <small><?= htmlspecialchars($conv['ultimo_mensaje'] ?? 'Sin mensajes') ?></small>
+            </a>
+        </div>
 
-    require "../MVC/views/messages_list.php";
-}
+    <?php endforeach; ?>
+
+<?php endif; ?>

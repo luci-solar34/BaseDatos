@@ -147,6 +147,19 @@ class DetailController {
         // Contar seguidores
         $followers = $this->follow->countFollowers($id);
 
+        // Obtener comentarios
+        $query = "SELECT C.comentario, C.fecha_comentario, U.nombre_usuario
+                  FROM Comentarios C
+                  INNER JOIN Usuarios U ON C.id_usuario = U.id_usuario
+                  WHERE C.id_artista = :id
+                  ORDER BY C.fecha_comentario DESC";
+
+        $stmt = $this->artist->getConnection()->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+        
+        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         require "../MVC/views/detail_artist.php";
     }
 
