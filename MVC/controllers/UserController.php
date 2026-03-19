@@ -44,8 +44,10 @@ class UserController {
     }
 
     $canReport = false;
+    $hasReported = false;
     if($viewer && $viewer != $id && $viewerData['id_rol'] != 1 && $user['id_rol'] != 1){
         $canReport = true;
+        $hasReported = $this->user->hasDenuncia($viewer, $id);
     }
 
     if($isBlocked){
