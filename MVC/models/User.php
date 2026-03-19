@@ -11,10 +11,10 @@ class User {
 
     public function login($username,$password){
 
+        // Se obtiene el usuario por credenciales para poder validar su estado (activo/inactivo)
         $query = "SELECT * FROM Usuarios
                   WHERE nombre_usuario = :username
-                  AND password = :password
-                  AND estado_usuario = TRUE";
+                  AND password = :password";
 
         $stmt = $this->conn->prepare($query);
 

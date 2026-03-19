@@ -30,19 +30,26 @@ class AuthController {
         $result = $this->user->login($username,$password);
 
         if($result){
-            $_SESSION['user_id'] = $result['id_usuario'];
-            $_SESSION['username'] = $result['nombre_usuario'];
-            $_SESSION['role'] = $result['id_rol'];
-            header("Location: /LASK/public");
-            exit;
-        } else {
-            $_SESSION['flash_message'] = "Credenciales incorrectas";
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/login");
-            exit;
+    if($result['estado_usuario'] == 0){
+        $_SESSION['flash_message'] = "Usuario inactivo. Contacta al administrador.";
+        $_SESSION['flash_message_type'] = "error";
+        header("Location: /LASK/public/index.php/login");
+        exit;
+    }
+    $_SESSION['user_id'] = $result['id_usuario'];
+    $_SESSION['username'] = $result['nombre_usuario'];
+    $_SESSION['role'] = $result['id_rol'];
+
+    header("Location: /LASK/public");
+    exit;
+
+    } else {
+    $_SESSION['flash_message'] = "Credenciales incorrectas";
+    $_SESSION['flash_message_type'] = "error";
+    header("Location: /LASK/public/index.php/login");
+    exit;
         }
     }
-
     public function register(){
 
         // validar términos
