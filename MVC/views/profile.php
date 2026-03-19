@@ -113,6 +113,9 @@ Editar bio
     <p>
         <a href="/LASK/public/index.php/tag/create">Crear nuevo tag</a>
     </p>
+    <p>
+        <a href="/LASK/public/index.php/admin/users">Ver todos los usuarios</a>
+    </p>
 <?php endif; ?>
 
 <h2>Playlists públicas</h2>

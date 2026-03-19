@@ -186,6 +186,52 @@ class UserController {
     exit;
 }
 
+    public function listUsers(){
+        if(empty($_SESSION['user_id']) || empty($_SESSION['role']) || $_SESSION['role'] != 1){
+            $_SESSION['flash_message'] = "Acceso denegado: solo administradores pueden ver todos los usuarios.";
+            header("Location: /LASK/public/index.php");
+            exit;
+        }
+
+        $users = $this->user->getAllUsers();
+        require "../MVC/views/users_list.php";
+    }
+
+    public function changeUserState(){
+        if(empty($_SESSION['user_id']) || empty($_SESSION['role']) || $_SESSION['role'] != 1){
+            $_SESSION['flash_message'] = "Acceso denegado: solo administradores pueden cambiar estado de usuarios.";
+            header("Location: /LASK/public/index.php");
+            exit;
+        }
+
+        $userId = $_POST['user_id'] ?? null;
+        $estado = isset($_POST['estado']) ? ($_POST['estado'] === '1' ? 1 : 0) : null;
+
+        if(!$userId || !in_array($estado, [0,1], true)){
+            $_SESSION['flash_message'] = "Datos inválidos para cambiar el estado.";
+            header("Location: /LASK/public/index.php/admin/users");
+            exit;
+        }
+
+        // Prevenir auto-bloqueo de administrador actual si se desea
+        if($userId == $_SESSION['user_id']){
+            $_SESSION['flash_message'] = "No se puede cambiar el estado de tu propia cuenta desde aquí.";
+            header("Location: /LASK/public/index.php/admin/users");
+            exit;
+        }
+
+        $updated = $this->user->changeState($userId, $estado);
+
+        if($updated){
+            $_SESSION['flash_message'] = $estado ? "Usuario activado correctamente." : "Usuario desactivado correctamente.";
+        } else {
+            $_SESSION['flash_message'] = "No se pudo actualizar el estado del usuario.";
+        }
+
+        header("Location: /LASK/public/index.php/admin/users");
+        exit;
+    }
+
     public function follow(){
 
     $seguidor = $_SESSION['user_id'] ?? null;

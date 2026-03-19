@@ -79,6 +79,19 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getAllUsers(){
+        $query = "SELECT U.id_usuario, U.email, U.nombre_usuario, U.id_rol, R.nombre_rol, U.estado_usuario, U.fecha_creacion
+                  FROM Usuarios U
+                  INNER JOIN Roles R ON U.id_rol = R.id_rol
+                  WHERE U.id_rol != 1
+                  ORDER BY U.id_usuario ASC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function updateBio($id,$bio){
 
     $query = "UPDATE Usuarios

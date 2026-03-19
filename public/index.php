@@ -279,6 +279,24 @@ break;
 
     break;
 
+    case "/admin/users":
+
+        $controller = new UserController();
+        $controller->listUsers();
+
+    break;
+
+    case "/admin/user/change-state":
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $controller = new UserController();
+            $controller->changeUserState();
+        } else {
+            echo "Método no permitido";
+        }
+
+    break;
+
     case "/report":
 
         if($_SERVER['REQUEST_METHOD'] === "POST"){
