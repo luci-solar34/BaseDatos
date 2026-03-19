@@ -72,6 +72,9 @@ class DetailController {
             $user_liked = $stmt->rowCount() > 0;
         }
 
+        $currentPage = 'song';
+
+
         require "../MVC/views/detail_song.php";
     }
 

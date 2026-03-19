@@ -1,124 +1,122 @@
-<h1>Perfil</h1>
-<a href="/LASK/public/index.php/logout">Cerrar sesión</a>
-<p>Haz click en la imagen para cambiar tu foto</p>
+<link rel="stylesheet" href="/LASK/public/css/profile.css">
 
-<form action="/LASK/public/index.php/update_pfp" method="POST" enctype="multipart/form-data">
+<div class="profile-container">
 
-<label for="pfp">
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <a href="/LASK/public">
+           <img src="/LASK/public/img/logo.png" class="logo">
+        </a>
 
-<img src="/LASK/<?= $user['pfp'] ?>" width="120" style="cursor:pointer;border-radius:50%;">
-
-</label>
-
-<input type="file" name="pfp" id="pfp" style="display:none" onchange="this.form.submit()">
-
-</form>
-
-<p>Usuario: <?= $user['nombre_usuario'] ?></p>
-
-<p>Email: <?= $user['email'] ?></p>
-
-<?php if(isset($flashMessage) && $flashMessage): ?>
-    <div style="padding:10px; margin:10px 0; border:1px solid green; background:#e6ffe6;">
-        <?= $flashMessage ?>
+        <div class="top-buttons">
+            <a href="/LASK/public/index.php/logout">
+                <button>Cerrar Sesión</button>
+            </a>
+        </div>
     </div>
-<?php endif; ?>
 
-<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id_usuario']): ?>
-    <form method="POST" action="/LASK/public/index.php">
-    <input type="hidden" name="route" value="<?= $isFollowing ? 'unfollow' : 'follow' ?>">
-    <input type="hidden" name="user_id" value="<?= $user['id_usuario'] ?>">
-    <input type="hidden" name="redirect_id" value="<?= $user['id_usuario'] ?>">
-    <button type="submit">
-        <?= $isFollowing ? 'Dejar de seguir' : 'Seguir' ?>
-    </button>
-</form>
-<?php endif; ?>
+    <!-- HEADER PERFIL -->
+    <div class="profile-header">
 
-<?php if(isset($canReport) && $canReport): ?>
-    <button onclick="document.getElementById('reportForm').style.display='block'">Denunciar</button>
+        <!-- FOTO + STATS -->
+        <div class="pfp-section">
 
-    <form id="reportForm" method="POST" action="/LASK/public/index.php/report" style="display:none; margin-top:15px; border:1px solid #ccc; padding: 12px;">
-        <input type="hidden" name="denunciado_id" value="<?= $user['id_usuario'] ?>">
+            <form action="/LASK/public/index.php/update_pfp" method="POST" enctype="multipart/form-data">
+                <label for="pfp">
+                    <img src="/LASK/<?= $user['pfp'] ?>" class="pfp">
+                </label>
+                <input type="file" name="pfp" id="pfp" hidden onchange="this.form.submit()">
+            </form>
 
-        <label>Tipo de denuncia:</label><br>
-        <select name="motivo_denuncia" required>
-            <option value="">Selecciona un motivo</option>
-            <option value="Contenido inapropiado">Contenido inapropiado</option>
-            <option value="Acoso">Acoso</option>
-            <option value="Spam">Spam</option>
-            <option value="Suplantación de identidad">Suplantación de identidad</option>
-            <option value="Otro">Otro</option>
-        </select>
+            <div class="stats">
+                <a href="/LASK/public/index.php/profile/following?id=<?= $user['id_usuario'] ?>" class="stat-box">
+                    <span class="stat-number"><?= $following ?></span>
+                    <span class="stat-label">Siguiendo</span>
+                </a>
 
-        <br><br>
+                <a href="/LASK/public/index.php/profile/followers?id=<?= $user['id_usuario'] ?>" class="stat-box">
+                    <span class="stat-number"><?= $followers ?></span>
+                    <span class="stat-label">Seguidores</span>
+                </a>
+            </div>
 
-        <label>Descripción de la denuncia:</label><br>
-        <textarea name="descripcion_denuncia" rows="4" cols="45" placeholder="Describe el motivo de tu denuncia" required></textarea>
+        </div>
 
-        <br><br>
+        <!-- INFO -->
+        <div class="profile-info">
+            <h2><?= $user['nombre_usuario'] ?></h2>
+            <p class="email"><?= $user['email'] ?></p>
+            <p class="role">Listener</p>
+        </div>
 
-        <button type="submit">Enviar denuncia</button>
-        <button type="button" onclick="document.getElementById('reportForm').style.display='none'">Cancelar</button>
-    </form>
-<?php elseif(isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id_usuario']): ?>
-    <p style="color: #a00;">No puedes denunciar a administradores ni usar esta función mientras estás en modo administrador.</p>
-<?php endif; ?>
+        <!-- BOTONES DERECHA -->
+        <div class="profile-actions">
 
-<a href="/LASK/public/index.php/profile/followers?id=<?= $user['id_usuario'] ?>"><?= $followers ?> Seguidores</a>
-<a href="/LASK/public/index.php/profile/following?id=<?= $user['id_usuario'] ?>"><?= $following ?> Siguiendo</a>
+            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id_usuario']): ?>
+                <form method="POST" action="/LASK/public/index.php">
+                    <input type="hidden" name="route" value="<?= $isFollowing ? 'unfollow' : 'follow' ?>">
+                    <input type="hidden" name="user_id" value="<?= $user['id_usuario'] ?>">
+                    <input type="hidden" name="redirect_id" value="<?= $user['id_usuario'] ?>">
+                    <button><?= $isFollowing ? 'Dejar de seguir' : 'Seguir' ?></button>
+                </form>
+            <?php endif; ?>
 
+            <a href="/LASK/public/index.php/playlist/create">
+                <button>Crear playlist</button>
+            </a>
 
-<h3>Bio</h3>
+        </div>
+    </div>
 
-<p><?= $user['bio'] ?? 'Sin bio' ?></p>
+    <!-- CONTENIDO -->
+    <div class="profile-content">
 
-<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id_usuario']): ?>
+        <!-- BIO -->
+        <div class="bio-box">
+            <h3>Descripción</h3>
+            <p><?= $user['bio'] ?? 'Sin bio' ?></p>
 
-<button onclick="document.getElementById('editBio').style.display='block'">
-Editar bio
-</button>
+            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id_usuario']): ?>
+                <button onclick="document.getElementById('editBio').style.display='block'">Editar</button>
 
-<form id="editBio" action="/LASK/public/index.php/update_bio" method="POST" style="display:none; margin-top:10px;">
+                <form id="editBio" action="/LASK/public/index.php/update_bio" method="POST" style="display:none;">
+                    <textarea name="bio"><?= $user['bio'] ?></textarea>
+                    <button type="submit">Guardar</button>
+                </form>
+            <?php endif; ?>
+        </div>
 
-<textarea name="bio" rows="4" cols="50" placeholder="Escribe tu bio"><?= $user['bio'] ?></textarea>
+        <!-- PLAYLISTS -->
+        <div class="playlists-box">
 
-<br><br>
+            <h3>Playlists públicas</h3>
 
-<button type="submit">Guardar</button>
+            <div class="playlist-row">
+                <?php foreach($playlists as $playlist): ?>
+                    <?php if($playlist['privacidad_playlist'] == 0): ?>
+                        <a href="/LASK/public/index.php/playlist?id=<?= $playlist['id_playlist'] ?>">
+                            <div class="playlist-card">
+                                <?= $playlist['nombre_playlist'] ?>
+                            </div>
+                        </a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
 
-</form>
+            <h3>Playlists privadas</h3>
 
-<a href="/LASK/public/index.php/playlist/create">
-    <button>Crear Playlist</button>
-</a>
+            <div class="playlist-row">
+                <?php foreach($playlists as $playlist): ?>
+                    <?php if($playlist['privacidad_playlist'] == 1): ?>
+                        <div class="playlist-card private">
+                            <?= $playlist['nombre_playlist'] ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
 
-<h2>Playlists públicas</h2>
+        </div>
 
-<?php if(empty($playlists)): ?>
-
-<p>No hay playlists</p>
-
-<?php else: ?>
-
-<?php foreach($playlists as $playlist): ?>
-
-<div>
-
-    <a href="/LASK/public/index.php/playlist?id=<?= $playlist['id_playlist'] ?>">
-        <?= $playlist['nombre_playlist'] ?>
-    </a>
-
-    <?php if($playlist['privacidad_playlist'] == 1): ?>
-        (Privada)
-    <?php endif; ?>
+    </div>
 
 </div>
-
-<?php endforeach; ?>
-
-<?php endif; ?>
-
-<?php endif; ?>
-
-<a href="/LASK/public">Volver al Home</a>

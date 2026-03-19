@@ -1,0 +1,547 @@
+/* ===================== */
+/* FONDO GENERAL */
+/* ===================== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('../img/fondo.jpeg') no-repeat center center/cover;
+}
+
+/* ===================== */
+/* NAVBAR */
+/* ===================== */
+.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* LOGO */
+.logo img {
+    width: 70px;
+    height: auto;
+}
+
+/* BOTONES NAV */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-buttons .btn {
+    background: #ddd;
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: black;
+}
+
+/* ===================== */
+/* CONTENEDOR */
+/* ===================== */
+.contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* ===================== */
+/* CAJAS LOGIN / REGISTER */
+/* ===================== */
+.login-box,
+.register-box {
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    color: white;
+    box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.8);
+}
+
+/* LOGIN */
+.login-box {
+    width: 600px;
+    padding: 50px;
+    background: linear-gradient(
+        to right,
+        rgba(20, 20, 20, 0.95),
+        rgba(70, 70, 70, 0.85),
+        rgba(150, 150, 150, 0.6)
+    );
+}
+
+/* REGISTER */
+.register-box {
+    width: 850px;
+    padding: 40px;
+    background: linear-gradient(
+        to right,
+        rgba(20, 20, 20, 0.95),
+        rgba(80, 80, 80, 0.8),
+        rgba(150, 150, 150, 0.6)
+    );
+}
+
+/* ===================== */
+/* TITULOS */
+/* ===================== */
+.titulo-pixel {
+    font-family: 'VT323', monospace;
+    font-size: 50px;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.login-box .titulo-pixel {
+    text-align: center;
+}
+
+.register-box .titulo-pixel {
+    text-align: left;
+}
+
+/* ===================== */
+/* FORMULARIOS */
+/* ===================== */
+.login-box label,
+.register-box label {
+    display: block;
+    margin-top: 10px;
+}
+
+.login-box input,
+.register-box input,
+.register-box select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+}
+
+/* LOGIN TEXT */
+.login-box p {
+    font-size: 14px;
+}
+
+/* BOTON LOGIN */
+.login-box button {
+    width: 200px;
+    display: block;
+    margin: 20px auto 0;
+    padding: 12px;
+    border-radius: 20px;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+}
+
+.login-box a {
+    color: black;
+    font-weight: bold;
+}
+
+/* ===================== */
+/* REGISTER */
+/* ===================== */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.rol-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.rol-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: #ddd;
+    cursor: pointer;
+}
+
+input[type="radio"]:checked + .rol-btn {
+    background: #aaa;
+    transform: scale(1.05);
+}
+
+/* CAMPO ARTISTA */
+.campo-artista {
+    display: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.campo-artista.activo {
+    display: block;
+    opacity: 1;
+}
+
+/* TERMS */
+.terms {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.terms input {
+    width: 18px;
+    height: 18px;
+}
+
+.terms a {
+    color: black;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+/* BOTON REGISTER */
+.btn-submit {
+    display: block;
+    margin: auto;
+    padding: 12px 30px;
+    border-radius: 20px;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+}
+
+/* ===================== */
+/* MODAL */
+/* ===================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-contenido {
+    display: block;
+    margin: 5% auto;
+    max-width: 80%;
+    border-radius: 10px;
+}
+
+.cerrar {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+/* ===================== */
+/* HOME */
+/* ===================== */
+
+/* HOME */
+body {
+    margin: 0;
+    font-family: Arial;
+    background: url('../img/fondo.jpeg') no-repeat center/cover;
+    color: white;
+}
+
+.app {
+    padding: 20px;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LOGO */
+.logo img {
+    height: 40px;
+}
+
+/* DERECHA */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-right a {
+    background: #ddd;
+    padding: 6px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+}
+
+/* FOTO PERFIL */
+.pfp {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* BIENVENIDA */
+.welcome-container {
+    margin-top: 70px;
+}
+
+.welcome-container h1 {
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+    margin-bottom: 5px;
+}
+
+.welcome-container p {
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    background: #ddd;
+    color: black;
+    padding: 3px 10px;
+    border-radius: 15px;
+    margin-top: 5px;
+}
+
+/* BUSCADOR */
+.search-container {
+    margin: 15px 0 25px 0;
+}
+
+.search-container input {
+    width: 60%;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+}
+
+.search-container button {
+    padding: 10px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+/* LAYOUT */
+.layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* SIDEBAR */
+.sidebar {
+    background: #ddd;
+    padding: 20px;
+    border-radius: 15px;
+    width: 250px;
+}
+
+.sidebar h3 {
+    margin-top: 15px;
+    color: black;
+}
+
+/* TAGS */
+.tag {
+    margin: 8px 0;
+}
+
+.tag a {
+    display: block;
+    background: #ccc;
+    padding: 6px 10px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+}
+
+.tag a:hover {
+    background: #bbb;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+}
+
+/* SECCIONES */
+.section {
+    margin-bottom: 25px;
+}
+
+/* TITULOS PRINCIPALES */
+.section h2 {
+    background: white;
+    color: black;
+    padding: 12px 25px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 15px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* SUBTITULOS */
+.section h3 {
+    background: #ccc;
+    color: black;
+    padding: 6px 15px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+/* HEADER (TITULO + VER TODOS PEGADOS) */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* BOTON VER TODOS */
+.section-header a {
+    background: white;
+    color: black;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.section-header a:hover {
+    background: #ddd;
+    transform: scale(1.05);
+}
+
+/* SCROLL */
+.scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+/* CARDS */
+.card {
+    min-width: 120px;
+}
+
+/* IMAGEN */
+.card img {
+    width: 120px;
+    border-radius: 10px;
+    display: block;
+    transition: 0.2s;
+}
+
+/* HOVER IMAGEN */
+.card a:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255,255,255,0.4);
+}
+
+/* LINKS */
+.card a {
+    text-decoration: none;
+}
+
+/* TEXTO CANCIONES / ALBUMES */
+.card p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.card small {
+    font-size: 12px;
+    color: #d1d1d1;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* HOVER TEXTO */
+.card a:hover p {
+    text-decoration: underline;
+}
+
+/* ARTISTAS */
+.artist {
+    display: flex;               /* 🔥 clave */
+    flex-direction: column;      /* 🔥 pone imagen arriba, texto abajo */
+    align-items: center;         
+    justify-content: center;
+    text-align: center;
+    min-width: 100px;
+    text-decoration: none;
+}
+
+/* IMAGEN ARTISTA */
+.artist img {
+    width: 90px;
+    border-radius: 50%;
+    transition: 0.2s;
+    display: block;
+}
+
+/* HOVER ARTISTA */
+.artist:hover img {
+    box-shadow: 0 0 15px rgba(255,255,255,0.5);
+    transform: scale(1.08);
+}
+
+/* TEXTO ARTISTA */
+.artist p {
+    color: #ffffff;
+    font-weight: bold;
+    margin-top: 8px;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+/* HOVER TEXTO */
+.artist:hover p {
+    text-decoration: underline;
+}

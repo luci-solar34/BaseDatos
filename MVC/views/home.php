@@ -1,196 +1,204 @@
-<h1>LASK</h1>
+<?php $currentPage = 'home'; // Indica que estamos en home ?>
 
-<?php if(!isset($_SESSION['user_id'])): ?>
+<link rel="stylesheet" href="/LASK/public/css/styles.css">
 
-<a href="/LASK/public/index.php/login">Iniciar sesión</a>
-<a href="/LASK/public/index.php/register">Registrarse</a>
+<?php
+// Solo carga song.css si estamos en la vista de canción
+if (isset($currentPage) && $currentPage === 'song') {
+    echo '<link rel="stylesheet" href="/LASK/public/css/song.css">';
+}
+?>
 
-<?php else: ?>
+<div class="app">
 
-<p>Bienvenid@ <?= $_SESSION['username'] ?></p>
+    <!-- NAVBAR -->
+    <div class="navbar">
 
-<?php if($_SESSION['role'] == 2): ?>
-<p>Artista</p>
-<?php elseif($_SESSION['role'] == 3): ?>
-<p>Listener</p>
-<?php endif; ?>
+        <div class="logo">
+            <img src="/LASK/public/img/logo.png" alt="logo">
+        </div>
 
-<a href="/LASK/public/index.php/profile?id=<?= $_SESSION['user_id'] ?>">Ver perfil</a>
-<a href="/LASK/public/index.php/messages">
-    <button>Mensajes</button>
-</a>
-<a href="/LASK/public/index.php/logout">Cerrar sesión</a>
+        <div class="nav-right">
+        <?php if(!isset($_SESSION['user_id'])): ?>
 
-<?php endif; ?>
+            <a href="/LASK/public/index.php/register">Registrarse</a>
+            <a href="/LASK/public/index.php/login">Iniciar sesión</a>
 
+        <?php else: ?>
 
-<h2>Buscar</h2>
+            <a href="/LASK/public/index.php/profile?id=<?= $_SESSION['user_id'] ?>">
+                <img class="pfp" src="/LASK/photos_pfp/pfp_default.png">
+            </a>
 
-<?php if(isset($_SESSION['user_id'])): ?>
+            <a href="/LASK/public/index.php/messages">Mensajes</a>
+            <a href="/LASK/public/index.php/logout">Cerrar sesión</a>
 
-<form action="/LASK/public/index.php/search" method="GET">
-<input type="text" id="search-input" name="q" placeholder="Buscar canciones, artistas, álbumes o tags">
-<button type="submit">Buscar</button>
-</form>
-<div id="suggestions" style="position: absolute; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; display: none;"></div>
+        <?php endif; ?>
+        </div>
 
-<?php else: ?>
-
-<form onsubmit="alert('Debes iniciar sesión para buscar'); return false;">
-<input type="text" placeholder="Buscar canciones, artistas, álbumes o tags">
-<button type="submit">Buscar</button>
-</form>
-
-<?php endif; ?>
-
-
-<h2>Explora Tags</h2>
-
-<p>
-    <?= isset($_SESSION['user_id']) ? 'Explora tags para descubrir canciones con una vibe parecida.' : 'Explora algunos tags populares para descubrir la vibe de la plataforma.' ?>
-</p>
-
-<?php foreach($tags as $tag): ?>
-    <div>
-        <a href="/LASK/public/index.php/tag?id=<?= $tag['id_tag'] ?>">
-            <?= htmlspecialchars($tag['nombre_tag']) ?>
-        </a>
     </div>
-<?php endforeach; ?>
-
-<p>
-    <a href="/LASK/public/index.php/tags">Explorar tags</a>
-</p>
 
 
-<h2>Nuevos Lanzamientos</h2>
+    <!-- BIENVENIDA -->
+    <div class="welcome-container">
 
-<div style="display: flex; justify-content: space-between; align-items: center;">
-    <h3>Canciones recientes</h3>
-    <a href="/LASK/public/index.php/new-releases">Ver todos los lanzamientos →</a>
-</div>
+        <?php if(isset($_SESSION['user_id'])): ?>
+            <h1>Bienvenid@ <?= $_SESSION['username'] ?></h1>
 
-<?php $songs = $songs ?? []; ?>
+            <?php if($_SESSION['role'] == 2): ?>
+                <p>Artista</p>
+            <?php elseif($_SESSION['role'] == 3): ?>
+                <p>Listener</p>
+            <?php endif; ?>
 
-<?php if(isset($songs) && !empty($songs)): ?>
-    <div style="display: flex; gap: 10px; overflow-x: auto;">
-        <?php foreach($songs as $song): ?>
-            <div style="min-width: 120px;">
-                <?php if(isset($_SESSION['user_id'])): ?>
-                    <a href="/LASK/public/index.php/song?id=<?= $song['id_cancion'] ?>">
-                        <img src="/LASK/<?= $song['portada_cancion'] ?? 'Photos/banner_default.png' ?>" 
-                             width="120" height="120"
-                             style="border-radius: 8px;">
-                        <p><?= $song['nombre_cancion'] ?></p>
-                        <small><?= $song['nombre_artistico'] ?? 'Artista' ?></small>
+        <?php else: ?>
+            <h1>Bienvenid@</h1>
+        <?php endif; ?>
+
+    </div>
+
+
+    <!-- BUSCADOR -->
+    <div class="search-container">
+
+    <?php if(isset($_SESSION['user_id'])): ?>
+
+        <form action="/LASK/public/index.php/search" method="GET">
+            <input type="text" id="search-input" name="q" placeholder="Busca tu estilo de música">
+            <button type="submit">🔍</button>
+        </form>
+
+        <div id="suggestions"></div>
+
+    <?php else: ?>
+
+        <form onsubmit="alert('Debes iniciar sesión para buscar'); return false;">
+            <input type="text" placeholder="Busca tu estilo de música">
+            <button type="submit">🔍</button>
+        </form>
+
+    <?php endif; ?>
+
+    </div>
+
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+
+            <h3>Encuentra tus favoritos</h3>
+
+            <?php foreach($tags as $tag): ?>
+                <div class="tag">
+                    <a href="/LASK/public/index.php/tag?id=<?= $tag['id_tag'] ?>">
+                        <?= htmlspecialchars($tag['nombre_tag']) ?>
                     </a>
-                <?php else: ?>
-                    <div onclick="alert('Debes iniciar sesión');">
-                        <img src="/LASK/<?= $song['portada_cancion'] ?? 'Photos/banner_default.png' ?>" 
-                             width="120" height="120"
-                             style="border-radius: 8px;">
-                        <p><?= $song['nombre_cancion'] ?></p>
-                        <small><?= $song['nombre_artistico'] ?? 'Artista' ?></small>
+                </div>
+            <?php endforeach; ?>
+
+        </div>
+
+
+        <!-- MAIN -->
+        <div class="main">
+
+            <!-- NUEVOS LANZAMIENTOS -->
+            <div class="section">
+
+                <div class="section-header">
+                    <h2>Nuevos Lanzamientos</h2>
+                    <a href="/LASK/public/index.php/new-releases">Ver todos →</a>
+                </div>
+
+                <h3>Canciones recientes</h3>
+
+                <div class="scroll">
+                <?php foreach($songs as $song): ?>
+                    <div class="card">
+
+                        <?php if(isset($_SESSION['user_id'])): ?>
+                        <a href="/LASK/public/index.php/song?id=<?= $song['id_cancion'] ?>">
+                        <?php else: ?>
+                        <div onclick="alert('Debes iniciar sesión');">
+                        <?php endif; ?>
+
+                            <img src="/LASK/<?= $song['portada_cancion'] ?>">
+                            <p><?= $song['nombre_cancion'] ?></p>
+
+                        <?php if(isset($_SESSION['user_id'])): ?>
+                        </a>
+                        <?php else: ?>
+                        </div>
+                        <?php endif; ?>
+
                     </div>
-                <?php endif; ?>
+                <?php endforeach; ?>
+                </div>
+
             </div>
-        <?php endforeach; ?>
+
+
+            <!-- ÁLBUMES -->
+            <div class="section">
+                <h3>Álbumes recientes</h3>
+
+                <div class="scroll">
+                <?php foreach($albums as $album): ?>
+                    <div class="card">
+
+                        <?php if(isset($_SESSION['user_id'])): ?>
+                            <a href="/LASK/public/index.php/album?id=<?= $album['id_album'] ?>">
+                        <?php else: ?>
+                            <a href="#" onclick="alert('Debes iniciar sesión'); return false;">
+                        <?php endif; ?>
+
+                                <img src="/LASK/<?= $album['portada_album'] ?>">
+                                <p><?= htmlspecialchars($album['nombre_album']) ?></p>
+
+                            </a>
+
+                    </div>
+                <?php endforeach; ?>
+                </div>
+            </div>
+
+
+           <!-- ARTISTAS -->
+            <div class="section">
+                <h2>Nuevos Artistas</h2>
+
+                <div class="scroll">
+                <?php foreach($artists as $artist): ?>
+
+                    <?php if(isset($_SESSION['user_id'])): ?>
+                        <?php 
+                        $profileUrl = ($_SESSION['user_id'] == $artist['id_usuario']) 
+                            ? "/LASK/public/index.php/profile?id={$artist['id_usuario']}" 
+                            : "/LASK/public/index.php/artist?id={$artist['id_usuario']}";
+                        ?>
+
+                        <a href="<?= $profileUrl ?>" class="artist">
+                            <img src="/LASK/<?= $artist['pfp'] ?>">
+                            <p><?= htmlspecialchars($artist['nombre_artistico']) ?></p>
+                        </a>
+
+                    <?php else: ?>
+
+                        <a href="#" class="artist" onclick="alert('Debes iniciar sesión'); return false;">
+                            <img src="/LASK/<?= $artist['pfp'] ?>">
+                            <p><?= htmlspecialchars($artist['nombre_artistico']) ?></p>
+                        </a>
+
+                    <?php endif; ?>
+
+                <?php endforeach; ?>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-<?php else: ?>
-    <p>No hay nuevos lanzamientos disponibles</p>
-<?php endif; ?>
 
-
-<?php $albums = $albums ?? []; ?>
-
-<h2>Álbumes recientes</h2>
-<div style="display: flex; gap: 10px; overflow-x: auto;">
-    <?php foreach($albums as $album): ?>
-        <div style="min-width: 140px; text-align: center;">
-            <?php if(isset($_SESSION['user_id'])): ?>
-                <a href="/LASK/public/index.php/album?id=<?= $album['id_album'] ?>">
-                    <img src="/LASK/<?= $album['portada_album'] ?>" width="120" style="border-radius: 8px;">
-                </a>
-                <p style="margin: 6px 0 0; font-size: 0.9em;"><?= htmlspecialchars($album['nombre_album'] ?? 'Álbum') ?></p>
-            <?php else: ?>
-                <a href="#" onclick="alert('Debes iniciar sesión'); return false;">
-                    <img src="/LASK/<?= $album['portada_album'] ?>" width="120" style="border-radius: 8px;">
-                </a>
-            <?php endif; ?>
-        </div>
-    <?php endforeach; ?>
 </div>
-
-
-<h2>Nuevos Artistas</h2>
-
-<?php $artists = $artists ?? []; ?>
-
-<div style="display: flex; gap: 10px; overflow-x: auto;">
-    <?php foreach($artists as $artist): ?>
-        <div style="min-width: 130px; text-align: center;">
-            <?php if(isset($_SESSION['user_id'])): ?>
-                <?php $profileUrl = ($_SESSION['user_id'] == $artist['id_usuario']) ? "/LASK/public/index.php/profile?id={$artist['id_usuario']}" : "/LASK/public/index.php/artist?id={$artist['id_usuario']}"; ?>
-                <a href="<?= $profileUrl ?>">
-                    <img src="/LASK/<?= $artist['pfp'] ?>" width="100" style="border-radius: 50%;">
-                </a>
-                <p style="margin: 6px 0 0; font-size: 0.9em;"><?= htmlspecialchars($artist['nombre_artistico'] ?? 'Artista') ?></p>
-
-            <?php else: ?>
-                <a href="#" onclick="alert('Debes iniciar sesión'); return false;">
-                    <img src="/LASK/<?= $artist['pfp'] ?>" width="100" style="border-radius: 50%;">
-                </a>
-            <?php endif; ?>
-        </div>
-    <?php endforeach; ?>
-</div>
-
-<script>
-document.getElementById('search-input').addEventListener('input', function() {
-    const query = this.value;
-    const suggestionsDiv = document.getElementById('suggestions');
-    
-    if (query.length < 2) {
-        suggestionsDiv.style.display = 'none';
-        return;
-    }
-    
-    fetch('/LASK/public/index.php/search/autocomplete?q=' + encodeURIComponent(query))
-        .then(response => response.json())
-        .then(data => {
-            suggestionsDiv.innerHTML = '';
-            if (data.length > 0) {
-                data.forEach(item => {
-                    const div = document.createElement('div');
-                    div.textContent = item.resultado + ' (' + item.tipo + ')';
-                    div.style.padding = '5px';
-                    div.style.cursor = 'pointer';
-                    div.addEventListener('click', function() {
-                        // Navegar al link correspondiente
-                        let url = '';
-                        if (item.tipo === 'cancion') {
-                            url = '/LASK/public/index.php/song?id=' + item.id;
-                        } else if (item.tipo === 'artista') {
-                            url = '/LASK/public/index.php/artist?id=' + item.id;
-                        } else if (item.tipo === 'album') {
-                            url = '/LASK/public/index.php/album?id=' + item.id;
-                        } else if (item.tipo === 'usuario') {
-                            url = '/LASK/public/index.php/profile?id=' + item.id;
-                        } else if (item.tipo === 'tag') {
-                            url = '/LASK/public/index.php/tag?id=' + item.id;
-                        }
-                        if (url) {
-                            window.location.href = url;
-                        }
-                        suggestionsDiv.style.display = 'none';
-                    });
-                    suggestionsDiv.appendChild(div);
-                });
-                suggestionsDiv.style.display = 'block';
-            } else {
-                suggestionsDiv.style.display = 'none';
-            }
-        });
-});
-</script>
-
