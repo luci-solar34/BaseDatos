@@ -45,6 +45,24 @@ class User {
         return $this->conn->lastInsertId();
     }
 
+    public function emailExists(string $email): bool {
+        $query = "SELECT 1 FROM Usuarios WHERE email = :email LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":email", $email);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function usernameExists(string $username): bool {
+        $query = "SELECT 1 FROM Usuarios WHERE nombre_usuario = :username LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":username", $username);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function getById($id){
 
         $query = "SELECT U.*, P.nombre_pais, R.nombre_rol
