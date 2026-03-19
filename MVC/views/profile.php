@@ -33,6 +33,18 @@
         <?= $isFollowing ? 'Dejar de seguir' : 'Seguir' ?>
     </button>
 </form>
+
+    <?php if(isset($hasBlocked) && $hasBlocked): ?>
+        <form method="POST" action="/LASK/public/index.php/unblock" style="margin-top:10px;">
+            <input type="hidden" name="user_id" value="<?= $user['id_usuario'] ?>">
+            <button style="background:green;color:white;">Desbloquear</button>
+        </form>
+    <?php else: ?>
+        <form method="POST" action="/LASK/public/index.php/block" style="margin-top:10px;">
+            <input type="hidden" name="user_id" value="<?= $user['id_usuario'] ?>">
+            <button style="background:red;color:white;">Bloquear</button>
+        </form>
+    <?php endif; ?>
 <?php endif; ?>
 
 <?php if(isset($canReport) && $canReport): ?>

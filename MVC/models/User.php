@@ -121,15 +121,19 @@ class User {
     }
 
     public function createDenuncia($denunciante_id, $denunciado_id, $motivo, $descripcion){
+        // Aseguramos que la denuncia se cree con un estado inicial (pendiente).
+        // Esto evita fallos si la columna id_estado_denuncia no permite NULL.
         $query = "INSERT INTO Denuncias
-                  (motivo_denuncia, descripcion_denuncia, denunciante_id, denunciado_id)
-                  VALUES (:motivo, :descripcion, :denunciante, :denunciado)";
+                  (motivo_denuncia, descripcion_denuncia, denunciante_id, denunciado_id, id_estado_denuncia)
+                  VALUES (:motivo, :descripcion, :denunciante, :denunciado, :estado)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":motivo", $motivo);
         $stmt->bindParam(":descripcion", $descripcion);
         $stmt->bindParam(":denunciante", $denunciante_id);
         $stmt->bindParam(":denunciado", $denunciado_id);
+        $estado = 1; // pendiente
+        $stmt->bindParam(":estado", $estado, PDO::PARAM_INT);
 
         return $stmt->execute();
     }
