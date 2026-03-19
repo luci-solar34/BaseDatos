@@ -220,29 +220,70 @@ class DetailController {
 
     public function like(){
 
-        if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])){
-            
-            $song_id = $_POST['song_id'] ?? null;
-            $user_id = $_SESSION['user_id'];
-
-            if($song_id){
-                // Chequear si ya existe el like
-                if($this->like->isLiked($user_id, $song_id)){
-                    // Si existe, borrar
-                    $this->like->unlikeSong($user_id, $song_id);
-                } else {
-                    // Si no existe, crear
-                    $this->like->likeSong($user_id, $song_id);
-                }
-            }
-
-            if(!empty($_POST['album_id'])){
-                header("Location: /LASK/public/index.php/album?id=" . (int)$_POST['album_id']);
-            } else {
-                header("Location: /LASK/public/index.php/song?id=" . $song_id);
-            }
+        if($_SERVER['REQUEST_METHOD'] !== 'POST'){
+            http_response_code(405);
             exit;
         }
+
+        $isAjax = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest'
+            || strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+
+        if(!isset($_SESSION['user_id'])){
+            if($isAjax){
+                http_response_code(401);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => 'Debes iniciar sesión']);
+                exit;
+            }
+
+            header("Location: /LASK/public/index.php/login");
+            exit;
+        }
+
+        $song_id = isset($_POST['song_id']) ? (int)$_POST['song_id'] : 0;
+        $user_id = (int)$_SESSION['user_id'];
+
+        if($song_id <= 0){
+            if($isAjax){
+                http_response_code(422);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => 'Canción inválida']);
+                exit;
+            }
+
+            header("Location: /LASK/public");
+            exit;
+        }
+
+        $userLiked = false;
+        if($this->like->isLiked($user_id, $song_id)){
+            $this->like->unlikeSong($user_id, $song_id);
+            $userLiked = false;
+        } else {
+            $this->like->likeSong($user_id, $song_id);
+            $userLiked = true;
+        }
+
+        $likeData = $this->like->countLikes($song_id);
+        $likesTotal = (int)($likeData['total'] ?? 0);
+
+        if($isAjax){
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'success' => true,
+                'songId' => $song_id,
+                'userLiked' => $userLiked,
+                'likesTotal' => $likesTotal,
+            ]);
+            exit;
+        }
+
+        if(!empty($_POST['album_id'])){
+            header("Location: /LASK/public/index.php/album?id=" . (int)$_POST['album_id']);
+        } else {
+            header("Location: /LASK/public/index.php/song?id=" . $song_id);
+        }
+        exit;
     }
 
     public function newReleases(){

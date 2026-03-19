@@ -66,7 +66,7 @@ foreach($playableSongs as $pi => $ps){ $playableIndex[$ps['id_cancion']] = $pi; 
             <?php if(!empty($song['path_link'])): ?>
                 <button onclick="albumPlay(<?= $playableIndex[$song['id_cancion']] ?>)">▶ Reproducir</button>
             <?php endif; ?>
-            <span style="margin-left:8px;">♥ <?= (int)($song['likes_total'] ?? 0) ?></span>
+            <span style="margin-left:8px;" data-song-like-count="<?= (int)$song['id_cancion'] ?>">♥ <?= (int)($song['likes_total'] ?? 0) ?></span>
             <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $album['id_artista']): ?>
                 <a href="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>">Editar</a>
             <?php endif; ?>
@@ -92,6 +92,15 @@ var albumQueue = <?= json_encode(array_map(fn($s) => [
 
 var albumIndex = 0;
 
+function renderNowPlayingLike(track){
+    document.getElementById('nowPlayingLikeButton').textContent = (track.userLiked ? '♥ Quitar like' : '♥ Dar like') + ' (' + track.likesTotal + ')';
+}
+
+function renderSongLikeInList(songId, likesTotal){
+    var el = document.querySelector('[data-song-like-count="' + songId + '"]');
+    if(el) el.textContent = '♥ ' + likesTotal;
+}
+
 function albumPlay(idx){
     if(idx === null || idx === undefined || !albumQueue[idx]) return;
     albumIndex = idx;
@@ -107,7 +116,7 @@ function albumPlay(idx){
     document.getElementById('lyricText').textContent     = t.letra    || 'Texto no disponible';
     document.getElementById('lyricPhonetic').textContent = t.fonetico || 'Texto no disponible';
     document.getElementById('nowPlayingSongId').value = t.id;
-    document.getElementById('nowPlayingLikeButton').textContent = (t.userLiked ? '♥ Quitar like' : '♥ Dar like') + ' (' + t.likesTotal + ')';
+    renderNowPlayingLike(t);
     document.getElementById('nowPlayingLikeForm').style.display = 'block';
 
 }
@@ -122,5 +131,49 @@ function albumPrev(){
 
 document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('albumAudio').addEventListener('ended', albumNext);
+
+    var likeForm = document.getElementById('nowPlayingLikeForm');
+    var likeButton = document.getElementById('nowPlayingLikeButton');
+
+    likeForm.addEventListener('submit', async function(e){
+        e.preventDefault();
+
+        if(!albumQueue[albumIndex]) return;
+
+        likeButton.disabled = true;
+        try {
+            var response = await fetch(likeForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: new FormData(likeForm)
+            });
+
+            if(response.status === 401){
+                window.location.href = '/LASK/public/index.php/login';
+                return;
+            }
+
+            if(!response.ok){
+                throw new Error('Error al actualizar like');
+            }
+
+            var data = await response.json();
+            if(data && data.success){
+                var track = albumQueue[albumIndex];
+                track.userLiked = !!data.userLiked;
+                track.likesTotal = parseInt(data.likesTotal || 0, 10);
+                renderNowPlayingLike(track);
+                renderSongLikeInList(track.id, track.likesTotal);
+            }
+        } catch (err) {
+            // Fallback al envío tradicional si falla AJAX.
+            likeForm.submit();
+        } finally {
+            likeButton.disabled = false;
+        }
+    });
 });
 </script>

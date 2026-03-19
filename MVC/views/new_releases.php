@@ -2,9 +2,9 @@
 $pageTitle = 'Nuevos Lanzamientos - LASK';
 ?>
 
-<h1>Nuevos Lanzamientos</h1>
+<h1>Todos los lanzamientos</h1>
 
-<h2>Últimas Canciones</h2>
+<h2>Canciones de nuestros artistas</h2>
 
 <?php if(empty($songs)): ?>
     <p>No hay nuevas canciones</p>
@@ -24,7 +24,7 @@ $pageTitle = 'Nuevos Lanzamientos - LASK';
     </ul>
 <?php endif; ?>
 
-<h2>Últimos Álbumes</h2>
+<h2>Albumes de nuestros artistas</h2>
 
 <?php if(empty($albums)): ?>
     <p>No hay nuevos álbumes</p>

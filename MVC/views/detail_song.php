@@ -33,7 +33,7 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
     </p>
 <?php endif; ?>
 
-<audio controls>
+<audio id="songAudio" controls>
     <source src="/LASK/<?= $song['path_link'] ?>" type="audio/mpeg">
 </audio>
 
@@ -47,10 +47,11 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
     </p>
 <?php endif; ?>
 
-<form action="/LASK/public/index.php/like" method="POST">
+<form id="songLikeForm" action="/LASK/public/index.php/like" method="POST">
     <input type="hidden" name="song_id" value="<?= $song['id_cancion'] ?>">
-    <button type="submit">
-        <?= $user_liked ? '♥ Quitar like' : '♥ Dar like' ?> (<?= $likes['total'] ?? 0 ?>)
+    <button type="submit" id="songLikeButton">
+        <span id="songLikeLabel"><?= $user_liked ? '♥ Quitar like' : '♥ Dar like' ?></span>
+        (<span id="songLikeCount"><?= (int)($likes['total'] ?? 0) ?></span>)
     </button>
 </form>
 
@@ -62,3 +63,50 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
 
 <br>
 <a href="/LASK/public">← Volver al inicio</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var likeForm = document.getElementById('songLikeForm');
+    var likeButton = document.getElementById('songLikeButton');
+    var likeLabel = document.getElementById('songLikeLabel');
+    var likeCount = document.getElementById('songLikeCount');
+
+    if(!likeForm || !likeButton || !likeLabel || !likeCount) return;
+
+    likeForm.addEventListener('submit', async function(e){
+        e.preventDefault();
+        likeButton.disabled = true;
+
+        try {
+            var response = await fetch(likeForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: new FormData(likeForm)
+            });
+
+            if(response.status === 401){
+                window.location.href = '/LASK/public/index.php/login';
+                return;
+            }
+
+            if(!response.ok){
+                throw new Error('Error al actualizar like');
+            }
+
+            var data = await response.json();
+            if(data && data.success){
+                likeLabel.textContent = data.userLiked ? '♥ Quitar like' : '♥ Dar like';
+                likeCount.textContent = String(data.likesTotal || 0);
+            }
+        } catch (err) {
+            // Fallback al flujo clásico si falla la petición asíncrona.
+            likeForm.submit();
+        } finally {
+            likeButton.disabled = false;
+        }
+    });
+});
+</script>
