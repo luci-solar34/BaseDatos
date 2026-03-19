@@ -7,13 +7,20 @@
     <!-- FUENTE PIXEL -->
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
+    <!-- Mensaje flash de PHP (de la rama de tu compañera) -->
+    <?php if(isset($_SESSION['flash_message'])): ?>
+        <div class="alert <?= (isset($_SESSION['flash_message_type']) && $_SESSION['flash_message_type'] === 'success') ? 'alert-success' : 'alert-error' ?>">
+            <?= htmlspecialchars($_SESSION['flash_message']) ?>
+        </div>
+        <?php unset($_SESSION['flash_message'], $_SESSION['flash_message_type']); ?>
+    <?php endif; ?>
+
     <!-- CSS CORRECTOS -->
     <link rel="stylesheet" href="/LASK/public/css/styles.css">
     
 </head>
 
 <body>
-
 
 <!-- Navbar -->
 <div class="navbar">
@@ -32,6 +39,7 @@
 
         <h1 class="titulo-pixel">Iniciar sesión</h1>
 
+        <!-- Formulario combinado -->
         <form action="/LASK/public/index.php/login" method="POST">
 
             <label>Nombre de usuario</label>

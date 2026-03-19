@@ -72,6 +72,18 @@ case "/tag":
 
 break;
 
+case "/tag/create":
+
+    $controller = new TagController();
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller->create();
+    } else {
+        $controller->showCreate();
+    }
+
+break;
+
 case "/album/add-songs":
 
     if($_SERVER['REQUEST_METHOD'] === "POST"){
@@ -152,6 +164,24 @@ case "/unfollow":
         $controller = new UserController();
         $controller->unfollow();
 
+    }
+
+break;
+
+case "/block":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new UserController();
+        $controller->block();
+    }
+
+break;
+
+case "/unblock":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new UserController();
+        $controller->unblock();
     }
 
 break;
@@ -493,6 +523,8 @@ case "/message/send":
     }
 
 break;
+
+
 
 
     default:

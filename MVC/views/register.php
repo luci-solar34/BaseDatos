@@ -7,6 +7,14 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/LASK/public/css/styles.css">
 
+    <!-- Mensaje flash de PHP (rama de tu compañera) -->
+    <?php if(isset($_SESSION['flash_message'])): ?>
+        <div class="alert <?= (isset($_SESSION['flash_message_type']) && $_SESSION['flash_message_type'] === 'success') ? 'alert-success' : 'alert-error' ?>">
+            <?= htmlspecialchars($_SESSION['flash_message']) ?>
+        </div>
+        <?php unset($_SESSION['flash_message'], $_SESSION['flash_message_type']); ?>
+    <?php endif; ?>
+
     <!-- FUENTE PIXEL -->
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
@@ -25,7 +33,6 @@
 
 <!-- CONTENEDOR -->
 <div class="contenedor">
-
     <div class="register-box">
 
         <h1 class="titulo-pixel">Crear cuenta</h1>
@@ -48,7 +55,6 @@
 
                 <!-- DERECHA -->
                 <div>
-
                     <label>País</label>
                     <select name="pais" required>
                         <option value="">Selecciona un país</option>
@@ -63,8 +69,22 @@
                         <option value="Estados Unidos">Estados Unidos</option>
                     </select>
 
+                    <!-- Selección de rol -->
                     <label>Rol</label>
+                    <select name="rol" id="rol" required>
+                        <option value="3">Listener</option>
+                        <option value="2">Artista</option>
+                    </select>
 
+                    <!-- Nombre artístico (solo artista) -->
+                    <label>Nombre artístico (solo artista)</label>
+                    <input type="text" name="nombre_artistico" id="nombre_artistico">
+
+                    <p id="artist-warning" class="alert alert-error" style="display:none;">
+                        Solo los artistas pueden tener nombre artístico. Si quieres ser artista, cambia el rol.
+                    </p>
+
+                    <!-- Botones de rol estilo visual -->
                     <div class="rol-buttons">
                         <label>
                             <input type="radio" name="rol" value="3" checked hidden onclick="mostrarArtista(false)">
@@ -81,7 +101,6 @@
                         <label>Nombre artístico</label>
                         <input type="text" name="nombre_artistico">
                     </div>
-
                 </div>
 
             </div>
@@ -99,7 +118,6 @@
         </form>
 
     </div>
-
 </div>
 
 <!-- MODAL -->
@@ -134,7 +152,42 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
+// Validación y sincronización campo artista
+document.addEventListener('DOMContentLoaded', function(){
+    const roleSelect = document.getElementById('rol');
+    const artistInput = document.getElementById('nombre_artistico');
+    const warning = document.getElementById('artist-warning');
+
+    function syncArtistField(){
+        const isArtist = roleSelect.value === '2';
+        artistInput.disabled = !isArtist;
+
+        if(!isArtist){
+            if(artistInput.value.trim() !== ''){
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+        } else {
+            warning.style.display = 'none';
+        }
+    }
+
+    roleSelect.addEventListener('change', syncArtistField);
+    artistInput.addEventListener('input', function(){
+        if(roleSelect.value !== '2' && artistInput.value.trim() !== ''){
+            warning.style.display = 'block';
+        } else {
+            warning.style.display = 'none';
+        }
+    });
+
+    syncArtistField();
+});
 </script>
+
+<a href="/LASK/public/index.php/login">Iniciar sesión</a>
 
 </body>
 </html>
