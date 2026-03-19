@@ -231,16 +231,6 @@ public function block(){
 
     $this->block->block($bloqueador,$bloqueado);
 
-    // Si no hay una denuncia previa, crea una automáticamente al bloquear.
-    if (!$this->user->hasDenuncia($bloqueador, $bloqueado)) {
-        $this->user->createDenuncia(
-            $bloqueador,
-            $bloqueado,
-            'Bloqueo de usuario',
-            'El usuario ha sido bloqueado y se ha generado una denuncia automática.'
-        );
-    }
-
     header("Location: /LASK/public/index.php/profile?id=".$bloqueado);
     exit;
 }
