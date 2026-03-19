@@ -4,12 +4,14 @@ require_once "../config/database.php";
 require_once "../MVC/models/User.php";
 require_once "../MVC/models/Follow.php";
 require_once "../MVC/models/Playlist.php";
+require_once "../MVC/models/Block.php";
 
 class UserController {
 
     private $user;
     private $follow;
     private $playlist;
+    private $block;
 
     public function __construct(){
 
@@ -19,43 +21,59 @@ class UserController {
         $this->user = new User($db);
         $this->follow = new Follow($db);
         $this->playlist = new Playlist($db);
+        $this->block = new Block($db);
     }
 
     public function profile($id){
 
-        $user = $this->user->getById($id);
-        if(!$user){
-            die("Usuario no encontrado");
-        }
+    $user = $this->user->getById($id);
+    if(!$user){
+        die("Usuario no encontrado");
+    }
 
-        $viewer = $_SESSION['user_id'] ?? null;
-        $viewerData = $viewer ? $this->user->getById($viewer) : null;
+    $viewer = $_SESSION['user_id'] ?? null;
+    $viewerData = $viewer ? $this->user->getById($viewer) : null;
 
-        // Si es artista, su perfil principal es detail_artist
-        if($user['id_rol'] == 2){
-            header("Location: /LASK/public/index.php/artist?id=" . $id);
-            exit;
-        }
+    // 🔥 BLOQUEO (VERSIÓN CORRECTA)
+    $isBlocked = false;
+    $hasBlocked = false;
 
-        $followers = $this->follow->countFollowers($id);
-        $following = $this->follow->countFollowing($id);
+    if($viewer){
+        $isBlocked = $this->block->isBlocked($viewer, $id);
+        $hasBlocked = $this->block->hasBlocked($viewer, $id);
+    }
 
-        $isFollowing = false;
-        if($viewer && $viewer != $id){
-            $isFollowing = $this->follow->isFollowing($viewer, $id);
-        }
+    $canReport = false;
+    if($viewer && $viewer != $id && $viewerData['id_rol'] != 1 && $user['id_rol'] != 1){
+        $canReport = true;
+    }
 
-        $playlists = $this->playlist->getUserPlaylists($id,$viewer);
+    if($isBlocked){
+        $canUnblock = $hasBlocked; // 👈 para la vista
+        require "../MVC/views/profile_blocked.php";
+        return;
+    }
 
-        $canReport = false;
-        if($viewer && $viewer != $id && $viewerData['id_rol'] != 1 && $user['id_rol'] != 1){
-            $canReport = true;
-        }
+    // Si es artista, redirigir
+    if($user['id_rol'] == 2){
+        header("Location: /LASK/public/index.php/artist?id=" . $id);
+        exit;
+    }
 
-        $flashMessage = $_SESSION['flash_message'] ?? null;
-        unset($_SESSION['flash_message']);
+    $followers = $this->follow->countFollowers($id);
+    $following = $this->follow->countFollowing($id);
 
-        require "../MVC/views/profile.php";
+    $isFollowing = false;
+    if($viewer && $viewer != $id){
+        $isFollowing = $this->follow->isFollowing($viewer, $id);
+    }
+
+    $playlists = $this->playlist->getUserPlaylists($id,$viewer);
+
+    $flashMessage = $_SESSION['flash_message'] ?? null;
+    unset($_SESSION['flash_message']);
+
+    require "../MVC/views/profile.php";
     }
 
     public function submitReport(){
@@ -175,11 +193,15 @@ class UserController {
         die("Datos inválidos");
     }
 
+    if($this->block->isBlocked($seguidor, $seguido)){
+        die("No puedes seguir a este usuario");
+    }
+
     if(!$this->follow->isFollowing($seguidor,$seguido)){
         $this->follow->follow($seguidor,$seguido);
     }
 
-    // 👇 REDIRECCIÓN CORRECTA
+    // REDIRECCIÓN CORRECTA
     header("Location: /LASK/public/index.php/profile?id=" . $seguido);
     exit;
 }
@@ -196,6 +218,35 @@ class UserController {
 
     // 👇 REDIRECCIÓN CORRECTA
     header("Location: /LASK/public/index.php/profile?id=" . $seguido);
+    exit;
+}
+public function block(){
+
+    $bloqueador = $_SESSION['user_id'] ?? null;
+    $bloqueado = $_POST['user_id'] ?? null;
+
+    if(!$bloqueador || !$bloqueado){
+        die("Datos inválidos");
+    }
+
+    $this->block->block($bloqueador,$bloqueado);
+
+    header("Location: /LASK/public/index.php/profile?id=".$bloqueado);
+    exit;
+}
+
+public function unblock(){
+
+    $bloqueador = $_SESSION['user_id'] ?? null;
+    $bloqueado = $_POST['user_id'] ?? null;
+
+    if(!$bloqueador || !$bloqueado){
+        die("Datos inválidos");
+    }
+
+    $this->block->unblock($bloqueador,$bloqueado);
+
+    header("Location: /LASK/public/index.php/profile?id=".$bloqueado);
     exit;
 }
 

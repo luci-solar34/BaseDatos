@@ -156,6 +156,24 @@ case "/unfollow":
 
 break;
 
+case "/block":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new UserController();
+        $controller->block();
+    }
+
+break;
+
+case "/unblock":
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller = new UserController();
+        $controller->unblock();
+    }
+
+break;
+
     case "/login":
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
@@ -493,6 +511,8 @@ case "/message/send":
     }
 
 break;
+
+
 
 
     default:

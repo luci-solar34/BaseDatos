@@ -44,10 +44,13 @@ document.addEventListener('DOMContentLoaded', function(){
         player.addEventListener('play', function(){
             const songTitle = player.dataset.title || 'Canción';
             const songCover = player.dataset.cover || 'Photos/banner_default.png';
+            const songSrc   = player.querySelector('source').src;
 
             nowPlaying.style.display = 'block';
             title.textContent = songTitle;
             cover.src = '/LASK/' + songCover;
+
+
         });
     });
 });

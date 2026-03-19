@@ -120,16 +120,53 @@ class User {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getMotivoDenunciaIdByName($nombre){
+        $query = "SELECT id_motivo_denuncia FROM motivos_denuncia WHERE nombre_motivo = :nombre LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":nombre", $nombre);
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
+    public function createMotivoDenuncia($nombre){
+        $query = "INSERT INTO motivos_denuncia (nombre_motivo) VALUES (:nombre)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":nombre", $nombre);
+
+        if ($stmt->execute()) {
+            return $this->conn->lastInsertId();
+        }
+
+        return null;
+    }
+
+    public function getOrCreateMotivoDenuncia($nombre){
+        $id = $this->getMotivoDenunciaIdByName($nombre);
+        if($id){
+            return $id;
+        }
+
+        return $this->createMotivoDenuncia($nombre);
+    }
+
     public function createDenuncia($denunciante_id, $denunciado_id, $motivo, $descripcion){
+        $motivoId = $this->getOrCreateMotivoDenuncia($motivo);
+        if(!$motivoId){
+            return false;
+        }
+
         $query = "INSERT INTO Denuncias
-                  (motivo_denuncia, descripcion_denuncia, denunciante_id, denunciado_id)
-                  VALUES (:motivo, :descripcion, :denunciante, :denunciado)";
+                  (id_motivo_denuncia, descripcion_denuncia, denunciante_id, denunciado_id, id_estado_denuncia, fecha_denuncia)
+                  VALUES (:motivo, :descripcion, :denunciante, :denunciado, :estado, NOW())";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":motivo", $motivo);
+        $stmt->bindParam(":motivo", $motivoId);
         $stmt->bindParam(":descripcion", $descripcion);
         $stmt->bindParam(":denunciante", $denunciante_id);
         $stmt->bindParam(":denunciado", $denunciado_id);
+        $estado = 1; // pendiente
+        $stmt->bindParam(":estado", $estado, PDO::PARAM_INT);
 
         return $stmt->execute();
     }

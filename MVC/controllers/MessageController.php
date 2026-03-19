@@ -4,21 +4,26 @@ require_once "../config/database.php";
 require_once "../MVC/models/Message.php";
 require_once "../MVC/models/Follow.php";
 require_once "../MVC/models/User.php";
+require_once "../MVC/models/Block.php";
 
 class MessageController {
 
     private $message;
     private $follow;
     private $userModel;
+    private $block;
 
     public function __construct(){
 
         $database = new Database();
         $db = $database->connect();
+        
 
         $this->message = new Message($db);
+        $this->block = new Block($db);
         $this->follow = new Follow($db);
         $this->userModel = new User($db);
+       
     }
 
     public function index(){
@@ -32,7 +37,15 @@ class MessageController {
     $conversations = $this->message->getConversations($user);
     $mutuals = $this->follow->getMutuals($user);
 
-    // 🔥 evitar duplicados (IMPORTANTE)
+    // Quitar conversaciones/mutuales si hay bloqueo en cualquier dirección
+    $conversations = array_filter($conversations, function($conv) use ($user){
+        return !$this->block->isBlocked($user, $conv['id_usuario']);
+    });
+
+    $mutuals = array_filter($mutuals, function($m) use ($user){
+        return !$this->block->isBlocked($user, $m['id_usuario']);
+    });
+
     $conversationIds = array_column($conversations, 'id_usuario');
 
     $mutuals = array_filter($mutuals, function($m) use ($conversationIds){
@@ -44,16 +57,21 @@ class MessageController {
 
     public function chat($user_id){
 
-        $user = $_SESSION['user_id'] ?? null;
+    $user = $_SESSION['user_id'] ?? null;
 
-        if(!$user){
-            die("Usuario no autenticado");
-        }
+    if(!$user){
+        die("Usuario no autenticado");
+    }
 
-        $messages = $this->message->getChat($user,$user_id);
-        $otherUser = $this->userModel->getById($user_id);
+    // Bloqueamos el chat si existe bloqueo en cualquier dirección.
+    if($this->block->isBlocked($user, $user_id)){
+        die("No puedes ver este chat");
+    }
 
-        require "../MVC/views/chat.php";
+    $messages = $this->message->getChat($user,$user_id);
+    $otherUser = $this->userModel->getById($user_id);
+
+    require "../MVC/views/chat.php";
     }
 
     public function send(){
@@ -63,6 +81,7 @@ class MessageController {
         if(!$user){
             die("Usuario no autenticado");
         }
+       
 
         $receptor = $_POST['user_id'] ?? null;
         $texto = trim($_POST['texto'] ?? '');
@@ -70,6 +89,10 @@ class MessageController {
         if (!$receptor || $texto === '') {
             header("Location: /LASK/public/index.php/chat?user=" . urlencode($receptor));
             exit;
+        }
+        // Bloquear el envío si existe bloqueo en cualquier dirección.
+        if($this->block->isBlocked($user, $receptor)){
+            die("No puedes enviar mensajes a este usuario");
         }
 
         // Validate receptor exists

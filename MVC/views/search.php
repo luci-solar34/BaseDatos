@@ -62,4 +62,4 @@
 
 <?php endif; ?>
 
-<a href="/LASK/public">Volver al Home</a></content>
+<a href="/LASK/public">Volver al Home</a>

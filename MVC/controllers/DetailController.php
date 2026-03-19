@@ -8,6 +8,7 @@ require_once "../MVC/models/Like.php";
 require_once "../MVC/models/Follow.php";
 require_once "../MVC/models/Tag.php";
 require_once "../MVC/models/Playlist.php";
+require_once "../MVC/models/Block.php";
 
 class DetailController {
 
@@ -19,6 +20,7 @@ class DetailController {
     private $follow;
     private $tag;
     private $playlist;
+    private $block;
 
     public function __construct(){
 
@@ -34,6 +36,7 @@ class DetailController {
         $this->follow = new Follow($db);
         $this->tag = new Tag($db);
         $this->playlist = new Playlist($db);
+        $this->block = new Block($db);
     }
 
     public function song($id){
@@ -54,7 +57,13 @@ class DetailController {
         $song = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if(!$song){
-            die("Canción no encontrada");
+        die("Canción no encontrada");
+        }
+
+        $viewerId = $_SESSION['user_id'] ?? null;
+
+        if($viewerId && $this->block->isBlocked($viewerId, $song['id_artista'])){
+        die("Contenido no disponible");
         }
 
         // Contar likes
@@ -94,10 +103,17 @@ class DetailController {
             die("Álbum no encontrado");
         }
 
-        // Obtener canciones del álbum
-        $query = "SELECT C.*, A.nombre_artistico
+        $viewerId = $_SESSION['user_id'] ?? null;
+
+        if($viewerId && $this->block->isBlocked($viewerId, $album['id_artista'])){
+        die("Contenido no disponible");
+        }
+
+        // Obtener canciones del álbum con letras
+        $query = "SELECT C.*, A.nombre_artistico, L.letra_cancion, L.texto_fonetico
                   FROM Canciones C
                   INNER JOIN Artista A ON C.id_artista = A.id_usuario
+                  LEFT JOIN Letras L ON C.id_cancion = L.id_cancion
                   WHERE C.id_album = :id
                   ORDER BY C.numero_pista";
 
@@ -117,6 +133,18 @@ class DetailController {
 
         if(!$artist){
             die("Artista no encontrado");
+        }
+
+        $viewerId = $_SESSION['user_id'] ?? null;
+
+        if($viewerId && $this->block->isBlocked($viewerId, $id)){
+            // Mostrar la misma vista de "Cuenta privada" para quien bloquea o es bloqueado.
+            $user = $artist; // reutiliza la vista que espera $user
+            $canUnblock = $this->block->hasBlocked($viewerId, $id);
+            $flashMessage = $_SESSION['flash_message'] ?? null;
+            unset($_SESSION['flash_message']);
+            require "../MVC/views/profile_blocked.php";
+            return;
         }
 
         // Verificar si el usuario actual sigue a este artista
@@ -218,6 +246,14 @@ class DetailController {
         $stmt = $this->song->getConnection()->prepare($query);
         $stmt->execute();
         $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $viewerId = $_SESSION['user_id'] ?? null;
+
+        if($viewerId){
+        $songs = array_filter($songs, function($s) use ($viewerId){
+        return !$this->block->isBlocked($viewerId, $s['id_artista']);
+        });
+        }
 
         // Obtener nuevos álbumes (últimos 20) - VERSIÓN CORREGIDA
         $query = "SELECT A.*, 
