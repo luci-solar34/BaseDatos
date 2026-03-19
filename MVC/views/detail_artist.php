@@ -5,11 +5,33 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
 <h1><?= $artist['nombre_artistico'] ?></h1>
 <p>@<?= $artist['nombre_usuario'] ?></p>
 
-<?php if(!empty($artist['pfp'])): ?>
+<?php if(isset($flashMessage) && $flashMessage): ?>
+    <div style="padding:10px; margin:10px 0; border:1px solid green; background:#e6ffe6;">
+        <?= $flashMessage ?>
+    </div>
+<?php endif; ?>
+
+<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $artist['id_usuario']): ?>
+    <p>Haz click en la imagen para cambiar tu foto</p>
+    <form action="/LASK/public/index.php/update_pfp" method="POST" enctype="multipart/form-data">
+        <label for="pfp">
+            <img src="/LASK/<?= $artist['pfp'] ?>" width="120" style="cursor:pointer;border-radius:50%;">
+        </label>
+        <input type="file" name="pfp" id="pfp" style="display:none" onchange="this.form.submit()">
+    </form>
+<?php elseif(!empty($artist['pfp'])): ?>
     <img src="/LASK/<?= $artist['pfp'] ?>" width="120" style="border-radius: 50%;">
 <?php endif; ?>
 
-<p><strong>Seguidores:</strong> <?= $followers ?></p>
+<p>
+    <strong>Seguidores:</strong>
+    <a href="/LASK/public/index.php/profile/followers?id=<?= $artist['id_usuario'] ?>"><?= $followers ?></a>
+</p>
+
+<p>
+    <strong>Siguiendo:</strong>
+    <a href="/LASK/public/index.php/profile/following?id=<?= $artist['id_usuario'] ?>"><?= $following ?></a>
+</p>
 
 <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] != $artist['id_usuario']): ?>
     <form method="POST" action="/LASK/public/index.php">
@@ -60,6 +82,20 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
     <p><?= nl2br($artist['bio']) ?></p>
 <?php endif; ?>
 
+<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $artist['id_usuario']): ?>
+    <button onclick="document.getElementById('editBio').style.display='block'">
+        Editar bio
+    </button>
+
+    <form id="editBio" action="/LASK/public/index.php/update_bio" method="POST" style="display:none; margin-top:10px;">
+        <textarea name="bio" rows="4" cols="50" placeholder="Escribe tu bio"><?= $artist['bio'] ?? '' ?></textarea>
+
+        <br><br>
+
+        <button type="submit">Guardar</button>
+    </form>
+<?php endif; ?>
+
 <?php if($artist['email']): ?>
     <p><strong>Email:</strong> <?= $artist['email'] ?></p>
 <?php endif; ?>
@@ -101,6 +137,28 @@ $pageTitle = $artist['nombre_artistico'] . ' - LASK';
 <?php endif; ?>
 
 <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $artist['id_usuario']): ?>
+
+<a href="/LASK/public/index.php/playlist/create">
+    <button>Crear Playlist</button>
+</a>
+
+<h2>Playlists públicas</h2>
+
+<?php if(empty($playlists)): ?>
+    <p>No hay playlists</p>
+<?php else: ?>
+    <?php foreach($playlists as $playlist): ?>
+        <div>
+            <a href="/LASK/public/index.php/playlist?id=<?= $playlist['id_playlist'] ?>">
+                <?= $playlist['nombre_playlist'] ?>
+            </a>
+
+            <?php if($playlist['privacidad_playlist'] == 1): ?>
+                (Privada)
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <a href="/LASK/public/index.php/artist/create-album?id=<?= $artist['id_usuario'] ?>">
     <button>Crear Álbum</button>
