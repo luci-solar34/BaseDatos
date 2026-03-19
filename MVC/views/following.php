@@ -3,7 +3,7 @@
 <a href="/LASK/public/index.php/profile?id=<?= $user['id_usuario'] ?>">← Volver al perfil</a>
 
 <?php if(empty($following)): ?>
-    <p>Este usuario no sigue a nadie aún aaaa.</p>
+    <p>Este usuario no sigue a nadie aún .</p>
 <?php else: ?>
     <p><?= count($following) ?> seguido<?= count($following) != 1 ? 's' : '' ?></p>
     <?php foreach($following as $followed): ?>
