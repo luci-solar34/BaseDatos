@@ -62,6 +62,21 @@ class Tag {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function createTag($nombre_tag, $descripcion_tag){
+        $query = "INSERT INTO Tags (nombre_tag, descripcion_tag)
+                  VALUES (:nombre, :descripcion)";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":nombre", $nombre_tag);
+        $stmt->bindParam(":descripcion", $descripcion_tag);
+
+        if($stmt->execute()){
+            return $this->conn->lastInsertId();
+        }
+
+        return false;
+    }
+
     public function getSongsByTag($tagId){
 
         $query = "SELECT C.id_cancion,

@@ -109,6 +109,12 @@ Editar bio
     <button>Crear Playlist</button>
 </a>
 
+<?php if(isset($_SESSION['role']) && $_SESSION['role'] == 1 && $_SESSION['user_id'] == $user['id_usuario']): ?>
+    <p>
+        <a href="/LASK/public/index.php/tag/create">Crear nuevo tag</a>
+    </p>
+<?php endif; ?>
+
 <h2>Playlists públicas</h2>
 
 <?php if(empty($playlists)): ?>

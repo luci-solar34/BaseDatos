@@ -72,6 +72,18 @@ case "/tag":
 
 break;
 
+case "/tag/create":
+
+    $controller = new TagController();
+
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
+        $controller->create();
+    } else {
+        $controller->showCreate();
+    }
+
+break;
+
 case "/album/add-songs":
 
     if($_SERVER['REQUEST_METHOD'] === "POST"){
