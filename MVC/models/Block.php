@@ -64,4 +64,14 @@ class Block {
 
         return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Determina si $user está bloqueado por $blockedBy.
+     *
+     * Esto se usa para casos como mensajería: si otro usuario te ha bloqueado, no
+     * deberías poder enviarle mensajes, pero si tú le has bloqueado, aún puedes.
+     */
+    public function isBlockedBy($user, $blockedBy){
+        return $this->hasBlocked($blockedBy, $user);
+    }
 }
