@@ -123,6 +123,14 @@ class DetailController {
         
         $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $viewerId = $_SESSION['user_id'] ?? null;
+        foreach($songs as &$song){
+            $likeData = $this->like->countLikes($song['id_cancion']);
+            $song['likes_total'] = (int)($likeData['total'] ?? 0);
+            $song['user_liked'] = $viewerId ? $this->like->isLiked($viewerId, $song['id_cancion']) : false;
+        }
+        unset($song);
+
         require "../MVC/views/detail_album.php";
     }
 
@@ -228,7 +236,11 @@ class DetailController {
                 }
             }
 
-            header("Location: /LASK/public/index.php/song?id=" . $song_id);
+            if(!empty($_POST['album_id'])){
+                header("Location: /LASK/public/index.php/album?id=" . (int)$_POST['album_id']);
+            } else {
+                header("Location: /LASK/public/index.php/song?id=" . $song_id);
+            }
             exit;
         }
     }
