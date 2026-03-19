@@ -1,5 +1,18 @@
 <h1>Explorar Tags</h1>
 
+<?php if(isset($_SESSION['role']) && $_SESSION['role'] == 1): ?>
+    <p>
+        <a href="/LASK/public/index.php/tag/create">Crear nuevo tag</a>
+    </p>
+<?php endif; ?>
+
+<?php if(isset($_SESSION['flash_message']) && $_SESSION['flash_message']): ?>
+    <div style="padding:10px; margin:10px 0; border:1px solid green; background:#e6ffe6;">
+        <?= $_SESSION['flash_message'] ?>
+    </div>
+    <?php unset($_SESSION['flash_message']); ?>
+<?php endif; ?>
+
 <form action="/LASK/public/index.php/tags" method="GET">
     <input type="text" name="q" value="<?= htmlspecialchars($query ?? '') ?>" placeholder="Buscar tags">
     <button type="submit">Buscar</button>
