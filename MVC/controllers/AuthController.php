@@ -68,6 +68,15 @@ class AuthController {
             exit;
         }
 
+        $nombre_artistico = trim($_POST['nombre_artistico'] ?? '');
+
+        if((int)$data['rol'] !== 2 && $nombre_artistico !== ''){
+            $_SESSION['flash_message'] = "Solo los artistas pueden tener nombre artístico. Si quieres ser artista, cambia el rol.";
+            $_SESSION['flash_message_type'] = "error";
+            header("Location: /LASK/public/index.php/register");
+            exit;
+        }
+
         // validar unicidad (email y nombre de usuario)
         if($this->user->emailExists($data['email'])){
             $_SESSION['flash_message'] = "El email ya está registrado";
@@ -107,9 +116,7 @@ class AuthController {
         // si es artista, crear registro en tabla Artista
         if($data['rol'] == 2){
 
-            $nombre_artistico = $_POST['nombre_artistico'] ?? null;
-
-            if(!$nombre_artistico){
+            if($nombre_artistico === ''){
                 $_SESSION['flash_message'] = "Debes ingresar nombre artístico";
                 $_SESSION['flash_message_type'] = "error";
                 header("Location: /LASK/public/index.php/register");
