@@ -1,35 +1,59 @@
-<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <h1>Nuevo Álbum Creado</h1>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/create_album.css') ?>">
 
-    <!-- Mostrar detalles del álbum -->
-    <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-        <?php if(!empty($album['portada_album'])): ?>
-            <img src="/LASK/<?= htmlspecialchars($album['portada_album']) ?>" style="max-width: 200px; height: auto; border-radius: 8px; margin-bottom: 20px;">
-        <?php endif; ?>
+<div class="page-wrapper">
+    <h1 class="page-title">Agregar canciones</h1>
 
-        <h2><?= htmlspecialchars($album['nombre_album']) ?></h2>
-        <p><strong>Descripción:</strong></p>
-        <p><?= htmlspecialchars($album['descripcion_album']) ?></p>
-    </div>
-
-    <!-- Formulario para agregar canciones -->
-    <h3>Agregar Canciones</h3>
-    <form action="<?= BASE_URL ?>/album/add-songs?id=<?= (int)$album['id_album'] ?>" method="POST" enctype="multipart/form-data">
+    <form class="album-form" action="<?= htmlspecialchars(BASE_URL . '/album/add-songs?id=' . (int)$album['id_album']) ?>" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="album_id" value="<?= (int)$album['id_album'] ?>">
 
-        <label for="nombre">Nombre de la Canción:</label>
-        <input type="text" id="nombre" name="nombre" required><br><br>
+        <div class="album-cover">
+            <label class="album-cover__label">Álbum</label>
+            <div class="album-cover__drop" style="cursor:default;">
+                <?php if(!empty($album['portada_album'])): ?>
+                    <img src="/LASK/<?= htmlspecialchars($album['portada_album']) ?>" class="album-cover__preview" style="display:block;" alt="Portada del álbum">
+                <?php else: ?>
+                    <div class="album-cover__placeholder">
+                        <span class="album-cover__icon" aria-hidden="true"></span>
+                        <span class="album-cover__hint">Sin portada</span>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <p class="album-cover__hint" style="margin-top:8px;"><?= htmlspecialchars($album['nombre_album']) ?></p>
+        </div>
 
-        <label for="archivo">Archivo de Música (mp3):</label>
-        <input type="file" id="archivo" name="archivo" accept=".mp3" required><br><br>
+        <div class="album-fields">
+            <div class="form-group">
+                <label class="form-label" for="existingSong">Agregar canción existente</label>
+                <select id="existingSong" class="form-input" name="existing_song_id">
+                    <option value="">Selecciona una canción ya subida (opcional)</option>
+                    <?php if(!empty($availableSongs)): ?>
+                        <?php foreach($availableSongs as $song): ?>
+                            <option value="<?= (int)$song['id_cancion'] ?>">
+                                <?= htmlspecialchars($song['nombre_cancion']) ?>
+                                <?= !empty($song['id_album']) ? '(transferir de otro álbum)' : '(sin álbum)' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
 
-        <button type="submit">Agregar Canción</button>
+            <div class="form-group">
+                <label class="form-label" for="nombre">Nombre canción nueva</label>
+                <input id="nombre" class="form-input" type="text" name="nombre" placeholder="Nombre de la canción nueva (opcional)">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="archivo">Archivo canción nueva</label>
+                <input id="archivo" class="form-input" type="file" name="archivo" accept=".mp3">
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-insert-songs" type="submit">Agregar canción al álbum</button>
+                <a class="btn-publish" href="<?= htmlspecialchars(BASE_URL . '/album?id=' . (int)$album['id_album']) ?>">Terminar y ver álbum</a>
+            </div>
+        </div>
+
     </form>
 
-    <!-- Opciones -->
-    <hr style="margin: 30px 0;">
-    <div style="display: flex; gap: 10px;">
-        <a href="<?= BASE_URL ?>/album?id=<?= (int)$album['id_album'] ?>" style="padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Ver Álbum Completo</a>
-        <a href="<?= htmlspecialchars($artistProfileUrl) ?>" style="padding: 10px 20px; background: #008CBA; color: white; text-decoration: none; border-radius: 5px;">Volver al Perfil</a>
-    </div>
+    <a class="link-back" href="<?= htmlspecialchars($artistProfileUrl) ?>">Volver al perfil</a>
 </div>
