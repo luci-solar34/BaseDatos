@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'LASK - Música') ?></title>
+    <link rel="stylesheet" href="<?= htmlspecialchars(BASE_URL . '/../css/profile.css') ?>">
     <style>
         * {
             margin: 0;
