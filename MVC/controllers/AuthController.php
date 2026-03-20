@@ -1,6 +1,9 @@
 <?php
 
-session_start();
+// Iniciar sesión solo si no hay ninguna activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once "../config/database.php";
 require_once "../MVC/models/User.php";
@@ -16,7 +19,6 @@ class AuthController {
     }
 
     public function login(){
-
         $username = $_POST['username'] ?? null;
         $password = $_POST['password'] ?? null;
 
@@ -40,7 +42,6 @@ class AuthController {
     }
 
     public function register(){
-
         // validar términos
         if(!isset($_POST['terms'])){
             echo "Debes aceptar los términos y condiciones";
@@ -75,9 +76,14 @@ class AuthController {
             $this->user->createArtist($user_id, $nombre_artistico);
         }
 
-        // versión HEAD: redirige automáticamente al login
-        header("Location: /LASK/public/index.php/login");
-        exit;
+        // Combinamos ambas opciones: redirigir o mostrar mensaje
+        if(isset($_POST['redirect']) && $_POST['redirect'] === 'login'){
+            header("Location: /LASK/public/index.php/login");
+            exit;
+        } else {
+            echo "Cuenta creada correctamente.<br>";
+            echo '<a href="/LASK/public/index.php/login">Ir a iniciar sesión</a>';
+        }
     }
 
     public function logout(){
