@@ -1,6 +1,6 @@
-<a href="/LASK/public/index.php/messages" style="display: inline-block; margin-bottom: 10px;">← Volver a mensajes</a>
+<a href="<?= BASE_URL ?>/messages" style="display: inline-block; margin-bottom: 10px;">← Volver a mensajes</a>
 
-<h1>Chat con <?= htmlspecialchars($otherUser['nombre_usuario'] ?? 'usuario') ?></h1>
+<h1>Chat con <?= htmlspecialchars($chatPartnerName) ?></h1>
 
 <?php if(empty($messages)): ?>
     <p>No hay mensajes aún. Envía el primero.</p>
@@ -9,11 +9,11 @@
 
     <div style="margin-bottom: 10px;">
         <strong>
-            <?= $msg['id_emisor'] == $_SESSION['user_id'] ? 'Yo' : htmlspecialchars($otherUser['nombre_usuario']) ?>:
+            <?= htmlspecialchars($msg['sender_label']) ?>:
         </strong>
         <?= htmlspecialchars($msg['texto']) ?>
         <br>
-        <small style="color:#666;"><?= $msg['fecha_mensaje'] ?></small>
+        <small style="color:#666;"><?= htmlspecialchars($msg['fecha_mensaje']) ?></small>
     </div>
 
     <?php endforeach; ?>
@@ -21,9 +21,9 @@
 
 <hr>
 
-<form method="POST" action="/LASK/public/index.php/message/send">
+<form method="POST" action="<?= htmlspecialchars(BASE_URL . '/message/send') ?>">
 
-    <input type="hidden" name="user_id" value="<?= htmlspecialchars($_GET['user']) ?>">
+    <input type="hidden" name="user_id" value="<?= (int)$chatRecipientId ?>">
 
     <input type="text" name="texto" placeholder="Escribe mensaje" required>
 

@@ -6,11 +6,11 @@
     <div id="nowPlayingTitle" style="font-weight:bold;"></div>
 </div>
 
-<a href="/LASK/public/index.php/playlist/add-song?playlist=<?= $playlist_id ?>">
+<a href="<?= BASE_URL ?>/playlist/add-song?playlist=<?= (int)$playlist_id ?>">
     <button>Agregar canciones</button>
 </a>
 
-<a href="/LASK/public/index.php/playlist/edit?id=<?= $playlist_id ?>">
+<a href="<?= BASE_URL ?>/playlist/edit?id=<?= (int)$playlist_id ?>">
     <button>Editar Playlist</button>
 </a>
 
@@ -19,39 +19,17 @@
 <?php foreach($songs as $song): ?>
 
 <div>
-    <?= $song['nombre_cancion'] ?>
+    <?= htmlspecialchars($song['nombre_cancion']) ?>
     <audio controls class="js-song-player"
            data-title="<?= htmlspecialchars($song['nombre_cancion']) ?>"
            data-cover="<?= htmlspecialchars($song['portada_cancion'] ?? 'Photos/banner_default.png') ?>">
-        <source src="/LASK/<?= $song['path_link'] ?>" type="audio/mpeg">
+        <source src="/LASK/<?= htmlspecialchars($song['path_link']) ?>" type="audio/mpeg">
     </audio>
 </div>
 
 <?php endforeach; ?>
 
-<a href="/LASK/public/index.php/profile?id=<?= $_SESSION['user_id'] ?>">
+<a href="<?= htmlspecialchars($finalizeUrl) ?>">
     <button>Finalizar</button>
 </a>
-
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-    const nowPlaying = document.getElementById('nowPlaying');
-    const cover = document.getElementById('nowPlayingCover');
-    const title = document.getElementById('nowPlayingTitle');
-    const players = document.querySelectorAll('.js-song-player');
-
-    players.forEach(function(player){
-        player.addEventListener('play', function(){
-            const songTitle = player.dataset.title || 'Canción';
-            const songCover = player.dataset.cover || 'Photos/banner_default.png';
-            const songSrc   = player.querySelector('source').src;
-
-            nowPlaying.style.display = 'block';
-            title.textContent = songTitle;
-            cover.src = '/LASK/' + songCover;
-
-
-        });
-    });
-});
-</script>
+<script src="<?= substr(BASE_URL, 0, strrpos(BASE_URL, '/')) ?>/js/playlist.js"></script>

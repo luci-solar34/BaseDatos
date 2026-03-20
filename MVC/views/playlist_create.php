@@ -1,6 +1,6 @@
 <h1>Crear Playlist</h1>
 
-<form action="/LASK/public/index.php/playlist/create" method="POST">
+<form action="<?= BASE_URL ?>/playlist/create" method="POST">
 
 <label>Nombre de la playlist</label><br>
 <input type="text" name="name" required><br><br>

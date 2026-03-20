@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pageTitle ?? 'LASK - Música' ?></title>
+    <title><?= htmlspecialchars($pageTitle ?? 'LASK - Música') ?></title>
     <style>
         * {
             margin: 0;
@@ -94,24 +94,30 @@
     </style>
 </head>
 <body>
+    <?php
+    $navIsLoggedIn = $navIsLoggedIn ?? false;
+    $navProfileUrl = $navProfileUrl ?? '#';
+    $navShowAdmin = $navShowAdmin ?? false;
+    $navUsername = $navUsername ?? '';
+    ?>
     <nav class="navbar">
-        <a href="/LASK/public">Inicio</a>
-        <a href="/LASK/public/index.php/new-releases">Nuevos Lanzamientos</a>
+        <a href="<?= htmlspecialchars(BASE_URL) ?>">Inicio</a>
+        <a href="<?= htmlspecialchars(BASE_URL . '/new-releases') ?>">Nuevos Lanzamientos</a>
         
-        <?php if(isset($_SESSION['user_id'])): ?>
-            <a href="/LASK/public/index.php/profile?id=<?= $_SESSION['user_id'] ?>">Mi Perfil</a>
-            <a href="/LASK/public/index.php/messages">Mensajes</a>
-            <?php if($_SESSION['role'] == 1): ?>
-                <a href="/LASK/public/index.php/admin/denuncias">Admin</a>
+        <?php if($navIsLoggedIn): ?>
+            <a href="<?= htmlspecialchars($navProfileUrl) ?>">Mi Perfil</a>
+            <a href="<?= htmlspecialchars(BASE_URL . '/messages') ?>">Mensajes</a>
+            <?php if($navShowAdmin): ?>
+                <a href="<?= htmlspecialchars(BASE_URL . '/admin/denuncias') ?>">Admin</a>
             <?php endif; ?>
             <div class="user-info">
-                <span>👤 <?= $_SESSION['username'] ?></span>
-                <a href="/LASK/public/index.php/logout" style="margin-left: 15px;">Cerrar sesión</a>
+                <span>👤 <?= htmlspecialchars($navUsername) ?></span>
+                <a href="<?= htmlspecialchars(BASE_URL . '/logout') ?>" style="margin-left: 15px;">Cerrar sesión</a>
             </div>
         <?php else: ?>
             <div class="user-info">
-                <a href="/LASK/public/index.php/login">Iniciar sesión</a>
-                <a href="/LASK/public/index.php/register" style="margin-left: 15px;">Registrarse</a>
+                <a href="<?= htmlspecialchars(BASE_URL . '/login') ?>">Iniciar sesión</a>
+                <a href="<?= htmlspecialchars(BASE_URL . '/register') ?>" style="margin-left: 15px;">Registrarse</a>
             </div>
         <?php endif; ?>
     </nav>
@@ -119,6 +125,8 @@
     <div class="main-content">
         <?= $content ?>
     </div>
+
+    <script src="<?= htmlspecialchars(BASE_URL . '/../js/view-actions.js') ?>"></script>
 
 </body>
 </html>

@@ -12,12 +12,12 @@ $pageTitle = 'Nuevos Lanzamientos - LASK';
     <ul>
     <?php foreach($songs as $song): ?>
         <li>
-            <a href="/LASK/public/index.php/song?id=<?= $song['id_cancion'] ?>">
-                <?= $song['nombre_cancion'] ?>
+            <a href="<?= BASE_URL ?>/song?id=<?= (int)$song['id_cancion'] ?>">
+                <?= htmlspecialchars($song['nombre_cancion']) ?>
             </a>
-            - <?= $song['nombre_artistico'] ?>
+            - <?= htmlspecialchars($song['nombre_artistico']) ?>
             <?php if($song['nombre_album']): ?>
-                (álbum: <?= $song['nombre_album'] ?>)
+                (álbum: <?= htmlspecialchars($song['nombre_album']) ?>)
             <?php endif; ?>
         </li>
     <?php endforeach; ?>
@@ -32,11 +32,11 @@ $pageTitle = 'Nuevos Lanzamientos - LASK';
     <ul>
     <?php foreach($albums as $album): ?>
         <li>
-            <a href="/LASK/public/index.php/album?id=<?= $album['id_album'] ?>">
-                <?= $album['nombre_album'] ?>
+            <a href="<?= BASE_URL ?>/album?id=<?= (int)$album['id_album'] ?>">
+                <?= htmlspecialchars($album['nombre_album']) ?>
             </a>
-            - <?= $album['nombre_artistico'] ?? 'Artista desconocido' ?>
-            (<?= $album['fecha_lanzamiento'] ?>)
+            - <?= htmlspecialchars($album['nombre_artistico'] ?? 'Artista desconocido') ?>
+            (<?= htmlspecialchars($album['fecha_lanzamiento']) ?>)
         </li>
     <?php endforeach; ?>
     </ul>

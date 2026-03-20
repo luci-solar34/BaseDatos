@@ -1,12 +1,12 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/Song.php";
-require_once "../MVC/models/Album.php";
-require_once "../MVC/models/Comment.php";
-require_once "../MVC/models/Tag.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/Song.php";
+require_once __DIR__ . "/../models/Album.php";
+require_once __DIR__ . "/../models/Comment.php";
+require_once __DIR__ . "/../models/Tag.php";
 
-class ArtistController {
+class ArtistController extends Controller {
 
     private $song;
     private $album;
@@ -14,264 +14,257 @@ class ArtistController {
     private $tag;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->song = new Song($db);
         $this->album = new Album($db);
         $this->comment = new Comment($db);
         $this->tag = new Tag($db);
     }
 
-    public function profile($id){
-        // En caso de que esta ruta se use, redirigimos a la vista de artista estándar.
-        require_once "../MVC/controllers/DetailController.php";
+    private function requireArtistUserId($expectedArtistId = null){
+        $artistId = $this->requireAuthenticatedUser('login');
+        if($this->sessionInt('role') !== 2){
+            $this->abort('Solo los artistas pueden realizar esta acción', 403);
+        }
 
-        $controller = new DetailController();
-        $controller->artist($id);
+        if($expectedArtistId !== null && (int)$expectedArtistId !== $artistId){
+            $this->abort('Sin permisos para este artista', 403);
+        }
+
+        return $artistId;
     }
 
-    public function uploadSong(){
+    private function loadOwnedAlbum($albumId, $artistId){
+        $album = $this->album->getById($albumId);
+        if(!$album || (int)$album['id_artista'] !== (int)$artistId){
+            $this->abort('Álbum no encontrado o sin permisos', 403);
+        }
 
-        $data = [
-            "nombre" => $_POST['nombre'],
-            "numero_pista" => $_POST['pista'],
-            "path" => $_POST['path'],
-            "album" => $_POST['album'],
-            "artista" => $_SESSION['user_id']
-        ];
+        return $album;
+    }
 
-        $this->song->create($data);
+    private function loadOwnedSong($songId, $artistId){
+        $song = $this->song->getById($songId);
+        if(!$song || (int)$song['id_artista'] !== (int)$artistId){
+            $this->abort('Canción no encontrada o sin permisos', 403);
+        }
+
+        return $song;
     }
 
     public function showCreateAlbum($artist_id){
 
-        require "../MVC/views/create_album.php";
+        $artistId = $this->requireArtistUserId((int)$artist_id);
+
+        $this->render('create_album.php', compact('artistId'));
     }
 
     public function createAlbum(){
 
-        $nombre = $_POST['nombre'];
-        $descripcion = $_POST['descripcion'];
-        $artista = $_SESSION['user_id'];
+        $nombre = $this->postString('nombre');
+        $descripcion = $this->postString('descripcion');
+        $artista = $this->requireArtistUserId();
 
-        // Subir portada
-        $portada = '';
-        if(isset($_FILES['portada']) && $_FILES['portada']['error'] == 0){
+        if(!$this->esEntradaSegura($nombre) || !$this->esEntradaSegura($descripcion)){
+            $this->abort('Los datos contienen caracteres no permitidos.', 422);
+        }
 
-            $ext = pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION);
-            if(in_array($ext, ['jpg', 'png'])){
-
-                $portada = 'Photos/' . uniqid() . '.' . $ext;
-                move_uploaded_file($_FILES['portada']['tmp_name'], '../' . $portada);
-            }
+        $upload = $this->storeUploadedFile('portada', ['jpg', 'jpeg', 'png', 'webp'], 'Photos', '');
+        if($upload['error']){
+            $this->abort($upload['error'], 422);
         }
 
         $data = [
-            "nombre" => $nombre,
-            "descripcion" => $descripcion,
-            "portada" => $portada,
-            "artista" => $artista
+            'nombre' => $nombre,
+            'descripcion' => $descripcion,
+            'portada' => $upload['path'] ?? '',
+            'artista' => $artista,
         ];
 
         $album_id = $this->album->create($data);
 
-        header("Location: /LASK/public/index.php/album/add-songs?id=" . $album_id);
-        exit;
+        $this->redirectToRoute('album/add-songs?id=' . (int)$album_id);
     }
 
     public function showCreateSong($artist_id){
 
+        $artistId = $this->requireArtistUserId((int)$artist_id);
         $tags = $this->tag->getAllTags();
 
-        require "../MVC/views/create_song.php";
+        $this->render('create_song.php', compact('artistId', 'tags'));
     }
 
     public function showEditAlbum($album_id){
 
-        $album = $this->album->getById($album_id);
-        $artistId = $_SESSION['user_id'] ?? null;
-
-        if(!$album || !$artistId || (int)$album['id_artista'] !== (int)$artistId){
-            die("Álbum no encontrado o sin permisos");
-        }
+        $artistId = $this->requireArtistUserId();
+        $album = $this->loadOwnedAlbum((int)$album_id, $artistId);
 
         $availableSongs = $this->song->getByArtistOutsideAlbum($artistId, $album_id);
 
-        require "../MVC/views/edit_album.php";
+        $this->render('edit_album.php', compact('album', 'artistId', 'availableSongs'));
     }
 
     public function editAlbum(){
 
-        $albumId = $_POST['album_id'] ?? null;
-        $artistId = $_SESSION['user_id'] ?? null;
-        $album = $this->album->getById($albumId);
-
-        if(!$album || !$artistId || (int)$album['id_artista'] !== (int)$artistId){
-            die("Álbum no encontrado o sin permisos");
+        $albumId = $this->postInt('album_id', 0);
+        $artistId = $this->requireArtistUserId();
+        $album = $this->loadOwnedAlbum($albumId, $artistId);
+        $upload = $this->storeUploadedFile('portada', ['jpg', 'jpeg', 'png', 'webp'], 'Photos', $album['portada_album']);
+        if($upload['error']){
+            $this->abort($upload['error'], 422);
         }
 
-        $portada = $album['portada_album'];
-        if(isset($_FILES['portada']) && $_FILES['portada']['error'] == 0){
+        $nombre = $this->postString('nombre');
+        $descripcion = $this->postString('descripcion');
 
-            $ext = pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION);
-            if(in_array($ext, ['jpg', 'png'])){
-                $portada = 'Photos/' . uniqid() . '.' . $ext;
-                move_uploaded_file($_FILES['portada']['tmp_name'], '../' . $portada);
-            }
+        if(!$this->esEntradaSegura($nombre) || !$this->esEntradaSegura($descripcion)){
+            $this->abort('Los datos del álbum contienen caracteres no permitidos.', 422);
         }
 
         $data = [
-            "album" => $albumId,
-            "artista" => $artistId,
-            "nombre" => $_POST['nombre'],
-            "descripcion" => $_POST['descripcion'],
-            "portada" => $portada
+            'album' => $albumId,
+            'artista' => $artistId,
+            'nombre' => $nombre,
+            'descripcion' => $descripcion,
+            'portada' => $upload['path'],
         ];
 
         $this->album->update($data);
 
-        if(!empty($_POST['existing_song_id'])){
-            $this->song->moveToAlbum($_POST['existing_song_id'], $albumId, $artistId);
+        $existingSongId = $this->postInt('existing_song_id', 0);
+        if($existingSongId > 0){
+            $this->song->moveToAlbum($existingSongId, $albumId, $artistId);
         }
 
-        header("Location: /LASK/public/index.php/album?id=" . $albumId);
-        exit;
+        $this->redirectToRoute('album?id=' . $albumId);
     }
 
     public function createSong(){
 
-        $nombre = $_POST['nombre'];
-        $artista = $_SESSION['user_id'];
-        $letra = $_POST['letra_cancion'] ?? '';
-        $fonetica = $_POST['texto_fonetico'] ?? '';
+        $nombre = $this->postString('nombre');
+        $artista = $this->requireArtistUserId();
+        $letra = $this->postString('letra_cancion');
+        $fonetica = $this->postString('texto_fonetico');
 
-        // Subir archivo
-        $path = '';
-        if(isset($_FILES['archivo']) && $_FILES['archivo']['error'] == 0){
-
-            $ext = strtolower(pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION));
-            if($ext == 'mp3'){
-
-                $path = 'music/' . uniqid() . '.' . $ext;
-                move_uploaded_file($_FILES['archivo']['tmp_name'], '../' . $path);
-            }
+        if(!$this->esEntradaSegura($nombre)){
+            $this->abort('El nombre de la canción contiene caracteres no permitidos.', 422);
         }
 
-        // Subir portada de canción
-        $portada = null;
-        if(isset($_FILES['portada']) && $_FILES['portada']['error'] == 0){
-            $extPortada = strtolower(pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION));
-            if(in_array($extPortada, ['jpg', 'jpeg', 'png', 'webp'])){
-                $portada = 'Photos/' . uniqid() . '.' . $extPortada;
-                move_uploaded_file($_FILES['portada']['tmp_name'], '../' . $portada);
-            }
+        $audioUpload = $this->storeUploadedFile('archivo', ['mp3'], 'music', '');
+        $coverUpload = $this->storeUploadedFile('portada', ['jpg', 'jpeg', 'png', 'webp'], 'Photos', null);
+
+        if($audioUpload['error']){
+            $this->abort($audioUpload['error'], 422);
+        }
+
+        if($coverUpload['error']){
+            $this->abort($coverUpload['error'], 422);
         }
 
         $data = [
-            "nombre" => $nombre,
-            "numero_pista" => null,
-            "album" => null,
-            "path" => $path,
-            "portada" => $portada,
-            "artista" => $artista
+            'nombre' => $nombre,
+            'numero_pista' => null,
+            'album' => null,
+            'path' => $audioUpload['path'] ?? '',
+            'portada' => $coverUpload['path'] ?? null,
+            'artista' => $artista,
         ];
 
-        $created = $this->song->create($data);
+        $songId = $this->song->create($data);
 
-        if($created){
-            $songId = (int) $this->song->getConnection()->lastInsertId();
-            $tagIds = $_POST['tags'] ?? [];
+        if($songId){
+            $songId = (int)$songId;
+            $tagIds = $this->normalizeIdArray($this->postArray('tags'));
             $this->tag->syncSongTags($songId, $tagIds);
             $this->song->saveLyrics($songId, $letra, $fonetica);
         }
 
-        header("Location: /LASK/public/index.php/artist?id=" . $artista);
-        exit;
+        $this->redirectToRoute('artist?id=' . $artista);
     }
 
     public function showEditSong($song_id){
 
-        $song = $this->song->getById($song_id);
-        $artistId = $_SESSION['user_id'] ?? null;
-
-        if(!$song || !$artistId || (int)$song['id_artista'] !== (int)$artistId){
-            die("Canción no encontrada o sin permisos");
-        }
+        $artistId = $this->requireArtistUserId();
+        $songId = (int)$song_id;
+        $song = $this->loadOwnedSong($songId, $artistId);
 
         $albums = $this->album->getByArtist($artistId);
         $tags = $this->tag->getAllTags();
-        $selectedTagIds = $this->tag->getSongTagIds($song_id);
-    $lyrics = $this->song->getLyrics($song_id);
+        $selectedTagIds = $this->tag->getSongTagIds($songId);
+        $lyrics = $this->song->getLyrics($songId);
 
-    require "../MVC/views/edit_song.php";
+        $this->render('edit_song.php', compact('song', 'albums', 'tags', 'selectedTagIds', 'lyrics'));
     }
 
     public function editSong(){
 
-        $songId = $_POST['song_id'] ?? null;
-        $artistId = $_SESSION['user_id'] ?? null;
-        $song = $this->song->getById($songId);
-
-        if(!$song || !$artistId || (int)$song['id_artista'] !== (int)$artistId){
-            die("Canción no encontrada o sin permisos");
-        }
-
-        $albumId = $_POST['album_id'] !== '' ? $_POST['album_id'] : null;
+        $songId = $this->postInt('song_id', 0);
+        $artistId = $this->requireArtistUserId();
+        $song = $this->loadOwnedSong($songId, $artistId);
+        $albumId = $this->postString('album_id', '') !== '' ? $this->postInt('album_id', 0) : null;
 
         if($albumId){
             $targetAlbum = $this->album->getById($albumId);
 
             if(!$targetAlbum || (int)$targetAlbum['id_artista'] !== (int)$artistId){
-                die("Álbum inválido para esta canción");
+                $this->abort('Álbum inválido para esta canción', 422);
             }
         }
 
-        $portada = $song['portada_cancion'] ?? null;
-        if(isset($_FILES['portada']) && $_FILES['portada']['error'] == 0){
-            $extPortada = strtolower(pathinfo($_FILES['portada']['name'], PATHINFO_EXTENSION));
-            if(in_array($extPortada, ['jpg', 'jpeg', 'png', 'webp'])){
-                $portada = 'Photos/' . uniqid() . '.' . $extPortada;
-                move_uploaded_file($_FILES['portada']['tmp_name'], '../' . $portada);
-            }
+        $coverUpload = $this->storeUploadedFile('portada', ['jpg', 'jpeg', 'png', 'webp'], 'Photos', $song['portada_cancion'] ?? null);
+        if($coverUpload['error']){
+            $this->abort($coverUpload['error'], 422);
+        }
+
+        $nombre = $this->postString('nombre');
+        $letra = $this->postString('letra_cancion');
+        $fonetica = $this->postString('texto_fonetico');
+
+        if(!$this->esEntradaSegura($nombre) || !$this->esEntradaSegura($letra) || !$this->esEntradaSegura($fonetica)){
+            $this->abort('Los datos de la canción contienen caracteres no permitidos.', 422);
         }
 
         $data = [
-            "song" => $songId,
-            "artista" => $artistId,
-            "nombre" => $_POST['nombre'],
-            "album" => $albumId,
-            "portada" => $portada
+            'song' => $songId,
+            'artista' => $artistId,
+            'nombre' => $nombre,
+            'album' => $albumId,
+            'portada' => $coverUpload['path'],
         ];
 
         $this->song->update($data);
 
-        $tagIds = $_POST['tags'] ?? [];
+        $tagIds = $this->normalizeIdArray($this->postArray('tags'));
         $this->tag->syncSongTags($songId, $tagIds);
 
-        $this->song->saveLyrics($songId, $_POST['letra_cancion'] ?? '', $_POST['texto_fonetico'] ?? '');
+        $this->song->saveLyrics($songId, $letra, $fonetica);
 
-        header("Location: /LASK/public/index.php/song?id=" . $songId);
-        exit;
+        $this->redirectToRoute('song?id=' . $songId);
     }
 
     public function addComment(){
 
-        $artista = $_POST['artist_id'];
-        $comentario = $_POST['comment'];
-        $usuario = $_SESSION['user_id'];
+        $artista = $this->postInt('artist_id', 0);
+        $comentario = $this->postString('comment');
+        $usuario = $this->requireAuthenticatedUser('login');
+
+        if(!$artista || $comentario === ''){
+            $this->abort('Datos inválidos', 422);
+        }
+
+        if(!$this->esEntradaSegura($comentario)){
+            $this->abort('El comentario contiene caracteres no permitidos.', 422);
+        }
 
         $data = [
-            "usuario" => $usuario,
-            "artista" => $artista,
-            "comentario" => $comentario
+            'usuario' => $usuario,
+            'artista' => $artista,
+            'comentario' => $comentario,
         ];
 
         $this->comment->create($data);
 
-        header("Location: /LASK/public/index.php/artist?id=" . $artista);
-        exit;
+        $this->redirectToRoute('artist?id=' . $artista);
     }
 
 }

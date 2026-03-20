@@ -1,19 +1,18 @@
 <h1>Explorar Tags</h1>
 
-<?php if(isset($_SESSION['role']) && $_SESSION['role'] == 1): ?>
+<?php if($canCreateTag): ?>
     <p>
-        <a href="/LASK/public/index.php/tag/create">Crear nuevo tag</a>
+        <a href="<?= BASE_URL ?>/tag/create">Crear nuevo tag</a>
     </p>
 <?php endif; ?>
 
-<?php if(isset($_SESSION['flash_message']) && $_SESSION['flash_message']): ?>
+<?php if($flashMessage): ?>
     <div style="padding:10px; margin:10px 0; border:1px solid green; background:#e6ffe6;">
-        <?= $_SESSION['flash_message'] ?>
+        <?= htmlspecialchars($flashMessage) ?>
     </div>
-    <?php unset($_SESSION['flash_message']); ?>
 <?php endif; ?>
 
-<form action="/LASK/public/index.php/tags" method="GET">
+<form action="<?= htmlspecialchars(BASE_URL . '/tags') ?>" method="GET">
     <input type="text" name="q" value="<?= htmlspecialchars($query ?? '') ?>" placeholder="Buscar tags">
     <button type="submit">Buscar</button>
 </form>
@@ -24,7 +23,7 @@
     <ul>
         <?php foreach($tags as $tag): ?>
             <li>
-                <a href="/LASK/public/index.php/tag?id=<?= $tag['id_tag'] ?>">
+                <a href="<?= BASE_URL ?>/tag?id=<?= (int)$tag['id_tag'] ?>">
                     <?= htmlspecialchars($tag['nombre_tag']) ?>
                 </a>
                 <?php if(!empty($tag['descripcion_tag'])): ?>
@@ -35,4 +34,4 @@
     </ul>
 <?php endif; ?>
 
-<a href="/LASK/public/index.php/">Volver al home</a>
+<a href="<?= htmlspecialchars(BASE_URL) ?>">Volver al home</a>

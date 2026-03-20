@@ -1,97 +1,115 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/Tag.php";
-require_once "../MVC/models/User.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/Tag.php";
+require_once __DIR__ . "/../models/User.php";
+require_once __DIR__ . "/../models/Block.php";
 
-class TagController {
+class TagController extends Controller {
 
     private $tag;
     private $user;
+    private $block;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->tag = new Tag($db);
         $this->user = new User($db);
+        $this->block = new Block($db);
     }
 
     private function ensureAdmin(){
-        if(empty($_SESSION['user_id']) || empty($_SESSION['role']) || $_SESSION['role'] != 1){
-            $_SESSION['flash_message'] = "Acceso denegado: solo administradores pueden crear tags.";
-            header("Location: /LASK/public/index.php");
-            exit;
-        }
+        $this->requireAdmin('Acceso denegado: solo administradores pueden crear tags.');
     }
 
     public function showCreate(){
         $this->ensureAdmin();
 
-        $flashMessage = $_SESSION['flash_message'] ?? null;
-        unset($_SESSION['flash_message']);
-
-        // Mostrar todos los tags para el admin en la misma vista de creación
+        $flash = $this->consumeFlash();
         $tags = $this->tag->getAllTags();
+        $profileUrl = $this->routeUrl('profile?id=' . (int)$this->sessionInt('user_id'));
 
-        require "../MVC/views/create_tag.php";
+        $this->render('create_tag.php', [
+            'flashMessage' => $flash['message'],
+            'tags' => $tags,
+            'profileUrl' => $profileUrl,
+        ]);
     }
 
     public function create(){
         $this->ensureAdmin();
 
-        $nombre = trim($_POST['nombre_tag'] ?? '');
-        $descripcion = trim($_POST['descripcion_tag'] ?? '');
+        $nombre = $this->postString('nombre_tag');
+        $descripcion = $this->postString('descripcion_tag');
 
         if($nombre === ''){
-            $_SESSION['flash_message'] = "El nombre del tag es obligatorio.";
-            header("Location: /LASK/public/index.php/tag/create");
-            exit;
+            $this->setFlash('El nombre del tag es obligatorio.');
+            $this->redirectToRoute('tag/create');
+        }
+
+        if(!$this->esEntradaSegura($nombre) || !$this->esEntradaSegura($descripcion)){
+            $this->setFlash('Los datos del tag contienen caracteres no permitidos.');
+            $this->redirectToRoute('tag/create');
         }
 
         try {
             $result = $this->tag->createTag($nombre, $descripcion);
 
             if($result){
-                $_SESSION['flash_message'] = "Tag creado correctamente.";
-                header("Location: /LASK/public/index.php/tag/create");
-                exit;
+                $this->setFlash('Tag creado correctamente.', 'success');
+                $this->redirectToRoute('tag/create');
             }
 
-            $_SESSION['flash_message'] = "No se pudo crear el tag. Verifica los datos.";
-            header("Location: /LASK/public/index.php/tag/create");
-            exit;
+            $this->setFlash('No se pudo crear el tag. Verifica los datos.');
+            $this->redirectToRoute('tag/create');
 
         } catch (PDOException $e) {
-            if($e->getCode() == 23000){
-                $_SESSION['flash_message'] = "Ya existe un tag con ese nombre.";
+            if((int)$e->getCode() === 23000){
+                $this->setFlash('Ya existe un tag con ese nombre.');
             } else {
-                $_SESSION['flash_message'] = "Error al crear tag: " . $e->getMessage();
+                $this->setFlash('Error al crear tag.');
             }
-            header("Location: /LASK/public/index.php/tag/create");
-            exit;
+
+            $this->redirectToRoute('tag/create');
         }
     }
 
     public function show($id){
 
-        $tag = $this->tag->getById($id);
+        $tagId = (int)$id;
+        $tag = $this->tag->getById($tagId);
 
         if(!$tag){
-            die("Tag no encontrado");
+            $this->abort('Tag no encontrado', 404);
         }
 
-        $songs = $this->tag->getSongsByTag($id);
+        $songs = $this->tag->getSongsByTag($tagId);
+        $viewerId = $this->sessionInt('user_id');
 
-        require "../MVC/views/detail_tag.php";
+        if($viewerId !== null){
+            $songs = array_values(array_filter($songs, function($song) use ($viewerId){
+                return !$this->block->isBlockedBy($viewerId, (int)$song['id_artista']);
+            }));
+        }
+
+        $this->render('detail_tag.php', [
+            'tag' => $tag,
+            'songs' => $songs,
+        ]);
     }
 
     public function index(){
 
-        $query = trim($_GET['q'] ?? '');
+        $query = $this->getString('q');
         $tags = $query !== '' ? $this->tag->searchTags($query) : $this->tag->getAllTags();
+        $canCreateTag = $this->sessionInt('role') === 1;
+        $flash = $this->consumeFlash();
 
-        require "../MVC/views/tags.php";
+        $this->render('tags.php', [
+            'query' => $query,
+            'tags' => $tags,
+            'canCreateTag' => $canCreateTag,
+            'flashMessage' => $flash['message'],
+        ]);
     }
 }

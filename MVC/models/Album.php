@@ -10,7 +10,7 @@ class Album {
 
     public function getLatestAlbums(){
 
-        $query = "SELECT id_album, nombre_album, portada_album
+        $query = "SELECT id_album, id_artista, nombre_album, portada_album
                   FROM Albumes
                   ORDER BY fecha_lanzamiento DESC
                   LIMIT 6";
@@ -34,6 +34,21 @@ class Album {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getDetailByIdWithArtist($id){
+
+        $query = "SELECT A.*, AR.id_usuario AS id_artista, AR.nombre_artistico, U.nombre_usuario
+                  FROM Albumes A
+                  INNER JOIN Artista AR ON A.id_artista = AR.id_usuario
+                  INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario
+                  WHERE A.id_album = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function getByArtist($artistId){
 
         $query = "SELECT *
@@ -48,9 +63,32 @@ class Album {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-public function getConnection(){
-    return $this->conn;
-}
+    public function getLatestDetailed($limit = 20){
+
+        $limit = max(1, (int)$limit);
+
+        $query = "SELECT A.*,
+                         (SELECT AR.nombre_artistico
+                          FROM Canciones C2
+                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario
+                          WHERE C2.id_album = A.id_album
+                          LIMIT 1) as nombre_artistico,
+                         (SELECT U.nombre_usuario
+                          FROM Canciones C2
+                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario
+                          INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario
+                          WHERE C2.id_album = A.id_album
+                          LIMIT 1) as nombre_usuario
+                  FROM Albumes A
+                  ORDER BY A.fecha_lanzamiento DESC
+                      LIMIT :limit";
+
+        $stmt = $this->conn->prepare($query);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 public function create($data){
 

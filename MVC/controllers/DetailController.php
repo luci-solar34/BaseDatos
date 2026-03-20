@@ -1,16 +1,18 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/Song.php";
-require_once "../MVC/models/Album.php";
-require_once "../MVC/models/Artist.php";
-require_once "../MVC/models/Like.php";
-require_once "../MVC/models/Follow.php";
-require_once "../MVC/models/Tag.php";
-require_once "../MVC/models/Playlist.php";
-require_once "../MVC/models/Block.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/Song.php";
+require_once __DIR__ . "/../models/Album.php";
+require_once __DIR__ . "/../models/Artist.php";
+require_once __DIR__ . "/../models/Like.php";
+require_once __DIR__ . "/../models/Follow.php";
+require_once __DIR__ . "/../models/Tag.php";
+require_once __DIR__ . "/../models/Playlist.php";
+require_once __DIR__ . "/../models/Block.php";
+require_once __DIR__ . "/../models/Comment.php";
+require_once __DIR__ . "/../models/User.php";
 
-class DetailController {
+class DetailController extends Controller {
 
     private $song;
     private $album;
@@ -21,246 +23,257 @@ class DetailController {
     private $tag;
     private $playlist;
     private $block;
+    private $comment;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->song = new Song($db);
         $this->album = new Album($db);
         $this->artist = new Artist($db);
-        require_once "../MVC/models/User.php";
         $this->user = new User($db);
         $this->like = new Like($db);
         $this->follow = new Follow($db);
         $this->tag = new Tag($db);
         $this->playlist = new Playlist($db);
         $this->block = new Block($db);
+        $this->comment = new Comment($db);
+    }
+
+    private function isAjaxRequest(){
+        return strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest'
+            || strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+    }
+
+    private function formatPlaylistLabels(array $playlists){
+        foreach($playlists as &$playlist){
+            $playlist['privacy_label'] = ((int)$playlist['privacidad_playlist'] === 1) ? '(Privada)' : '';
+        }
+        unset($playlist);
+
+        return $playlists;
+    }
+
+    private function buildAlbumQueue(array $songs, $albumCover){
+        $playableSongs = array_values(array_filter($songs, function($song){
+            return !empty($song['path_link']);
+        }));
+        $playableIndex = [];
+
+        foreach($playableSongs as $index => $playableSong){
+            $playableIndex[$playableSong['id_cancion']] = $index;
+        }
+
+        foreach($songs as &$song){
+            $song['playable_index'] = $playableIndex[$song['id_cancion']] ?? null;
+        }
+        unset($song);
+
+        $albumQueue = array_map(function($song) use ($albumCover){
+            return [
+                'id' => (int)$song['id_cancion'],
+                'src' => '/LASK/' . $song['path_link'],
+                'title' => $song['nombre_cancion'],
+                'cover' => '/LASK/' . (!empty($song['portada_cancion']) ? $song['portada_cancion'] : $albumCover),
+                'letra' => $song['letra_cancion'] ?? null,
+                'fonetico' => $song['texto_fonetico'] ?? null,
+                'userLiked' => !empty($song['user_liked']),
+                'likesTotal' => (int)($song['likes_total'] ?? 0),
+            ];
+        }, $playableSongs);
+
+        return [
+            'songs' => $songs,
+            'albumQueueJson' => json_encode($albumQueue),
+        ];
     }
 
     public function song($id){
 
-        // Obtener información de la canción
-        $query = "SELECT C.*, A.nombre_artistico, AL.nombre_album, AL.portada_album,
-                         L.letra_cancion, L.texto_fonetico
-                  FROM Canciones C
-                  INNER JOIN Artista A ON C.id_artista = A.id_usuario
-                  LEFT JOIN Albumes AL ON C.id_album = AL.id_album
-                  LEFT JOIN Letras L ON C.id_cancion = L.id_cancion
-                  WHERE C.id_cancion = :id";
+        $viewerId = $this->requireAuthenticatedUser('login');
 
-        $stmt = $this->song->getConnection()->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        
-        $song = $stmt->fetch(PDO::FETCH_ASSOC);
+        $songId = (int)$id;
+        $song = $this->song->getDetailById($songId);
 
         if(!$song){
-        die("Canción no encontrada");
+            $this->abort('Canción no encontrada', 404);
         }
 
-        $viewerId = $_SESSION['user_id'] ?? null;
-
-        if($viewerId && $this->block->isBlocked($viewerId, $song['id_artista'])){
-        die("Contenido no disponible");
+        if($this->block->isBlockedBy($viewerId, (int)$song['id_artista'])){
+            $this->abort('Contenido no disponible', 403);
         }
 
-        // Contar likes
-        $likes = $this->like->countLikes($id);
-        $tags = $this->tag->getSongTags($id);
+        $likes = $this->like->countLikes($songId);
+        $tags = $this->tag->getSongTags($songId);
+        $user_liked = $this->like->isLiked($viewerId, $songId);
+        $canEditSong = $viewerId === (int)$song['id_artista'];
+        $songCover = !empty($song['portada_cancion']) ? $song['portada_cancion'] : 'Photos/banner_default.png';
+        $songLikeCount = (int)($likes['total'] ?? 0);
+        $songLikeLabel = $user_liked ? '♥ Quitar like' : '♥ Dar like';
+        $lyricsText = !empty($song['letra_cancion']) ? $song['letra_cancion'] : 'Texto no disponible';
+        $phoneticText = !empty($song['texto_fonetico']) ? $song['texto_fonetico'] : 'Texto no disponible';
+        $hasAlbum = !empty($song['nombre_album']);
 
-        // Verificar si el usuario actual le dio like
-        $user_liked = false;
-        if(isset($_SESSION['user_id'])){
-            $query = "SELECT 1 FROM Likes WHERE id_usuario = :user AND id_cancion = :song";
-            $stmt = $this->song->getConnection()->prepare($query);
-            $stmt->bindParam(":user", $_SESSION['user_id']);
-            $stmt->bindParam(":song", $id);
-            $stmt->execute();
-            $user_liked = $stmt->rowCount() > 0;
-        }
-
-        require "../MVC/views/detail_song.php";
+        $this->render('detail_song.php', compact(
+            'song',
+            'tags',
+            'canEditSong',
+            'songCover',
+            'songLikeCount',
+            'songLikeLabel',
+            'lyricsText',
+            'phoneticText',
+            'hasAlbum'
+        ));
     }
 
     public function album($id){
 
-        // Obtener información del álbum
-        $query = "SELECT A.*, AR.id_usuario AS id_artista, AR.nombre_artistico, U.nombre_usuario
-              FROM Albumes A
-              INNER JOIN Artista AR ON A.id_artista = AR.id_usuario
-              INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario
-              WHERE A.id_album = :id";
+        $viewerId = $this->requireAuthenticatedUser('login');
 
-        $stmt = $this->album->getConnection()->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        
-        $album = $stmt->fetch(PDO::FETCH_ASSOC);
+        $albumId = (int)$id;
+        $album = $this->album->getDetailByIdWithArtist($albumId);
 
         if(!$album){
-            die("Álbum no encontrado");
+            $this->abort('Álbum no encontrado', 404);
         }
 
-        $viewerId = $_SESSION['user_id'] ?? null;
-
-        if($viewerId && $this->block->isBlocked($viewerId, $album['id_artista'])){
-        die("Contenido no disponible");
+        if($this->block->isBlockedBy($viewerId, (int)$album['id_artista'])){
+            $this->abort('Contenido no disponible', 403);
         }
 
-        // Obtener canciones del álbum con letras
-        $query = "SELECT C.*, A.nombre_artistico, L.letra_cancion, L.texto_fonetico
-                  FROM Canciones C
-                  INNER JOIN Artista A ON C.id_artista = A.id_usuario
-                  LEFT JOIN Letras L ON C.id_cancion = L.id_cancion
-                  WHERE C.id_album = :id
-                  ORDER BY C.numero_pista";
+        $songs = $this->song->getByAlbumWithLyrics($albumId);
 
-        $stmt = $this->album->getConnection()->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        
-        $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $viewerId = $_SESSION['user_id'] ?? null;
         foreach($songs as &$song){
             $likeData = $this->like->countLikes($song['id_cancion']);
             $song['likes_total'] = (int)($likeData['total'] ?? 0);
-            $song['user_liked'] = $viewerId ? $this->like->isLiked($viewerId, $song['id_cancion']) : false;
+            $song['user_liked'] = $this->like->isLiked($viewerId, $song['id_cancion']);
+            $song['can_play'] = !empty($song['path_link']);
+            $song['can_edit'] = (int)$viewerId === (int)$album['id_artista'];
         }
         unset($song);
 
-        require "../MVC/views/detail_album.php";
+        $canEditAlbum = (int)$viewerId === (int)$album['id_artista'];
+        $albumCover = !empty($album['portada_album']) ? $album['portada_album'] : 'Photos/banner_default.png';
+        $albumArtistUrl = $this->routeUrl('artist?id=' . (int)$album['id_artista']);
+        $queueData = $this->buildAlbumQueue($songs, $albumCover);
+        $songs = $queueData['songs'];
+        $albumQueueJson = $queueData['albumQueueJson'];
+
+        $this->render('detail_album.php', compact(
+            'album',
+            'songs',
+            'canEditAlbum',
+            'albumCover',
+            'albumArtistUrl',
+            'albumQueueJson'
+        ));
     }
 
     public function artist($id){
 
-        // Obtener información del artista
-        $artist = $this->artist->getById($id);
+        $artistId = (int)$id;
+        $artist = $this->artist->getById($artistId);
 
         if(!$artist){
-            die("Artista no encontrado");
+            $this->abort('Artista no encontrado', 404);
         }
 
-        $viewerId = $_SESSION['user_id'] ?? null;
+        $viewerId = $this->sessionInt('user_id');
 
-        if($viewerId && $this->block->isBlocked($viewerId, $id)){
-            // Mostrar la misma vista de "Cuenta privada" para quien bloquea o es bloqueado.
-            $user = $artist; // reutiliza la vista que espera $user
-            $canUnblock = $this->block->hasBlocked($viewerId, $id);
-            $flashMessage = $_SESSION['flash_message'] ?? null;
-            unset($_SESSION['flash_message']);
-            require "../MVC/views/profile_blocked.php";
+        if($viewerId && $this->block->isBlockedBy($viewerId, $artistId)){
+            $flash = $this->consumeFlash();
+            $this->render('profile_blocked.php', [
+                'user' => $artist,
+                'canUnblock' => $this->block->hasBlocked($viewerId, $artistId),
+                'flashMessage' => $flash['message'],
+                'canReport' => false,
+                'showReportedMessage' => false,
+            ]);
             return;
         }
 
-        // Verificar si el usuario actual sigue a este artista
-        $viewerId = $_SESSION['user_id'] ?? null;
-        $isFollowing = false;
-        if($viewerId && $viewerId != $id){
-            $isFollowing = $this->follow->isFollowing($viewerId, $id);
-        }
-
-        // Obtener canciones del artista
-        $query = "SELECT C.*, AL.nombre_album
-                  FROM Canciones C
-                  LEFT JOIN Albumes AL ON C.id_album = AL.id_album
-                  WHERE C.id_artista = :id
-                  ORDER BY C.id_cancion DESC";
-
-        $stmt = $this->artist->getConnection()->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        
-        $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Obtener álbumes del artista
-        $query = "SELECT AL.*
-              FROM Albumes AL
-              WHERE AL.id_artista = :id
-                  ORDER BY AL.fecha_lanzamiento DESC";
-
-        $stmt = $this->artist->getConnection()->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        
-        $albums = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Contar seguidores
-        $followers = $this->follow->countFollowers($id);
-        $following = $this->follow->countFollowing($id);
-        $playlists = $this->playlist->getUserPlaylists($id, $viewerId);
-
-        $viewerId = $_SESSION['user_id'] ?? null;
+        $isFollowing = $viewerId && $viewerId !== $artistId
+            ? $this->follow->isFollowing($viewerId, $artistId)
+            : false;
+        $songs = $this->song->getByArtistWithAlbum($artistId);
+        $albums = $this->album->getByArtist($artistId);
+        $followers = $this->follow->countFollowers($artistId);
+        $following = $this->follow->countFollowing($artistId);
+        $playlists = $this->formatPlaylistLabels($this->playlist->getUserPlaylists($artistId, $viewerId));
         $viewer = $viewerId ? $this->user->getById($viewerId) : null;
-        $canReport = false;
-        if($viewerId && $viewerId != $id && $viewer && $viewer['id_rol'] != 1 && $artist['id_rol'] != 1){
-            $canReport = true;
-        }
+        $canReport = $viewerId && $viewerId !== $artistId && $viewer && (int)$viewer['id_rol'] !== 1 && (int)$artist['id_rol'] !== 1;
+        $flash = $this->consumeFlash();
+        $flashMessage = $flash['message'];
+        $comments = $this->comment->getByArtist($artistId);
 
-        $flashMessage = $_SESSION['flash_message'] ?? null;
-        unset($_SESSION['flash_message']);
+        $isOwner = $viewerId && (int)$viewerId === (int)$artist['id_usuario'];
+        $canInteract = $viewerId && (int)$viewerId !== (int)$artist['id_usuario'];
+        $showArtistImageUpload = $isOwner;
+        $showArtistImage = !empty($artist['pfp']);
+        $hasBio = !empty($artist['bio']);
+        $bioText = $artist['bio'] ?? '';
+        $hasEmail = !empty($artist['email']);
+        $canSeeEmail = $isOwner;
+        $hasCountry = !empty($artist['nombre_pais']);
+        $canComment = !empty($viewerId);
 
-        // Obtener comentarios
-        $query = "SELECT C.texto AS comentario, C.fecha_comentario, U.nombre_usuario
-                  FROM Comentarios_Artista C
-                  INNER JOIN Usuarios U ON C.id_usuario = U.id_usuario
-                  WHERE C.id_artista = :id
-                  ORDER BY C.fecha_comentario DESC";
-
-        $stmt = $this->artist->getConnection()->prepare($query);
-        $stmt->bindParam(":id", $id);
-        $stmt->execute();
-        
-        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        require "../MVC/views/detail_artist.php";
+        $this->render('detail_artist.php', compact(
+            'artist',
+            'isFollowing',
+            'songs',
+            'albums',
+            'followers',
+            'following',
+            'playlists',
+            'canReport',
+            'flashMessage',
+            'comments',
+            'isOwner',
+            'canInteract',
+            'showArtistImageUpload',
+            'showArtistImage',
+            'hasBio',
+            'bioText',
+            'hasEmail',
+            'canSeeEmail',
+            'hasCountry',
+            'canComment'
+        ));
     }
 
     public function like(){
 
-        if($_SERVER['REQUEST_METHOD'] !== 'POST'){
-            http_response_code(405);
-            exit;
+        if(!$this->isPostRequest()){
+            $this->abort('Método no permitido', 405);
         }
 
-        $isAjax = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest'
-            || strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+        $isAjax = $this->isAjaxRequest();
 
-        if(!isset($_SESSION['user_id'])){
+        $userId = $this->sessionInt('user_id');
+        if($userId === null){
             if($isAjax){
-                http_response_code(401);
-                header('Content-Type: application/json; charset=utf-8');
-                echo json_encode(['success' => false, 'message' => 'Debes iniciar sesión']);
-                exit;
+                $this->jsonResponse(['success' => false, 'message' => 'Debes iniciar sesión'], 401);
             }
 
-            header("Location: /LASK/public/index.php/login");
-            exit;
+            $this->redirectToRoute('login');
         }
 
-        $song_id = isset($_POST['song_id']) ? (int)$_POST['song_id'] : 0;
-        $user_id = (int)$_SESSION['user_id'];
+        $song_id = $this->postInt('song_id', 0);
 
         if($song_id <= 0){
             if($isAjax){
-                http_response_code(422);
-                header('Content-Type: application/json; charset=utf-8');
-                echo json_encode(['success' => false, 'message' => 'Canción inválida']);
-                exit;
+                $this->jsonResponse(['success' => false, 'message' => 'Canción inválida'], 422);
             }
 
-            header("Location: /LASK/public");
-            exit;
+            $this->redirectToPath($this->publicUrl());
         }
 
         $userLiked = false;
-        if($this->like->isLiked($user_id, $song_id)){
-            $this->like->unlikeSong($user_id, $song_id);
+        if($this->like->isLiked($userId, $song_id)){
+            $this->like->unlikeSong($userId, $song_id);
             $userLiked = false;
         } else {
-            $this->like->likeSong($user_id, $song_id);
+            $this->like->likeSong($userId, $song_id);
             $userLiked = true;
         }
 
@@ -268,133 +281,87 @@ class DetailController {
         $likesTotal = (int)($likeData['total'] ?? 0);
 
         if($isAjax){
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
+            $this->jsonResponse([
                 'success' => true,
                 'songId' => $song_id,
                 'userLiked' => $userLiked,
                 'likesTotal' => $likesTotal,
             ]);
-            exit;
         }
 
-        if(!empty($_POST['album_id'])){
-            header("Location: /LASK/public/index.php/album?id=" . (int)$_POST['album_id']);
+        $albumId = $this->postInt('album_id', 0);
+        if($albumId > 0){
+            $this->redirectToRoute('album?id=' . $albumId);
         } else {
-            header("Location: /LASK/public/index.php/song?id=" . $song_id);
+            $this->redirectToRoute('song?id=' . $song_id);
         }
-        exit;
     }
 
     public function newReleases(){
 
-        // Obtener nuevas canciones (últimas 20)
-        $query = "SELECT C.*, A.nombre_artistico, AL.nombre_album
-                  FROM Canciones C
-                  INNER JOIN Artista A ON C.id_artista = A.id_usuario
-                  LEFT JOIN Albumes AL ON C.id_album = AL.id_album
-                  ORDER BY C.id_cancion DESC
-                  LIMIT 20";
+        $songs = $this->song->getLatestDetailed(20);
 
-        $stmt = $this->song->getConnection()->prepare($query);
-        $stmt->execute();
-        $songs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $viewerId = $_SESSION['user_id'] ?? null;
+        $viewerId = $this->sessionInt('user_id');
 
         if($viewerId){
-        $songs = array_filter($songs, function($s) use ($viewerId){
-        return !$this->block->isBlocked($viewerId, $s['id_artista']);
-        });
+            $songs = array_filter($songs, function($s) use ($viewerId){
+                return !$this->block->isBlockedBy($viewerId, (int)$s['id_artista']);
+            });
         }
 
-        // Obtener nuevos álbumes (últimos 20) - VERSIÓN CORREGIDA
-        $query = "SELECT A.*, 
-                         (SELECT AR.nombre_artistico 
-                          FROM Canciones C2 
-                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario 
-                          WHERE C2.id_album = A.id_album 
-                          LIMIT 1) as nombre_artistico,
-                         (SELECT U.nombre_usuario 
-                          FROM Canciones C2 
-                          INNER JOIN Artista AR ON C2.id_artista = AR.id_usuario 
-                          INNER JOIN Usuarios U ON AR.id_usuario = U.id_usuario 
-                          WHERE C2.id_album = A.id_album 
-                          LIMIT 1) as nombre_usuario
-                  FROM Albumes A
-                  ORDER BY A.fecha_lanzamiento DESC
-                  LIMIT 20";
+        $albums = $this->album->getLatestDetailed(20);
 
-        $stmt = $this->album->getConnection()->prepare($query);
-        $stmt->execute();
-        $albums = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        require "../MVC/views/new_releases.php";
+        $this->render('new_releases.php', [
+            'songs' => $songs,
+            'albums' => $albums,
+        ]);
     }
 
     public function addSongToAlbum(){
 
-        if($_SERVER['REQUEST_METHOD'] === "POST"){
-
-            $album_id = $_POST['album_id'] ?? null;
-            $nombre = $_POST['nombre'] ?? null;
-            $artista = $_SESSION['user_id'] ?? null;
-
+        if($this->isPostRequest()){
+            $album_id = $this->postInt('album_id', 0);
+            $nombre = $this->postString('nombre');
+            $artista = $this->requireAuthenticatedUser('login');
             $album = $this->album->getById($album_id);
 
-            if(!$album_id || !$nombre || !$artista || !$album || (int)$album['id_artista'] !== (int)$artista){
-                die("Datos incompletos");
+            if(!$album_id || !$nombre || !$album || (int)$album['id_artista'] !== (int)$artista){
+                $this->abort('Datos incompletos', 422);
             }
 
-            // Subir archivo
-            $path = '';
-            if(isset($_FILES['archivo']) && $_FILES['archivo']['error'] == 0){
-
-                $ext = pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION);
-                if($ext == 'mp3'){
-
-                    $path = 'music/' . uniqid() . '.' . $ext;
-                    move_uploaded_file($_FILES['archivo']['tmp_name'], '../' . $path);
-                }
+            $upload = $this->storeUploadedFile('archivo', ['mp3'], 'music');
+            if($upload['error']){
+                $this->abort($upload['error'], 422);
             }
 
             $data = [
-                "nombre" => $nombre,
-                "numero_pista" => null,
-                "path" => $path,
-                "album" => $album_id,
-                "artista" => $artista
+                'nombre' => $nombre,
+                'numero_pista' => null,
+                'path' => $upload['path'] ?? '',
+                'album' => $album_id,
+                'artista' => $artista,
             ];
 
             $this->song->create($data);
-
-            header("Location: /LASK/public/index.php/album?id=" . $album_id);
-            exit;
-
-        } else {
-
-            if(isset($_GET['id'])){
-
-                $album_id = $_GET['id'];
-
-                $album = $this->album->getById($album_id);
-
-                if(!$album){
-                    die("Álbum no encontrado");
-                }
-
-                $viewerId = $_SESSION['user_id'] ?? null;
-                if(!$viewerId || (int)$album['id_artista'] !== (int)$viewerId){
-                    die("Sin permisos para editar este álbum");
-                }
-
-                require "../MVC/views/add_songs_to_album.php";
-
-            } else {
-
-                echo "Álbum no especificado";
-            }
+            $this->redirectToRoute('album?id=' . $album_id);
         }
+
+        $album_id = $this->getInt('id', 0);
+        if(!$album_id){
+            $this->abort('Álbum no especificado', 422);
+        }
+
+        $album = $this->album->getById($album_id);
+        if(!$album){
+            $this->abort('Álbum no encontrado', 404);
+        }
+
+        $viewerId = $this->requireAuthenticatedUser('login');
+        if((int)$album['id_artista'] !== (int)$viewerId){
+            $this->abort('Sin permisos para editar este álbum', 403);
+        }
+
+        $artistProfileUrl = $this->routeUrl('artist?id=' . (int)$viewerId);
+        $this->render('add_songs_to_album.php', compact('album_id', 'album', 'artistProfileUrl'));
     }
 }
-?>

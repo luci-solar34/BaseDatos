@@ -1,41 +1,50 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/Song.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/Song.php";
 
-class SearchController {
+class SearchController extends Controller {
 
     private $song;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->song = new Song($db);
     }
 
     public function search(){
 
-        $term = $_GET['q'];
+        $term = $this->getString('q');
+        $query = $term;
+
+        if(!$this->esEntradaSegura($term)){
+            $this->render('search.php', ['query' => $query, 'results' => []]);
+            return;
+        }
 
         $results = $this->song->search($term);
 
-        require "../MVC/views/search.php";
+        $this->render('search.php', [
+            'query' => $query,
+            'results' => $results,
+        ]);
     }
 
     public function autocomplete(){
 
-        $term = $_GET['q'] ?? '';
+        $this->requireAuthenticatedUser('login');
 
-        if(strlen($term) < 2){
+        $term = $this->getString('q');
+
+        if(strlen($term) < 2 || !$this->esEntradaSegura($term)){
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([]);
             return;
         }
 
         $results = $this->song->search($term);
 
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($results);
     }
 }

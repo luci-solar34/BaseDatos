@@ -1,103 +1,140 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/Playlist.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/Playlist.php";
+require_once __DIR__ . "/../models/Song.php";
 
-class PlaylistController {
+class PlaylistController extends Controller {
 
     private $playlist;
+    private $song;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->playlist = new Playlist($db);
+        $this->song = new Song($db);
     }
 
-    // 🔥 CREAR PLAYLIST
+    private function loadOwnedPlaylist($playlistId, $userId){
+        $playlist = $this->playlist->getPlaylistByOwner($playlistId, $userId);
+        if(!$playlist){
+            $this->abort('Playlist no encontrada o sin permisos', 403);
+        }
+
+        return $playlist;
+    }
+
+    public function showCreateForm(){
+        $this->requireAuthenticatedUser('login');
+        $this->render('playlist_create.php');
+    }
+
     public function create(){
 
-        $name = $_POST['name'] ?? null;
-        $privacy = $_POST['privacy'] ?? 0;
-        $user = $_SESSION['user_id'] ?? null;
+        $name = $this->postString('name');
+        $privacy = $this->postInt('privacy', 0);
+        $user = $this->requireAuthenticatedUser('login');
 
         if(!$name || !$user){
-            die("Datos inválidos");
+            $this->abort('Datos inválidos', 422);
         }
 
-        $this->playlist->create($name,$privacy,$user);
+        $playlist_id = $this->playlist->create($name, $privacy, $user);
 
-        $playlist_id = $this->playlist->getLastId();
-
-        header("Location: /LASK/public/index.php/playlist?id=".$playlist_id);
-        exit;
+        $this->redirectToRoute('playlist?id=' . (int)$playlist_id);
     }
 
-    // 🔥 VER PLAYLIST
     public function show($id){
+        $userId = $this->requireAuthenticatedUser('login');
+        $playlistId = (int)$id;
+        if($playlistId <= 0){
+            $this->abort('Playlist inválida', 422);
+        }
 
-        $songs = $this->playlist->getPlaylistSongs($id);
-        $playlist_id = $id;
+        $songs = $this->playlist->getPlaylistSongs($playlistId);
+        $playlist_id = $playlistId;
+        $finalizeUrl = $this->routeUrl('profile?id=' . (int)$userId);
 
-        require "../MVC/views/playlist.php";
+        $this->render('playlist.php', compact('songs', 'playlist_id', 'finalizeUrl'));
     }
 
-    // 🔥 EDITAR PLAYLIST
+    public function showAddSongForm(){
+
+        $userId = $this->requireAuthenticatedUser('login');
+        $playlistId = $this->getInt('playlist', 0);
+
+        if(!$playlistId){
+            $this->abort('Playlist no especificada', 422);
+        }
+
+        $this->loadOwnedPlaylist($playlistId, $userId);
+
+        $songs = $this->song->getAll();
+        $playlist = $playlistId;
+
+        $this->render('add_song.php', compact('songs', 'playlist'));
+    }
+
     public function edit($id){
+        $userId = $this->requireAuthenticatedUser('login');
+        $playlistId = (int)$id;
+        $playlist = $this->loadOwnedPlaylist($playlistId, $userId);
+        $songs = $this->playlist->getPlaylistSongs($playlistId);
+        $playlist_id = $playlistId;
 
-        $playlist = $this->playlist->getPlaylist($id);
-        $songs = $this->playlist->getPlaylistSongs($id);
-        $playlist_id = $id;
-
-        require "../MVC/views/edit_playlist.php";
+        $this->render('edit_playlist.php', compact('playlist', 'songs', 'playlist_id'));
     }
 
-    // 🔥 AGREGAR CANCIÓN
     public function addSong(){
 
-        $playlist = $_POST['playlist'] ?? null;
-        $song = $_POST['song'] ?? null;
+        $userId = $this->requireAuthenticatedUser('login');
+        $playlist = $this->postInt('playlist', 0);
+        $song = $this->postInt('song', 0);
 
         if(!$playlist || !$song){
-            die("Datos inválidos");
+            $this->abort('Datos inválidos', 422);
         }
 
-        $this->playlist->addSong($playlist,$song);
+        $this->loadOwnedPlaylist($playlist, $userId);
 
-        header("Location: /LASK/public/index.php/playlist?id=".$playlist);
-        exit;
+        if(!$this->playlist->hasSong($playlist, $song)){
+            $this->playlist->addSong($playlist, $song);
+        }
+
+        $this->redirectToRoute('playlist?id=' . $playlist);
     }
 
-    // 🔥 ELIMINAR CANCIÓN
     public function removeSong(){
 
-        $playlist = $_POST['playlist_id'] ?? null;
-        $song = $_POST['song_id'] ?? null;
+        $userId = $this->requireAuthenticatedUser('login');
+        $playlist = $this->postInt('playlist_id', 0);
+        $song = $this->postInt('song_id', 0);
 
         if(!$playlist || !$song){
-            die("Datos inválidos");
+            $this->abort('Datos inválidos', 422);
         }
 
-        $this->playlist->removeSong($playlist,$song);
+        $this->loadOwnedPlaylist($playlist, $userId);
 
-        header("Location: /LASK/public/index.php/profile?id=" . $_SESSION['user_id']);
-        exit;
+        $this->playlist->removeSong($playlist, $song);
+
+        $this->redirectToRoute('profile?id=' . $userId);
     }
 
-    // 🔥 PRIVACIDAD
     public function changePrivacy(){
 
-        $playlist = $_POST['playlist_id'] ?? null;
-        $privacy = isset($_POST['privacy']) ? (int)$_POST['privacy'] : 0;
+        $userId = $this->requireAuthenticatedUser('login');
+        $playlist = $this->postInt('playlist_id', 0);
+        $privacy = $this->postInt('privacy', 0);
 
         if(!$playlist){
-            die("Datos inválidos");
+            $this->abort('Datos inválidos', 422);
         }
 
-        $this->playlist->changePrivacy($playlist,$privacy);
+        $this->loadOwnedPlaylist($playlist, $userId);
 
-        header("Location: /LASK/public/index.php/profile?id=" . $_SESSION['user_id']);
-        exit;
+        $this->playlist->changePrivacy($playlist, $privacy === 1 ? 1 : 0);
+
+        $this->redirectToRoute('profile?id=' . $userId);
     }
 }

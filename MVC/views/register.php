@@ -1,13 +1,12 @@
 <h1>Crear cuenta</h1>
 
-<?php if(isset($_SESSION['flash_message'])): ?>
-    <div class="alert <?= (isset($_SESSION['flash_message_type']) && $_SESSION['flash_message_type'] === 'success') ? 'alert-success' : 'alert-error' ?>">
-        <?= htmlspecialchars($_SESSION['flash_message']) ?>
+<?php if($flashMessage): ?>
+    <div class="alert <?= $flashMessageType === 'success' ? 'alert-success' : 'alert-error' ?>">
+        <?= htmlspecialchars($flashMessage) ?>
     </div>
-    <?php unset($_SESSION['flash_message'], $_SESSION['flash_message_type']); ?>
 <?php endif; ?>
 
-<form action="/LASK/public/index.php/register" method="POST">
+<form action="<?= htmlspecialchars(BASE_URL . '/register') ?>" method="POST">
 
 <label>Email</label>
 <input type="email" name="email" required>
@@ -45,39 +44,6 @@ Acepto los Términos y condiciones
 
 </form>
 
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-    const roleSelect = document.getElementById('rol');
-    const artistInput = document.getElementById('nombre_artistico');
-    const warning = document.getElementById('artist-warning');
+<script src="<?= htmlspecialchars(BASE_URL . '/../js/register.js') ?>"></script>
 
-    function syncArtistField(){
-        const isArtist = roleSelect.value === '2';
-
-        artistInput.disabled = !isArtist;
-
-        if(!isArtist){
-            if(artistInput.value.trim() !== ''){
-                warning.style.display = 'block';
-            } else {
-                warning.style.display = 'none';
-            }
-        } else {
-            warning.style.display = 'none';
-        }
-    }
-
-    roleSelect.addEventListener('change', syncArtistField);
-    artistInput.addEventListener('input', function(){
-        if(roleSelect.value !== '2' && artistInput.value.trim() !== ''){
-            warning.style.display = 'block';
-        } else {
-            warning.style.display = 'none';
-        }
-    });
-
-    syncArtistField();
-});
-</script>
-
-<a href="/LASK/public/index.php/login">Iniciar sesión</a>
+<a href="<?= htmlspecialchars(BASE_URL . '/login') ?>">Iniciar sesión</a>

@@ -24,10 +24,6 @@ class Playlist {
 
     return $this->conn->lastInsertId(); 
     }
-    public function getLastId(){
-        return $this->conn->lastInsertId();
-    }
-
 
     public function addSong($playlist,$song){
 
@@ -121,6 +117,38 @@ public function getPlaylist($id){
     $stmt->execute();
 
     return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+public function getPlaylistByOwner($playlistId, $userId){
+
+    $query = "SELECT *
+              FROM Playlists
+              WHERE id_playlist = :playlist
+              AND id_usuario = :user
+              LIMIT 1";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":playlist", $playlistId, PDO::PARAM_INT);
+    $stmt->bindParam(":user", $userId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+public function hasSong($playlistId, $songId){
+
+    $query = "SELECT 1
+              FROM Playlist_Canciones
+              WHERE id_playlist = :playlist
+              AND id_cancion = :song
+              LIMIT 1";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":playlist", $playlistId, PDO::PARAM_INT);
+    $stmt->bindParam(":song", $songId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchColumn() !== false;
 }
 
 }

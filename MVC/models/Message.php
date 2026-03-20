@@ -21,8 +21,7 @@ class Message {
         $stmt->bindParam(":texto",$texto);
 
         if (!$stmt->execute()) {
-            $errorInfo = $stmt->errorInfo();
-            throw new Exception("Error al guardar mensaje: " . ($errorInfo[2] ?? 'unknown'));
+            throw new RuntimeException('No se pudo guardar el mensaje.');
         }
 
         return true;
@@ -56,27 +55,33 @@ class Message {
                    u.pfp,
                    (SELECT texto
                     FROM Mensajes m2
-                    WHERE (m2.id_emisor = :user AND m2.id_receptor = u.id_usuario)
-                       OR (m2.id_emisor = u.id_usuario AND m2.id_receptor = :user)
+                          WHERE (m2.id_emisor = :user1 AND m2.id_receptor = u.id_usuario)
+                              OR (m2.id_emisor = u.id_usuario AND m2.id_receptor = :user2)
                     ORDER BY fecha_mensaje DESC
                     LIMIT 1) AS ultimo_mensaje,
                    (SELECT fecha_mensaje
                     FROM Mensajes m2
-                    WHERE (m2.id_emisor = :user AND m2.id_receptor = u.id_usuario)
-                       OR (m2.id_emisor = u.id_usuario AND m2.id_receptor = :user)
+                          WHERE (m2.id_emisor = :user3 AND m2.id_receptor = u.id_usuario)
+                              OR (m2.id_emisor = u.id_usuario AND m2.id_receptor = :user4)
                     ORDER BY fecha_mensaje DESC
                     LIMIT 1) AS ultimo_ts
             FROM Usuarios u
             WHERE u.id_usuario IN (
-                SELECT CASE WHEN id_emisor = :user THEN id_receptor ELSE id_emisor END
+                     SELECT CASE WHEN id_emisor = :user5 THEN id_receptor ELSE id_emisor END
                 FROM Mensajes
-                WHERE id_emisor = :user OR id_receptor = :user
+                     WHERE id_emisor = :user6 OR id_receptor = :user7
             )
             ORDER BY ultimo_ts DESC
         ";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":user",$user);
+          $stmt->bindValue(":user1", $user, PDO::PARAM_INT);
+          $stmt->bindValue(":user2", $user, PDO::PARAM_INT);
+          $stmt->bindValue(":user3", $user, PDO::PARAM_INT);
+          $stmt->bindValue(":user4", $user, PDO::PARAM_INT);
+          $stmt->bindValue(":user5", $user, PDO::PARAM_INT);
+          $stmt->bindValue(":user6", $user, PDO::PARAM_INT);
+          $stmt->bindValue(":user7", $user, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

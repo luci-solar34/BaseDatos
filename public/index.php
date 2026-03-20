@@ -2,17 +2,19 @@
 
 session_start();
 
-require_once "../config/database.php";
+require_once __DIR__ . "/../config/constants.php";
+require_once __DIR__ . "/../config/database.php";
 
-require_once "../MVC/controllers/AuthController.php";
-require_once "../MVC/controllers/UserController.php";
-require_once "../MVC/controllers/ArtistController.php";
-require_once "../MVC/controllers/PlaylistController.php";
-require_once "../MVC/controllers/MessageController.php";
-require_once "../MVC/controllers/AdminController.php";
-require_once "../MVC/controllers/HomeController.php";
-require_once "../MVC/controllers/SearchController.php";
-require_once "../MVC/controllers/TagController.php";
+require_once __DIR__ . "/../MVC/controllers/AuthController.php";
+require_once __DIR__ . "/../MVC/controllers/UserController.php";
+require_once __DIR__ . "/../MVC/controllers/ArtistController.php";
+require_once __DIR__ . "/../MVC/controllers/PlaylistController.php";
+require_once __DIR__ . "/../MVC/controllers/MessageController.php";
+require_once __DIR__ . "/../MVC/controllers/AdminController.php";
+require_once __DIR__ . "/../MVC/controllers/HomeController.php";
+require_once __DIR__ . "/../MVC/controllers/SearchController.php";
+require_once __DIR__ . "/../MVC/controllers/TagController.php";
+require_once __DIR__ . "/../MVC/controllers/DetailController.php";
 
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -43,8 +45,6 @@ switch ($uri) {
 case "/song":
 
     if(isset($_GET['id'])){
-
-        require_once "../MVC/controllers/DetailController.php";
 
         $controller = new DetailController();
         $controller->song($_GET['id']);
@@ -88,16 +88,12 @@ case "/album/add-songs":
 
     if($_SERVER['REQUEST_METHOD'] === "POST"){
 
-        require_once "../MVC/controllers/DetailController.php";
-
         $controller = new DetailController();
         $controller->addSongToAlbum();
 
     } else {
 
         if(isset($_GET['id'])){
-
-            require_once "../MVC/controllers/DetailController.php";
 
             $controller = new DetailController();
             $controller->addSongToAlbum();
@@ -114,8 +110,6 @@ case "/album":
 
     if(isset($_GET['id'])){
 
-        require_once "../MVC/controllers/DetailController.php";
-
         $controller = new DetailController();
         $controller->album($_GET['id']);
 
@@ -126,8 +120,6 @@ break;
 
 case "/new-releases":
 
-    require_once "../MVC/controllers/DetailController.php";
-
     $controller = new DetailController();
     $controller->newReleases();
 
@@ -136,8 +128,6 @@ break;
 case "/like":
 
     if($_SERVER['REQUEST_METHOD'] === "POST"){
-
-        require_once "../MVC/controllers/DetailController.php";
 
         $controller = new DetailController();
         $controller->like();
@@ -188,14 +178,13 @@ break;
 
     case "/login":
 
-        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+        $controller = new AuthController();
 
-            $controller = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $controller->login();
 
         } else {
-
-            require "../MVC/views/login.php";
+            $controller->showLoginForm();
 
         }
 
@@ -204,14 +193,13 @@ break;
 
     case "/register":
 
-        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+        $controller = new AuthController();
 
-            $controller = new AuthController();
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $controller->register();
 
         } else {
-
-            require "../MVC/views/register.php";
+            $controller->showRegisterForm();
 
         }
 
@@ -315,6 +303,28 @@ break;
 
     break;
 
+    case "/admin/denuncias/accept":
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $controller = new AdminController();
+            $controller->aceptarDenuncia();
+        } else {
+            echo "Método no permitido";
+        }
+
+    break;
+
+    case "/admin/denuncias/reject":
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $controller = new AdminController();
+            $controller->rechazarDenuncia();
+        } else {
+            echo "Método no permitido";
+        }
+
+    break;
+
     case "/update_pfp":
 
     if($_SERVER['REQUEST_METHOD'] === "POST"){
@@ -414,7 +424,6 @@ break;
     case "/artist":
 
         if (isset($_GET['id'])) {
-            require_once "../MVC/controllers/DetailController.php";
             $controller = new DetailController();
             $controller->artist($_GET['id']);
         } else {
@@ -426,18 +435,15 @@ break;
 
     case "/playlist/create":
 
-    if($_SERVER['REQUEST_METHOD'] === "POST"){
+    $controller = new PlaylistController();
 
-        $controller = new PlaylistController();
+    if($_SERVER['REQUEST_METHOD'] === "POST"){
         $controller->create();
 
     } else {
-
-        require "../MVC/views/playlist_create.php";
+        $controller->showCreateForm();
 
     }
-
-    break;
 
     break;
 
@@ -465,17 +471,8 @@ break;
 
     } else {
 
-        require_once "../MVC/models/Song.php";
-
-        $database = new Database();
-        $db = $database->connect();
-
-        $songModel = new Song($db);
-
-        $songs = $songModel->getAll();
-        $playlist = $_GET['playlist'];
-
-        require "../MVC/views/add_song.php";
+        $controller = new PlaylistController();
+        $controller->showAddSongForm();
     }
 
 break;

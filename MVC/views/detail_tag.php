@@ -10,7 +10,7 @@ $pageTitle = $tag['nombre_tag'] . ' - LASK';
     <p>Este tag todavía no tiene descripción.</p>
 <?php endif; ?>
 
-<p><a href="/LASK/public/index.php/tags">Explorar más tags</a></p>
+<p><a href="<?= htmlspecialchars(BASE_URL . '/tags') ?>">Explorar más tags</a></p>
 
 <h2>Canciones con esta vibe</h2>
 
@@ -20,19 +20,19 @@ $pageTitle = $tag['nombre_tag'] . ' - LASK';
     <ul>
         <?php foreach($songs as $song): ?>
             <li>
-                <a href="/LASK/public/index.php/song?id=<?= $song['id_cancion'] ?>">
+                <a href="<?= htmlspecialchars(BASE_URL . '/song?id=' . (int)$song['id_cancion']) ?>">
                     <?= htmlspecialchars($song['nombre_cancion']) ?>
                 </a>
                 por
-                <a href="/LASK/public/index.php/artist?id=<?= $song['id_artista'] ?>">
+                <a href="<?= htmlspecialchars(BASE_URL . '/artist?id=' . (int)$song['id_artista']) ?>">
                     <?= htmlspecialchars($song['nombre_artistico']) ?>
                 </a>
                 <?php if(!empty($song['nombre_album'])): ?>
-                    (álbum: <a href="/LASK/public/index.php/album?id=<?= $song['id_album'] ?>"><?= htmlspecialchars($song['nombre_album']) ?></a>)
+                    (álbum: <a href="<?= htmlspecialchars(BASE_URL . '/album?id=' . (int)$song['id_album']) ?>"><?= htmlspecialchars($song['nombre_album']) ?></a>)
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>
     </ul>
 <?php endif; ?>
 
-<a href="/LASK/public/index.php/">Volver al home</a>
+<a href="<?= htmlspecialchars(BASE_URL) ?>">Volver al home</a>

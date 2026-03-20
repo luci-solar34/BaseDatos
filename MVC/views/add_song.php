@@ -4,12 +4,12 @@
 
 <div>
 
-    <?= $song['nombre_cancion'] ?>
+    <?= htmlspecialchars($song['nombre_cancion']) ?>
 
-    <form method="POST" action="/LASK/public/index.php/playlist/add-song">
+    <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/playlist/add-song') ?>">
 
-        <input type="hidden" name="playlist" value="<?= $playlist ?>">
-        <input type="hidden" name="song" value="<?= $song['id_cancion'] ?>">
+        <input type="hidden" name="playlist" value="<?= (int)$playlist ?>">
+        <input type="hidden" name="song" value="<?= (int)$song['id_cancion'] ?>">
 
         <button>Agregar</button>
 

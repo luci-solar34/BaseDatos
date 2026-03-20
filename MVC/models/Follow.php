@@ -43,13 +43,15 @@ class Follow {
     $query = "
         SELECT COUNT(*) as total
         FROM Siguen
-        WHERE (id_seguidor = :u1 AND id_seguido = :u2)
-           OR (id_seguidor = :u2 AND id_seguido = :u1)
+          WHERE (id_seguidor = :u1a AND id_seguido = :u2a)
+              OR (id_seguidor = :u2b AND id_seguido = :u1b)
     ";
 
     $stmt = $this->conn->prepare($query);
-    $stmt->bindParam(":u1",$user1);
-    $stmt->bindParam(":u2",$user2);
+     $stmt->bindValue(":u1a",$user1, PDO::PARAM_INT);
+     $stmt->bindValue(":u2a",$user2, PDO::PARAM_INT);
+     $stmt->bindValue(":u2b",$user2, PDO::PARAM_INT);
+     $stmt->bindValue(":u1b",$user1, PDO::PARAM_INT);
     $stmt->execute();
 
     return $stmt->fetch(PDO::FETCH_ASSOC)['total'] == 2;

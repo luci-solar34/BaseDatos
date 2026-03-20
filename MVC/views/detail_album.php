@@ -1,10 +1,5 @@
 <?php
 $pageTitle = $album['nombre_album'] . ' - LASK';
-$albumCover = !empty($album['portada_album']) ? $album['portada_album'] : 'Photos/banner_default.png';
-// Canciones con audio reproducible
-$playableSongs = array_values(array_filter($songs, fn($s) => !empty($s['path_link'])));
-$playableIndex = [];
-foreach($playableSongs as $pi => $ps){ $playableIndex[$ps['id_cancion']] = $pi; }
 ?>
 
 <h1><?= htmlspecialchars($album['nombre_album']) ?></h1>
@@ -12,7 +7,7 @@ foreach($playableSongs as $pi => $ps){ $playableIndex[$ps['id_cancion']] = $pi; 
 <?php if(!empty($album['nombre_artistico'])): ?>
     <p>
         <strong>Artista:</strong>
-        <a href="/LASK/public/index.php/artist?id=<?= $album['id_artista'] ?? '' ?>">
+        <a href="<?= htmlspecialchars($albumArtistUrl) ?>">
             <?= htmlspecialchars($album['nombre_artistico']) ?>
         </a>
     </p>
@@ -24,25 +19,27 @@ foreach($playableSongs as $pi => $ps){ $playableIndex[$ps['id_cancion']] = $pi; 
 
 <p><strong>Fecha de lanzamiento:</strong> <?= htmlspecialchars($album['fecha_lanzamiento']) ?></p>
 
-<?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $album['id_artista']): ?>
-    <a href="/LASK/public/index.php/artist/edit-album?id=<?= $album['id_album'] ?>">
-        <button>Editar Álbum</button>
+<?php if($canEditAlbum): ?>
+    <a href="<?= htmlspecialchars(BASE_URL . '/artist/edit-album?id=' . (int)$album['id_album']) ?>" class="btn btn-edit">
+        Editar Álbum
     </a>
 <?php endif; ?>
+
+<div id="albumPageData" data-album-queue="<?= htmlspecialchars($albumQueueJson, ENT_QUOTES, 'UTF-8') ?>"></div>
 
 <!-- Panel de reproducción (oculto hasta que se da play) -->
 <div id="nowPlaying" style="display:none; margin:16px 0; border:1px solid #ddd; border-radius:10px; padding:14px; max-width:520px;">
     <p style="margin:0 0 6px;"><strong>▶ Reproduciendo: <span id="nowPlayingTitle"></span></strong></p>
-    <img id="nowPlayingCover" src="/LASK/<?= htmlspecialchars($albumCover) ?>" alt="Portada actual" width="220" style="display:block; margin:0 0 10px; border-radius:8px; object-fit:cover;">
+    <img id="nowPlayingCover" src="/LASK/<?= htmlspecialchars($albumCover) ?>" alt="Portada del álbum actual" width="220" style="display:block; margin:0 0 10px; border-radius:8px; object-fit:cover;">
     <audio id="albumAudio" controls style="width:100%; margin-bottom:8px;"></audio>
-    <form id="nowPlayingLikeForm" action="/LASK/public/index.php/like" method="POST" style="margin:0 0 12px; display:none;">
+    <form id="nowPlayingLikeForm" action="<?= htmlspecialchars(BASE_URL . '/like') ?>" method="POST" style="margin:0 0 12px; display:none;">
         <input type="hidden" name="song_id" id="nowPlayingSongId" value="">
-        <input type="hidden" name="album_id" value="<?= $album['id_album'] ?>">
+        <input type="hidden" name="album_id" value="<?= (int)$album['id_album'] ?>">
         <button type="submit" id="nowPlayingLikeButton">♥ Dar like</button>
     </form>
     <div style="display:flex; gap:10px; margin-bottom:14px;">
-        <button onclick="albumPrev()">⏮ Anterior</button>
-        <button onclick="albumNext()">Siguiente ⏭</button>
+        <button type="button" data-album-action="prev">⏮ Anterior</button>
+        <button type="button" data-album-action="next">Siguiente ⏭</button>
     </div>
     <div id="lyricsSection">
         <h4 style="margin:0 0 4px;">Letra</h4>
@@ -60,15 +57,15 @@ foreach($playableSongs as $pi => $ps){ $playableIndex[$ps['id_cancion']] = $pi; 
     <ul>
     <?php foreach($songs as $song): ?>
         <li>
-            <a href="/LASK/public/index.php/song?id=<?= $song['id_cancion'] ?>">
+            <a href="<?= htmlspecialchars(BASE_URL . '/song?id=' . (int)$song['id_cancion']) ?>">
                 <?= (int)$song['numero_pista'] ?>. <?= htmlspecialchars($song['nombre_cancion']) ?>
             </a>
-            <?php if(!empty($song['path_link'])): ?>
-                <button onclick="albumPlay(<?= $playableIndex[$song['id_cancion']] ?>)">▶ Reproducir</button>
+            <?php if($song['can_play']): ?>
+                <button type="button" data-album-play-index="<?= (int)$song['playable_index'] ?>">▶ Reproducir</button>
             <?php endif; ?>
-            <span style="margin-left:8px;" data-song-like-count="<?= (int)$song['id_cancion'] ?>">♥ <?= (int)($song['likes_total'] ?? 0) ?></span>
-            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $album['id_artista']): ?>
-                <a href="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>">Editar</a>
+            <span style="margin-left:8px;" data-song-like-count="<?= (int)$song['id_cancion'] ?>">♥ <?= (int)$song['likes_total'] ?></span>
+            <?php if($song['can_edit']): ?>
+                <a href="<?= htmlspecialchars(BASE_URL . '/artist/edit-song?id=' . (int)$song['id_cancion']) ?>">Editar</a>
             <?php endif; ?>
         </li>
     <?php endforeach; ?>
@@ -76,104 +73,6 @@ foreach($playableSongs as $pi => $ps){ $playableIndex[$ps['id_cancion']] = $pi; 
 <?php endif; ?>
 
 <br>
-<a href="/LASK/public">← Volver al inicio</a>
+<a href="<?= htmlspecialchars(BASE_URL) ?>">← Volver al inicio</a>
 
-<script>
-var albumQueue = <?= json_encode(array_map(fn($s) => [
-    'id'       => $s['id_cancion'],
-    'src'      => '/LASK/' . $s['path_link'],
-    'title'    => $s['nombre_cancion'],
-    'cover'    => '/LASK/' . (!empty($s['portada_cancion']) ? $s['portada_cancion'] : $albumCover),
-    'letra'    => $s['letra_cancion']    ?? null,
-    'fonetico' => $s['texto_fonetico']   ?? null,
-    'userLiked' => !empty($s['user_liked']),
-    'likesTotal' => (int)($s['likes_total'] ?? 0),
-], $playableSongs)) ?>;
-
-var albumIndex = 0;
-
-function renderNowPlayingLike(track){
-    document.getElementById('nowPlayingLikeButton').textContent = (track.userLiked ? '♥ Quitar like' : '♥ Dar like') + ' (' + track.likesTotal + ')';
-}
-
-function renderSongLikeInList(songId, likesTotal){
-    var el = document.querySelector('[data-song-like-count="' + songId + '"]');
-    if(el) el.textContent = '♥ ' + likesTotal;
-}
-
-function albumPlay(idx){
-    if(idx === null || idx === undefined || !albumQueue[idx]) return;
-    albumIndex = idx;
-    var t = albumQueue[idx];
-
-    var audio = document.getElementById('albumAudio');
-    audio.src = t.src;
-    audio.play();
-
-    document.getElementById('nowPlayingTitle').textContent = t.title;
-    document.getElementById('nowPlayingCover').src = t.cover;
-    document.getElementById('nowPlaying').style.display = 'block';
-    document.getElementById('lyricText').textContent     = t.letra    || 'Texto no disponible';
-    document.getElementById('lyricPhonetic').textContent = t.fonetico || 'Texto no disponible';
-    document.getElementById('nowPlayingSongId').value = t.id;
-    renderNowPlayingLike(t);
-    document.getElementById('nowPlayingLikeForm').style.display = 'block';
-
-}
-
-function albumNext(){
-    if(albumIndex < albumQueue.length - 1) albumPlay(albumIndex + 1);
-}
-
-function albumPrev(){
-    if(albumIndex > 0) albumPlay(albumIndex - 1);
-}
-
-document.addEventListener('DOMContentLoaded', function(){
-    document.getElementById('albumAudio').addEventListener('ended', albumNext);
-
-    var likeForm = document.getElementById('nowPlayingLikeForm');
-    var likeButton = document.getElementById('nowPlayingLikeButton');
-
-    likeForm.addEventListener('submit', async function(e){
-        e.preventDefault();
-
-        if(!albumQueue[albumIndex]) return;
-
-        likeButton.disabled = true;
-        try {
-            var response = await fetch(likeForm.action, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                },
-                body: new FormData(likeForm)
-            });
-
-            if(response.status === 401){
-                window.location.href = '/LASK/public/index.php/login';
-                return;
-            }
-
-            if(!response.ok){
-                throw new Error('Error al actualizar like');
-            }
-
-            var data = await response.json();
-            if(data && data.success){
-                var track = albumQueue[albumIndex];
-                track.userLiked = !!data.userLiked;
-                track.likesTotal = parseInt(data.likesTotal || 0, 10);
-                renderNowPlayingLike(track);
-                renderSongLikeInList(track.id, track.likesTotal);
-            }
-        } catch (err) {
-            // Fallback al envío tradicional si falla AJAX.
-            likeForm.submit();
-        } finally {
-            likeButton.disabled = false;
-        }
-    });
-});
-</script>
+<script src="<?= htmlspecialchars(BASE_URL . '/../js/detail_album.js') ?>"></script>

@@ -4,18 +4,18 @@
 
 <?php if(isset($flashMessage) && $flashMessage): ?>
     <div style="padding:10px; margin:10px 0; border:1px solid green; background:#e6ffe6;">
-        <?= $flashMessage ?>
+        <?= htmlspecialchars($flashMessage) ?>
     </div>
 <?php endif; ?>
 
 <?php if(isset($canReport) && $canReport): ?>
-    <?php if(isset($hasReported) && $hasReported): ?>
+    <?php if(isset($showReportedMessage) && $showReportedMessage): ?>
         <p style="color: #a00;">Ya has enviado una denuncia para este usuario. Espera a que sea revisada.</p>
     <?php else: ?>
-        <button onclick="document.getElementById('reportForm').style.display='block'">Denunciar</button>
+        <button type="button" data-toggle-target="reportForm">Denunciar</button>
 
-        <form id="reportForm" method="POST" action="/LASK/public/index.php/report" style="display:none; margin-top:15px; border:1px solid #ccc; padding: 12px;">
-            <input type="hidden" name="denunciado_id" value="<?= $user['id_usuario'] ?>">
+        <form id="reportForm" method="POST" action="<?= htmlspecialchars(BASE_URL . '/report') ?>" style="display:none; margin-top:15px; border:1px solid #ccc; padding: 12px;">
+            <input type="hidden" name="denunciado_id" value="<?= (int)$user['id_usuario'] ?>">
 
             <label>Tipo de denuncia:</label><br>
             <select name="motivo_denuncia" required>
@@ -35,20 +35,20 @@
             <br><br>
 
             <button type="submit">Enviar denuncia</button>
-            <button type="button" onclick="document.getElementById('reportForm').style.display='none'">Cancelar</button>
+            <button type="button" data-hide-target="reportForm">Cancelar</button>
         </form>
     <?php endif; ?>
 <?php endif; ?>
 
 <?php if(isset($canUnblock) && $canUnblock): ?>
 
-    <form method="POST" action="/LASK/public/index.php/unblock">
-        <input type="hidden" name="user_id" value="<?= $user['id_usuario'] ?>">
-        <button>Desbloquear</button>
+    <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/unblock') ?>">
+        <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
+        <button type="submit" class="btn">Desbloquear</button>
     </form>
 
 <?php endif; ?>
 
 <p style="margin-top: 15px;">
-    <a href="/LASK/public" style="color:#1DB954; text-decoration:none;">← Volver al inicio</a>
+    <a href="<?= htmlspecialchars(BASE_URL) ?>" style="color:#1DB954; text-decoration:none;">← Volver al inicio</a>
 </p>

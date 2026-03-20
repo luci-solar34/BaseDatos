@@ -48,6 +48,72 @@ class Song {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getDetailById($id){
+
+        $query = "SELECT C.*, A.nombre_artistico, AL.nombre_album, AL.portada_album,
+                         L.letra_cancion, L.texto_fonetico
+                  FROM Canciones C
+                  INNER JOIN Artista A ON C.id_artista = A.id_usuario
+                  LEFT JOIN Albumes AL ON C.id_album = AL.id_album
+                  LEFT JOIN Letras L ON C.id_cancion = L.id_cancion
+                  WHERE C.id_cancion = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getByAlbumWithLyrics($albumId){
+
+        $query = "SELECT C.*, A.nombre_artistico, L.letra_cancion, L.texto_fonetico
+                  FROM Canciones C
+                  INNER JOIN Artista A ON C.id_artista = A.id_usuario
+                  LEFT JOIN Letras L ON C.id_cancion = L.id_cancion
+                  WHERE C.id_album = :id
+                  ORDER BY C.numero_pista";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $albumId);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getByArtistWithAlbum($artistId){
+
+        $query = "SELECT C.*, AL.nombre_album
+                  FROM Canciones C
+                  LEFT JOIN Albumes AL ON C.id_album = AL.id_album
+                  WHERE C.id_artista = :id
+                  ORDER BY C.id_cancion DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $artistId);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getLatestDetailed($limit = 20){
+
+        $limit = max(1, (int)$limit);
+
+        $query = "SELECT C.*, A.nombre_artistico, AL.nombre_album
+                  FROM Canciones C
+                  INNER JOIN Artista A ON C.id_artista = A.id_usuario
+                  LEFT JOIN Albumes AL ON C.id_album = AL.id_album
+                  ORDER BY C.id_cancion DESC
+                  LIMIT :limit";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getByArtistOutsideAlbum($artist, $albumId){
 
         $query = "SELECT *
@@ -67,6 +133,7 @@ class Song {
     public function getLatestSongs(){
 
         $query = "SELECT C.id_cancion,
+                         C.id_artista,
                          C.nombre_cancion,
                          C.portada_cancion,
                          C.path_link,
@@ -170,7 +237,11 @@ class Song {
         $stmt->bindParam(":album",$album);
         $stmt->bindParam(":artista",$data['artista']);
 
-        return $stmt->execute();
+        if(!$stmt->execute()){
+            return false;
+        }
+
+        return $this->conn->lastInsertId();
     }
 
     public function getLyrics($songId){
@@ -336,8 +407,5 @@ class Song {
             $finalTrack++;
         }
     }
-public function getConnection(){
-    return $this->conn;
-}
 }
 

@@ -1,7 +1,7 @@
 <h1>Editar Álbum</h1>
 
-<form action="/LASK/public/index.php/artist/edit-album?id=<?= $album['id_album'] ?>" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="album_id" value="<?= $album['id_album'] ?>">
+<form action="<?= BASE_URL ?>/artist/edit-album?id=<?= (int)$album['id_album'] ?>" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="album_id" value="<?= (int)$album['id_album'] ?>">
 
     <label>Nombre del Álbum:</label>
     <input type="text" name="nombre" value="<?= htmlspecialchars($album['nombre_album']) ?>" required><br>
@@ -10,7 +10,7 @@
     <textarea name="descripcion"><?= htmlspecialchars($album['descripcion_album'] ?? '') ?></textarea><br>
 
     <?php if(!empty($album['portada_album'])): ?>
-        <img src="/LASK/<?= $album['portada_album'] ?>" width="180"><br>
+        <img src="/LASK/<?= htmlspecialchars($album['portada_album']) ?>" width="180"><br>
     <?php endif; ?>
 
     <label>Nueva portada (opcional):</label>
@@ -21,7 +21,7 @@
         <select name="existing_song_id">
             <option value="">No mover ninguna canción</option>
             <?php foreach($availableSongs as $song): ?>
-                <option value="<?= $song['id_cancion'] ?>">
+                <option value="<?= (int)$song['id_cancion'] ?>">
                     <?= htmlspecialchars($song['nombre_cancion']) ?>
                     <?= !empty($song['id_album']) ? '(transferir)' : '(sin álbum)' ?>
                 </option>
@@ -35,9 +35,9 @@
 </form>
 
 <p>
-    <a href="/LASK/public/index.php/album/add-songs?id=<?= $album['id_album'] ?>">
+    <a href="<?= BASE_URL ?>/album/add-songs?id=<?= (int)$album['id_album'] ?>">
         <button>Subir Nueva Canción al Álbum</button>
     </a>
 </p>
 
-<a href="/LASK/public/index.php/album?id=<?= $album['id_album'] ?>">Volver al álbum</a>
+<a href="<?= BASE_URL ?>/album?id=<?= (int)$album['id_album'] ?>">Volver al álbum</a>

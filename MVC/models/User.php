@@ -9,21 +9,23 @@ class User {
         $this->conn = $db;
     }
 
-    public function login($username,$password){
+    public function login($username, $password){
 
-        // Se obtiene el usuario por credenciales para poder validar su estado (activo/inactivo)
+        // Se obtiene el usuario solo por nombre; la contraseña se verifica con password_verify()
         $query = "SELECT * FROM Usuarios
-                  WHERE nombre_usuario = :username
-                  AND password = :password";
+                  WHERE nombre_usuario = :username";
 
         $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(":username",$username);
-        $stmt->bindParam(":password",$password);
-
+        $stmt->bindParam(":username", $username);
         $stmt->execute();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if(!$user || !password_verify($password, $user['password'])){
+            return false;
+        }
+
+        return $user;
     }
 
     public function register($data){
@@ -34,11 +36,13 @@ class User {
 
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(":email",$data['email']);
-        $stmt->bindParam(":username",$data['username']);
-        $stmt->bindParam(":password",$data['password']);
-        $stmt->bindParam(":pais",$data['pais']);
-        $stmt->bindParam(":rol",$data['rol']);
+        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+
+        $stmt->bindParam(":email", $data['email']);
+        $stmt->bindParam(":username", $data['username']);
+        $stmt->bindParam(":password", $hashedPassword);
+        $stmt->bindParam(":pais", $data['pais']);
+        $stmt->bindParam(":rol", $data['rol']);
 
         $stmt->execute();
 

@@ -4,8 +4,8 @@
 
 <?php foreach($songs as $song): ?>
 
-<a href="/LASK/public/song?id=<?= $song['id_cancion'] ?>">
-<img src="/LASK/<?= $song['portada_cancion'] ?>" width="150">
+<a href="<?= BASE_URL ?>/song?id=<?= (int)$song['id_cancion'] ?>">
+<img src="/LASK/<?= htmlspecialchars($song['portada_cancion']) ?>" width="150">
 </a>
 
 <?php endforeach; ?>
@@ -16,8 +16,8 @@
 
 <?php foreach($albums as $album): ?>
 
-<a href="/LASK/public/album?id=<?= $album['id_album'] ?>">
-<img src="/LASK/<?= $album['portada_album'] ?>" width="150">
+<a href="<?= BASE_URL ?>/album?id=<?= (int)$album['id_album'] ?>">
+<img src="/LASK/<?= htmlspecialchars($album['portada_album']) ?>" width="150">
 </a>
 
 

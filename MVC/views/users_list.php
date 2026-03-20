@@ -1,10 +1,9 @@
 <h1>Usuarios registrados</h1>
 
-<?php if(isset($_SESSION['flash_message'])): ?>
+<?php if($flashMessage): ?>
     <div style="padding:10px; margin-bottom:12px; border:1px solid #ccc; background:#f9f9f9;">
-        <?= htmlspecialchars($_SESSION['flash_message']) ?>
+        <?= htmlspecialchars($flashMessage) ?>
     </div>
-    <?php unset($_SESSION['flash_message']); ?>
 <?php endif; ?>
 
 <?php if(!empty($users)): ?>
@@ -28,14 +27,14 @@
                     <td><?= htmlspecialchars($user['email']) ?></td>
                     <td><?= htmlspecialchars($user['nombre_usuario']) ?></td>
                     <td><?= htmlspecialchars($user['nombre_rol']) ?></td>
-                    <td><?= $user['estado_usuario'] ? 'Activo' : 'Inactivo' ?></td>
+                    <td><?= htmlspecialchars($user['status_label']) ?></td>
                     <td><?= htmlspecialchars($user['fecha_creacion']) ?></td>
                     <td>*****</td>
                     <td>
-                        <form action="/LASK/public/index.php/admin/user/change-state" method="POST" style="margin:0;">
+                        <form action="<?= htmlspecialchars(BASE_URL . '/admin/user/change-state') ?>" method="POST" style="margin:0;">
                             <input type="hidden" name="user_id" value="<?= htmlspecialchars($user['id_usuario']) ?>">
-                            <input type="hidden" name="estado" value="<?= $user['estado_usuario'] ? '0' : '1' ?>">
-                            <button type="submit"><?= $user['estado_usuario'] ? 'Desactivar' : 'Activar' ?></button>
+                            <input type="hidden" name="estado" value="<?= htmlspecialchars($user['next_state']) ?>">
+                            <button type="submit" class="btn"><?= htmlspecialchars($user['action_label']) ?></button>
                         </form>
                     </td>
                 </tr>
@@ -46,4 +45,4 @@
     <p>No hay usuarios registrados.</p>
 <?php endif; ?>
 
-<p><a href="/LASK/public/index.php/profile?id=<?= $_SESSION['user_id'] ?? '' ?>">Volver al perfil</a></p>
+<p><a href="<?= htmlspecialchars($profileUrl) ?>">Volver al perfil</a></p>

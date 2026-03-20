@@ -1,7 +1,7 @@
 <h1>Editar Canción</h1>
 
-<form action="/LASK/public/index.php/artist/edit-song?id=<?= $song['id_cancion'] ?>" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="song_id" value="<?= $song['id_cancion'] ?>">
+<form action="<?= BASE_URL ?>/artist/edit-song?id=<?= (int)$song['id_cancion'] ?>" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="song_id" value="<?= (int)$song['id_cancion'] ?>">
 
     <label>Nombre de la Canción:</label>
     <input type="text" name="nombre" value="<?= htmlspecialchars($song['nombre_cancion']) ?>" required><br>
@@ -10,7 +10,7 @@
     <select name="album_id">
         <option value="">Sin álbum</option>
         <?php foreach($albums as $album): ?>
-            <option value="<?= $album['id_album'] ?>" <?= (int) $song['id_album'] === (int) $album['id_album'] ? 'selected' : '' ?>>
+            <option value="<?= (int)$album['id_album'] ?>" <?= (int) $song['id_album'] === (int) $album['id_album'] ? 'selected' : '' ?>>
                 <?= htmlspecialchars($album['nombre_album']) ?>
             </option>
         <?php endforeach; ?>
@@ -25,7 +25,7 @@
     <label>Tags (puedes elegir varios):</label>
     <select name="tags[]" multiple size="6">
         <?php foreach($tags as $tag): ?>
-            <option value="<?= $tag['id_tag'] ?>" <?= in_array((int) $tag['id_tag'], $selectedTagIds, true) ? 'selected' : '' ?>>
+            <option value="<?= (int)$tag['id_tag'] ?>" <?= in_array((int) $tag['id_tag'], $selectedTagIds, true) ? 'selected' : '' ?>>
                 <?= htmlspecialchars($tag['nombre_tag']) ?>
             </option>
         <?php endforeach; ?>
@@ -43,4 +43,4 @@
 
 <p>Al mover la canción de álbum, se conserva el mismo ID de canción y no se pierden los likes.</p>
 
-<a href="/LASK/public/index.php/song?id=<?= $song['id_cancion'] ?>">Volver a la canción</a>
+<a href="<?= BASE_URL ?>/song?id=<?= (int)$song['id_cancion'] ?>">Volver a la canción</a>

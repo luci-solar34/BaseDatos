@@ -22,13 +22,14 @@ class Tag {
 
     public function getRandomTags($limit = 8){
 
-        $limit = (int) $limit;
+        $limit = max(1, (int)$limit);
         $query = "SELECT id_tag, nombre_tag, descripcion_tag
                   FROM Tags
                   ORDER BY RAND()
-                  LIMIT $limit";
+                  LIMIT :limit";
 
         $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -133,9 +134,7 @@ class Tag {
     public function syncSongTags($songId, $tagIds){
 
         $songId = (int) $songId;
-        $cleanIds = array_values(array_unique(array_filter(array_map('intval', $tagIds), function($id){
-            return $id > 0;
-        })));
+        $cleanIds = $this->normalizeTagIds($tagIds);
 
         $this->conn->beginTransaction();
 
@@ -147,14 +146,7 @@ class Tag {
 
             if(!empty($cleanIds)){
 
-                $placeholders = implode(',', array_fill(0, count($cleanIds), '?'));
-                $validQuery = "SELECT id_tag FROM Tags WHERE id_tag IN ($placeholders)";
-                $validStmt = $this->conn->prepare($validQuery);
-                foreach($cleanIds as $i => $tagId){
-                    $validStmt->bindValue($i + 1, $tagId, PDO::PARAM_INT);
-                }
-                $validStmt->execute();
-                $validIds = array_map('intval', $validStmt->fetchAll(PDO::FETCH_COLUMN));
+                $validIds = $this->fetchExistingTagIds($cleanIds);
 
                 if(!empty($validIds)){
                     $insertQuery = "INSERT INTO cancion_tags (id_cancion, id_tag)
@@ -177,6 +169,30 @@ class Tag {
             }
             throw $e;
         }
+    }
+
+    private function normalizeTagIds(array $tagIds){
+        return array_values(array_unique(array_filter(array_map('intval', $tagIds), function($id){
+            return $id > 0;
+        })));
+    }
+
+    private function fetchExistingTagIds(array $tagIds){
+        if(empty($tagIds)){
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($tagIds), '?'));
+        $validQuery = "SELECT id_tag FROM Tags WHERE id_tag IN ($placeholders)";
+        $validStmt = $this->conn->prepare($validQuery);
+
+        foreach($tagIds as $i => $tagId){
+            $validStmt->bindValue($i + 1, $tagId, PDO::PARAM_INT);
+        }
+
+        $validStmt->execute();
+
+        return array_map('intval', $validStmt->fetchAll(PDO::FETCH_COLUMN));
     }
 
 }

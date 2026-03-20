@@ -1,12 +1,12 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/User.php";
-require_once "../MVC/models/Follow.php";
-require_once "../MVC/models/Playlist.php";
-require_once "../MVC/models/Block.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/User.php";
+require_once __DIR__ . "/../models/Follow.php";
+require_once __DIR__ . "/../models/Playlist.php";
+require_once __DIR__ . "/../models/Block.php";
 
-class UserController {
+class UserController extends Controller {
 
     private $user;
     private $follow;
@@ -14,289 +14,302 @@ class UserController {
     private $block;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->user = new User($db);
         $this->follow = new Follow($db);
         $this->playlist = new Playlist($db);
         $this->block = new Block($db);
     }
 
+    private function redirectToProfile($userId){
+        $this->redirectToRoute('profile?id=' . (int)$userId);
+    }
+
+    private function formatPlaylists(array $playlists){
+        foreach($playlists as &$playlist){
+            $playlist['privacy_label'] = ((int)$playlist['privacidad_playlist'] === 0) ? '(Privada)' : '';
+        }
+        unset($playlist);
+
+        return $playlists;
+    }
+
     public function profile($id){
+        $profileUserId = (int)$id;
+        $user = $this->user->getById($profileUserId);
+        if(!$user){
+            $this->abort('Usuario no encontrado', 404);
+        }
 
-    $user = $this->user->getById($id);
-    if(!$user){
-        die("Usuario no encontrado");
-    }
+        $viewerId = $this->sessionInt('user_id');
+        $viewerData = $viewerId ? $this->user->getById($viewerId) : null;
+        $isBlocked = $viewerId ? $this->block->isBlocked($viewerId, $profileUserId) : false;
+        $hasBlocked = $viewerId ? $this->block->hasBlocked($viewerId, $profileUserId) : false;
+        $canReport = $viewerId
+            && $viewerId !== $profileUserId
+            && $viewerData
+            && (int)$viewerData['id_rol'] !== 1
+            && (int)$user['id_rol'] !== 1;
+        $hasReported = $canReport ? $this->user->hasDenuncia($viewerId, $profileUserId) : false;
+        $isOwner = $viewerId !== null && $viewerId === (int)$user['id_usuario'];
+        $canInteract = $viewerId !== null && $viewerId !== (int)$user['id_usuario'];
+        $showAdminActions = $this->sessionInt('role') === 1 && $isOwner;
+        $reportUnavailableMessage = $canInteract && !$canReport
+            ? 'No puedes denunciar a administradores ni usar esta función mientras estás en modo administrador.'
+            : null;
+        $bioText = !empty($user['bio']) ? $user['bio'] : 'Sin bio';
 
-    $viewer = $_SESSION['user_id'] ?? null;
-    $viewerData = $viewer ? $this->user->getById($viewer) : null;
+        if($isBlocked){
+            $flash = $this->consumeFlash();
+            $this->render('profile_blocked.php', [
+                'user' => $user,
+                'flashMessage' => $flash['message'],
+                'canReport' => $canReport,
+                'showReportedMessage' => $canReport && $hasReported,
+                'canUnblock' => $hasBlocked,
+            ]);
+            return;
+        }
 
-    // 🔥 BLOQUEO (VERSIÓN CORRECTA)
-    $isBlocked = false;
-    $hasBlocked = false;
+        if((int)$user['id_rol'] === 2){
+            $this->redirectToRoute('artist?id=' . $profileUserId);
+        }
 
-    if($viewer){
-        $isBlocked = $this->block->isBlocked($viewer, $id);
-        $hasBlocked = $this->block->hasBlocked($viewer, $id);
-    }
+        $followers = $this->follow->countFollowers($profileUserId);
+        $following = $this->follow->countFollowing($profileUserId);
+        $isFollowing = $viewerId && $viewerId !== $profileUserId
+            ? $this->follow->isFollowing($viewerId, $profileUserId)
+            : false;
+        $playlists = $this->formatPlaylists($this->playlist->getUserPlaylists($profileUserId, $viewerId));
+        $flash = $this->consumeFlash();
 
-    $canReport = false;
-    $hasReported = false;
-    if($viewer && $viewer != $id && $viewerData['id_rol'] != 1 && $user['id_rol'] != 1){
-        $canReport = true;
-        $hasReported = $this->user->hasDenuncia($viewer, $id);
-    }
-
-    if($isBlocked){
-        $canUnblock = $hasBlocked; // 👈 para la vista
-        require "../MVC/views/profile_blocked.php";
-        return;
-    }
-
-    // Si es artista, redirigir
-    if($user['id_rol'] == 2){
-        header("Location: /LASK/public/index.php/artist?id=" . $id);
-        exit;
-    }
-
-    $followers = $this->follow->countFollowers($id);
-    $following = $this->follow->countFollowing($id);
-
-    $isFollowing = false;
-    if($viewer && $viewer != $id){
-        $isFollowing = $this->follow->isFollowing($viewer, $id);
-    }
-
-    $playlists = $this->playlist->getUserPlaylists($id,$viewer);
-
-    $flashMessage = $_SESSION['flash_message'] ?? null;
-    unset($_SESSION['flash_message']);
-
-    require "../MVC/views/profile.php";
+        $this->render('profile.php', [
+            'user' => $user,
+            'followers' => $followers,
+            'following' => $following,
+            'isFollowing' => $isFollowing,
+            'playlists' => $playlists,
+            'flashMessage' => $flash['message'],
+            'canInteract' => $canInteract,
+            'hasBlocked' => $hasBlocked,
+            'canReport' => $canReport,
+            'hasReported' => $hasReported,
+            'reportUnavailableMessage' => $reportUnavailableMessage,
+            'bioText' => $bioText,
+            'isOwner' => $isOwner,
+            'showAdminActions' => $showAdminActions,
+        ]);
     }
 
     public function submitReport(){
-        $denunciante = $_SESSION['user_id'] ?? null;
-        $denunciado = $_POST['denunciado_id'] ?? null;
-        $motivo = trim($_POST['motivo_denuncia'] ?? '');
-        $descripcion = trim($_POST['descripcion_denuncia'] ?? '');
+        $denunciante = $this->requireAuthenticatedUser('login');
+        $denunciado = $this->postInt('denunciado_id', 0);
+        $motivo = $this->postString('motivo_denuncia');
+        $descripcion = $this->postString('descripcion_denuncia');
 
         if(!$denunciante || !$denunciado || !$motivo || !$descripcion){
-            $_SESSION['flash_message'] = "Por favor completa todos los campos de la denuncia.";
-            header("Location: /LASK/public/index.php/profile?id=".$denunciado);
-            exit;
+            $this->setFlash('Por favor completa todos los campos de la denuncia.');
+            $this->redirectToProfile($denunciado);
         }
 
-        if($denunciante == $denunciado){
-            $_SESSION['flash_message'] = "No puedes denunciarte a ti mismo.";
-            header("Location: /LASK/public/index.php/profile?id=".$denunciado);
-            exit;
+        if(!$this->esEntradaSegura($motivo) || !$this->esEntradaSegura($descripcion)){
+            $this->setFlash('La denuncia contiene caracteres no permitidos.');
+            $this->redirectToProfile($denunciado);
+        }
+
+        if($denunciante === $denunciado){
+            $this->setFlash('No puedes denunciarte a ti mismo.');
+            $this->redirectToProfile($denunciado);
         }
 
         $denuncianteData = $this->user->getById($denunciante);
         $denunciadoData = $this->user->getById($denunciado);
 
         if(!$denuncianteData || !$denunciadoData){
-            die("Usuario no encontrado");
+            $this->abort('Usuario no encontrado', 404);
         }
 
-        if($denuncianteData['id_rol'] == 1 || $denunciadoData['id_rol'] == 1){
-            $_SESSION['flash_message'] = "No se puede realizar denuncias contra/desde administradores.";
-            header("Location: /LASK/public/index.php/profile?id=".$denunciado);
-            exit;
+        if((int)$denuncianteData['id_rol'] === 1 || (int)$denunciadoData['id_rol'] === 1){
+            $this->setFlash('No se puede realizar denuncias contra/desde administradores.');
+            $this->redirectToProfile($denunciado);
         }
 
-        // Evita denuncias duplicadas por clave única
         if($this->user->hasDenuncia($denunciante, $denunciado)){
-            $_SESSION['flash_message'] = "Ya has denunciado a este usuario. Espera la resolución.";
-            header("Location: /LASK/public/index.php/profile?id=".$denunciado);
-            exit;
+            $this->setFlash('Ya has denunciado a este usuario. Espera la resolución.');
+            $this->redirectToProfile($denunciado);
         }
 
         $result = $this->user->createDenuncia($denunciante, $denunciado, $motivo, $descripcion);
 
         if($result){
-            $_SESSION['flash_message'] = "Gracias por denunciar esta cuenta, tu solicitud está en progreso.";
+            $this->setFlash('Gracias por denunciar esta cuenta, tu solicitud está en progreso.', 'success');
         } else {
-            $_SESSION['flash_message'] = "Ocurrió un error al enviar la denuncia. Intenta de nuevo.";
+            $this->setFlash('Ocurrió un error al enviar la denuncia. Intenta de nuevo.');
         }
 
-        header("Location: /LASK/public/index.php/profile?id=".$denunciado);
-        exit;
+        $this->redirectToProfile($denunciado);
     }
 
     public function followers($id){
         $user = $this->user->getById($id);
         if(!$user){
-            die("Usuario no encontrado");
+            $this->abort('Usuario no encontrado', 404);
         }
         $followers = $this->follow->getFollowers($id);
-        require "../MVC/views/followers.php";
+        $followersCount = count($followers);
+        $followersLabel = $followersCount === 1 ? 'seguidor' : 'seguidores';
+        $profileUrl = $this->routeUrl('profile?id=' . (int)$user['id_usuario']);
+        $this->render('followers.php', compact('user', 'followers', 'followersCount', 'followersLabel', 'profileUrl'));
     }
 
     public function following($id){
         $user = $this->user->getById($id);
         if(!$user){
-            die("Usuario no encontrado");
+            $this->abort('Usuario no encontrado', 404);
         }
         $following = $this->follow->getFollowing($id);
-        require "../MVC/views/following.php";
+        $followingCount = count($following);
+        $followingLabel = $followingCount === 1 ? 'seguido' : 'seguidos';
+        $profileUrl = $this->routeUrl('profile?id=' . (int)$user['id_usuario']);
+        $this->render('following.php', compact('user', 'following', 'followingCount', 'followingLabel', 'profileUrl'));
     }
 
     public function updateBio(){
+        $id = $this->requireAuthenticatedUser('login');
+        $bio = $this->postString('bio');
 
-    $bio = $_POST['bio'] ?? null;
-    $id = $_SESSION['user_id'] ?? null;
+        if(!$this->esEntradaSegura($bio)){
+            $this->setFlash('La biografía contiene caracteres no permitidos.');
+            $this->redirectToProfile($id);
+        }
 
-    if(!$id){
-        die("Datos inválidos");
-    }
-
-    $this->user->updateBio($id,$bio);
-
-    header("Location: /LASK/public/index.php/profile?id=".$id);
-    exit;
+        $this->user->updateBio($id, $bio);
+        $this->redirectToProfile($id);
     }
 
 
     public function updatePfp(){
+        $userId = $this->requireAuthenticatedUser('login');
+        $upload = $this->storeUploadedFile('pfp', ['jpg', 'jpeg', 'png', 'webp'], 'photos_pfp');
 
-    $user_id = $_SESSION['user_id'];
-
-    if(!isset($_FILES['pfp'])){
-        die("No se subió ninguna imagen");
-    }
-
-    $file = $_FILES['pfp'];
-
-    $filename = time() . "_" . basename($file['name']);
-
-    $destination = "../photos_pfp/" . $filename;
-
-    move_uploaded_file($file['tmp_name'], $destination);
-
-    $path = "photos_pfp/" . $filename;
-
-    $this->user->updatePfp($user_id,$path);
-
-    header("Location: /LASK/public/index.php/profile?id=".$user_id);
-    exit;
-}
-
-    public function listUsers(){
-        if(empty($_SESSION['user_id']) || empty($_SESSION['role']) || $_SESSION['role'] != 1){
-            $_SESSION['flash_message'] = "Acceso denegado: solo administradores pueden ver todos los usuarios.";
-            header("Location: /LASK/public/index.php");
-            exit;
+        if($upload['error']){
+            $this->setFlash($upload['error']);
+            $this->redirectToProfile($userId);
         }
 
+        if(empty($upload['uploaded'])){
+            $this->setFlash('No se subió ninguna imagen');
+            $this->redirectToProfile($userId);
+        }
+
+        if($this->user->updatePfp($userId, $upload['path'])){
+            $this->setFlash('Foto de perfil actualizada correctamente.', 'success');
+        } else {
+            $this->setFlash('No se pudo actualizar la foto de perfil. Intenta de nuevo.');
+        }
+
+        $this->redirectToProfile($userId);
+    }
+
+    public function listUsers(){
+        $adminId = $this->requireAdmin('Acceso denegado: solo administradores pueden ver todos los usuarios.');
+
         $users = $this->user->getAllUsers();
-        require "../MVC/views/users_list.php";
+        foreach($users as &$userRow){
+            $userRow['status_label'] = $userRow['estado_usuario'] ? 'Activo' : 'Inactivo';
+            $userRow['next_state'] = $userRow['estado_usuario'] ? '0' : '1';
+            $userRow['action_label'] = $userRow['estado_usuario'] ? 'Desactivar' : 'Activar';
+        }
+        unset($userRow);
+        $flash = $this->consumeFlash();
+        $profileUrl = $this->routeUrl('profile?id=' . (int)$adminId);
+        $this->render('users_list.php', [
+            'users' => $users,
+            'flashMessage' => $flash['message'],
+            'profileUrl' => $profileUrl,
+        ]);
     }
 
     public function changeUserState(){
-        if(empty($_SESSION['user_id']) || empty($_SESSION['role']) || $_SESSION['role'] != 1){
-            $_SESSION['flash_message'] = "Acceso denegado: solo administradores pueden cambiar estado de usuarios.";
-            header("Location: /LASK/public/index.php");
-            exit;
+        $adminId = $this->requireAdmin('Acceso denegado: solo administradores pueden cambiar estado de usuarios.');
+
+        $userId = $this->postInt('user_id', 0);
+        $estado = $this->postString('estado', '');
+        $estadoValue = ($estado == '1') ? 1 : (($estado == '0') ? 0 : null);
+
+        if(!$userId || !in_array($estadoValue, [0, 1], true)){
+            $this->setFlash('Datos inválidos para cambiar el estado.');
+            $this->redirectToRoute('admin/users');
         }
 
-        $userId = $_POST['user_id'] ?? null;
-        $estado = isset($_POST['estado']) ? ($_POST['estado'] === '1' ? 1 : 0) : null;
-
-        if(!$userId || !in_array($estado, [0,1], true)){
-            $_SESSION['flash_message'] = "Datos inválidos para cambiar el estado.";
-            header("Location: /LASK/public/index.php/admin/users");
-            exit;
+        if($userId === $adminId){
+            $this->setFlash('No se puede cambiar el estado de tu propia cuenta desde aquí.');
+            $this->redirectToRoute('admin/users');
         }
 
-        // Prevenir auto-bloqueo de administrador actual si se desea
-        if($userId == $_SESSION['user_id']){
-            $_SESSION['flash_message'] = "No se puede cambiar el estado de tu propia cuenta desde aquí.";
-            header("Location: /LASK/public/index.php/admin/users");
-            exit;
-        }
-
-        $updated = $this->user->changeState($userId, $estado);
+        $updated = $this->user->changeState($userId, $estadoValue);
 
         if($updated){
-            $_SESSION['flash_message'] = $estado ? "Usuario activado correctamente." : "Usuario desactivado correctamente.";
+            $this->setFlash($estadoValue ? 'Usuario activado correctamente.' : 'Usuario desactivado correctamente.', 'success');
         } else {
-            $_SESSION['flash_message'] = "No se pudo actualizar el estado del usuario.";
+            $this->setFlash('No se pudo actualizar el estado del usuario.');
         }
 
-        header("Location: /LASK/public/index.php/admin/users");
-        exit;
+        $this->redirectToRoute('admin/users');
     }
 
     public function follow(){
+        $seguidor = $this->requireAuthenticatedUser('login');
+        $seguido = $this->postInt('user_id', 0);
 
-    $seguidor = $_SESSION['user_id'] ?? null;
-    $seguido = $_POST['user_id'] ?? null;
+        if(!$seguido){
+            $this->abort('Datos inválidos', 422);
+        }
 
-    if(!$seguidor || !$seguido){
-        die("Datos inválidos");
+        if($this->block->isBlocked($seguidor, $seguido)){
+            $this->abort('No puedes seguir a este usuario', 403);
+        }
+
+        if(!$this->follow->isFollowing($seguidor, $seguido)){
+            $this->follow->follow($seguidor, $seguido);
+        }
+
+        $this->redirectToProfile($seguido);
     }
 
-    if($this->block->isBlocked($seguidor, $seguido)){
-        die("No puedes seguir a este usuario");
-    }
-
-    if(!$this->follow->isFollowing($seguidor,$seguido)){
-        $this->follow->follow($seguidor,$seguido);
-    }
-
-    // REDIRECCIÓN CORRECTA
-    header("Location: /LASK/public/index.php/profile?id=" . $seguido);
-    exit;
-}
     public function unfollow(){
+        $seguidor = $this->requireAuthenticatedUser('login');
+        $seguido = $this->postInt('user_id', 0);
 
-    $seguidor = $_SESSION['user_id'] ?? null;
-    $seguido = $_POST['user_id'] ?? null;
+        if(!$seguido){
+            $this->abort('Datos inválidos', 422);
+        }
 
-    if(!$seguidor || !$seguido){
-        die("Datos inválidos");
+        $this->follow->unfollow($seguidor, $seguido);
+        $this->redirectToProfile($seguido);
     }
 
-    $this->follow->unfollow($seguidor,$seguido);
+    public function block(){
+        $bloqueador = $this->requireAuthenticatedUser('login');
+        $bloqueado = $this->postInt('user_id', 0);
 
-    // 👇 REDIRECCIÓN CORRECTA
-    header("Location: /LASK/public/index.php/profile?id=" . $seguido);
-    exit;
-}
-public function block(){
+        if(!$bloqueado){
+            $this->abort('Datos inválidos', 422);
+        }
 
-    $bloqueador = $_SESSION['user_id'] ?? null;
-    $bloqueado = $_POST['user_id'] ?? null;
-
-    if(!$bloqueador || !$bloqueado){
-        die("Datos inválidos");
+        $this->block->block($bloqueador, $bloqueado);
+        $this->redirectToProfile($bloqueado);
     }
 
-    $this->block->block($bloqueador,$bloqueado);
+    public function unblock(){
+        $bloqueador = $this->requireAuthenticatedUser('login');
+        $bloqueado = $this->postInt('user_id', 0);
 
-    header("Location: /LASK/public/index.php/profile?id=".$bloqueado);
-    exit;
-}
+        if(!$bloqueado){
+            $this->abort('Datos inválidos', 422);
+        }
 
-public function unblock(){
-
-    $bloqueador = $_SESSION['user_id'] ?? null;
-    $bloqueado = $_POST['user_id'] ?? null;
-
-    if(!$bloqueador || !$bloqueado){
-        die("Datos inválidos");
+        $this->block->unblock($bloqueador, $bloqueado);
+        $this->redirectToProfile($bloqueado);
     }
-
-    $this->block->unblock($bloqueador,$bloqueado);
-
-    header("Location: /LASK/public/index.php/profile?id=".$bloqueado);
-    exit;
-}
-
-    
 }

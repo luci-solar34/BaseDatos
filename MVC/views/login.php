@@ -1,13 +1,12 @@
 <h1>Iniciar sesión</h1>
 
-<?php if(isset($_SESSION['flash_message'])): ?>
-    <div class="alert <?= (isset($_SESSION['flash_message_type']) && $_SESSION['flash_message_type'] === 'success') ? 'alert-success' : 'alert-error' ?>">
-        <?= htmlspecialchars($_SESSION['flash_message']) ?>
+<?php if($flashMessage): ?>
+    <div class="alert <?= $flashMessageType === 'success' ? 'alert-success' : 'alert-error' ?>">
+        <?= htmlspecialchars($flashMessage) ?>
     </div>
-    <?php unset($_SESSION['flash_message'], $_SESSION['flash_message_type']); ?>
 <?php endif; ?>
 
-<form action="/LASK/public/index.php/login" method="POST">
+<form action="<?= htmlspecialchars(BASE_URL . '/login') ?>" method="POST">
 
 <label>Nombre de usuario</label>
 <input type="text" name="username" required>
@@ -19,4 +18,4 @@
 
 </form>
 
-<a href="/LASK/public/index.php/register">Crear cuenta</a>
+<a href="<?= htmlspecialchars(BASE_URL . '/register') ?>">Crear cuenta</a>

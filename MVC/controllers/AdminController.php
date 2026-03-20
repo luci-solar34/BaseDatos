@@ -1,46 +1,65 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/User.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/User.php";
 
-class AdminController {
+class AdminController extends Controller {
 
     private $user;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->user = new User($db);
+    }
+
+    private function ensureAdmin(){
+        $this->requireAdmin('Acceso denegado');
     }
 
     public function denuncias(){
 
-        $denuncias = $this->user->getDenuncias();
+        $this->ensureAdmin();
 
-        require "../MVC/views/admin_denuncias.php";
+        $denuncias = $this->user->getDenuncias();
+        $flash = $this->consumeFlash();
+
+        $this->render('admin_denuncias.php', [
+            'denuncias' => $denuncias,
+            'flashMessage' => $flash['message'],
+        ]);
     }
 
     public function aceptarDenuncia(){
 
-        $id = $_POST['denuncia'];
+        $this->ensureAdmin();
+
+        $id = $this->postInt('denuncia', 0);
+
+        if(!$id){
+            $this->setFlash('Denuncia inválida');
+            $this->redirectToRoute('admin/denuncias');
+        }
 
         $this->user->acceptDenuncia($id);
+
+        $this->setFlash('Denuncia aceptada', 'success');
+        $this->redirectToRoute('admin/denuncias');
     }
 
     public function rechazarDenuncia(){
 
-        $id = $_POST['denuncia'];
+        $this->ensureAdmin();
+
+        $id = $this->postInt('denuncia', 0);
+
+        if(!$id){
+            $this->setFlash('Denuncia inválida');
+            $this->redirectToRoute('admin/denuncias');
+        }
 
         $this->user->rejectDenuncia($id);
-    }
 
-    public function cambiarEstadoUsuario(){
-
-        $user = $_POST['user_id'];
-        $estado = $_POST['estado'];
-
-        $this->user->changeState($user,$estado);
+        $this->setFlash('Denuncia rechazada', 'success');
+        $this->redirectToRoute('admin/denuncias');
     }
 }

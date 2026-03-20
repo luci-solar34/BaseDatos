@@ -1,4 +1,4 @@
-<a href="/LASK/public/index.php" style="display: inline-block; margin-bottom: 10px;">← Volver al inicio</a>
+<a href="<?= BASE_URL ?>" style="display: inline-block; margin-bottom: 10px;">← Volver al inicio</a>
 
 <h1>Mensajes</h1>
 
@@ -11,7 +11,7 @@
     <?php foreach($conversations as $conv): ?>
         
         <div style="margin-bottom: 10px;">
-            <a href="/LASK/public/index.php/chat?user=<?= $conv['id_usuario'] ?>">
+            <a href="<?= BASE_URL ?>/chat?user=<?= (int)$conv['id_usuario'] ?>">
                 <strong><?= htmlspecialchars($conv['username'] ?? $conv['nombre_usuario'] ?? '') ?></strong><br>
                 <small><?= htmlspecialchars($conv['ultimo_mensaje'] ?? 'Sin mensajes') ?></small>
             </a>
@@ -33,7 +33,7 @@
     <?php foreach($mutuals as $m): ?>
         
         <div style="margin-bottom: 10px;">
-            <a href="/LASK/public/index.php/chat?user=<?= $m['id_usuario'] ?>">
+            <a href="<?= BASE_URL ?>/chat?user=<?= (int)$m['id_usuario'] ?>">
                 <strong><?= htmlspecialchars($m['nombre_usuario']) ?></strong><br>
                 <small style="color: green;">Iniciar conversación</small>
             </a>

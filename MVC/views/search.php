@@ -2,7 +2,7 @@
 
 <?php if(empty($results)): ?>
 
-<p>No se encontraron resultados para "<?= htmlspecialchars($_GET['q']) ?>"</p>
+<p>No se encontraron resultados para "<?= htmlspecialchars($query ?? '') ?>"</p>
 
 <?php else: ?>
 
@@ -14,7 +14,7 @@
 
         <?php if($result['tipo'] == 'cancion'): ?>
 
-            <a href="/LASK/public/index.php/song?id=<?= $result['id'] ?>">
+            <a href="<?= BASE_URL ?>/song?id=<?= (int)$result['id'] ?>">
 
                 <?= htmlspecialchars($result['resultado']) ?> (Canción)
 
@@ -22,7 +22,7 @@
 
         <?php elseif($result['tipo'] == 'artista'): ?>
 
-            <a href="/LASK/public/index.php/artist?id=<?= $result['id'] ?>">
+            <a href="<?= BASE_URL ?>/artist?id=<?= (int)$result['id'] ?>">
 
                 <?= htmlspecialchars($result['resultado']) ?> (Artista)
 
@@ -30,7 +30,7 @@
 
         <?php elseif($result['tipo'] == 'album'): ?>
 
-            <a href="/LASK/public/index.php/album?id=<?= $result['id'] ?>">
+            <a href="<?= BASE_URL ?>/album?id=<?= (int)$result['id'] ?>">
 
                 <?= htmlspecialchars($result['resultado']) ?> (Álbum)
 
@@ -38,7 +38,7 @@
 
         <?php elseif($result['tipo'] == 'usuario'): ?>
 
-            <a href="/LASK/public/index.php/profile?id=<?= $result['id'] ?>">
+            <a href="<?= BASE_URL ?>/profile?id=<?= (int)$result['id'] ?>">
 
                 <?= htmlspecialchars($result['resultado']) ?> (Usuario)
 
@@ -46,7 +46,7 @@
 
         <?php elseif($result['tipo'] == 'tag'): ?>
 
-            <a href="/LASK/public/index.php/tag?id=<?= $result['id'] ?>">
+            <a href="<?= BASE_URL ?>/tag?id=<?= (int)$result['id'] ?>">
 
                 <?= htmlspecialchars($result['resultado']) ?> (Tag)
 

@@ -1,6 +1,6 @@
 <h1>Crear Álbum</h1>
 
-<form action="/LASK/public/index.php/artist/create-album?id=<?= $_GET['id'] ?>" method="POST" enctype="multipart/form-data">
+<form action="<?= BASE_URL ?>/artist/create-album?id=<?= (int)$artistId ?>" method="POST" enctype="multipart/form-data">
     <label>Nombre del Álbum:</label>
     <input type="text" name="nombre" required><br>
 
@@ -13,4 +13,4 @@
     <button type="submit">Crear Álbum</button>
 </form>
 
-<a href="/LASK/public/index.php/artist?id=<?= $_GET['id'] ?>">Volver</a>
+<a href="<?= BASE_URL ?>/artist?id=<?= (int)$artistId ?>">Volver</a>

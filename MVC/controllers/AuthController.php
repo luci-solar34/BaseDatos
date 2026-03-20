@@ -1,149 +1,143 @@
 <?php
 
-require_once "../config/database.php";
-require_once "../MVC/models/User.php";
+require_once __DIR__ . "/Controller.php";
+require_once __DIR__ . "/../models/User.php";
 
-class AuthController {
+class AuthController extends Controller {
 
     private $user;
 
     public function __construct(){
-
-        $database = new Database();
-        $db = $database->connect();
-
+        $db = $this->connectDatabase();
         $this->user = new User($db);
+    }
+
+    public function showLoginForm(){
+        $flash = $this->consumeFlash();
+        $this->render('login.php', [
+            'flashMessage' => $flash['message'],
+            'flashMessageType' => $flash['type'],
+        ]);
+    }
+
+    public function showRegisterForm(){
+        $flash = $this->consumeFlash();
+        $this->render('register.php', [
+            'flashMessage' => $flash['message'],
+            'flashMessageType' => $flash['type'],
+        ]);
     }
 
     public function login(){
 
-        $username = $_POST['username'] ?? null;
-        $password = $_POST['password'] ?? null;
+        $username = $this->postString('username');
+        $password = $this->postString('password');
 
         if(!$username || !$password){
-            $_SESSION['flash_message'] = "Datos inválidos";
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/login");
-            exit;
+            $this->setFlash('Datos inválidos');
+            $this->redirectToRoute('login');
         }
 
-        $result = $this->user->login($username,$password);
+        if(!$this->esEntradaSegura($username)){
+            $this->setFlash('Los datos contienen caracteres no permitidos.');
+            $this->redirectToRoute('login');
+        }
+
+        $result = $this->user->login($username, $password);
 
         if($result){
-    if($result['estado_usuario'] == 0){
-        $_SESSION['flash_message'] = "Usuario inactivo. Contacta al administrador.";
-        $_SESSION['flash_message_type'] = "error";
-        header("Location: /LASK/public/index.php/login");
-        exit;
-    }
-    $_SESSION['user_id'] = $result['id_usuario'];
-    $_SESSION['username'] = $result['nombre_usuario'];
-    $_SESSION['role'] = $result['id_rol'];
+            if((int)$result['estado_usuario'] === 0){
+                $this->setFlash('Usuario inactivo. Contacta al administrador.');
+                $this->redirectToRoute('login');
+            }
 
-    header("Location: /LASK/public");
-    exit;
+            $_SESSION['user_id'] = (int)$result['id_usuario'];
+            $_SESSION['username'] = $result['nombre_usuario'];
+            $_SESSION['role'] = (int)$result['id_rol'];
 
-    } else {
-    $_SESSION['flash_message'] = "Credenciales incorrectas";
-    $_SESSION['flash_message_type'] = "error";
-    header("Location: /LASK/public/index.php/login");
-    exit;
+            $this->redirectToPath($this->publicUrl());
         }
+
+        $this->setFlash('Credenciales incorrectas');
+        $this->redirectToRoute('login');
     }
+
     public function register(){
 
-        // validar términos
-        if(!isset($_POST['terms'])){
-            $_SESSION['flash_message'] = "Debes aceptar los términos y condiciones";
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/register");
-            exit;
+        if(!$this->postBool('terms')){
+            $this->setFlash('Debes aceptar los términos y condiciones');
+            $this->redirectToRoute('register');
         }
 
         $data = [
-            "email" => $_POST['email'] ?? null,
-            "username" => $_POST['username'] ?? null,
-            "password" => $_POST['password'] ?? null,
-            "pais" => $_POST['pais'] ?? null,
-            "rol" => $_POST['rol'] ?? null
+            'email' => filter_var($this->postString('email'), FILTER_VALIDATE_EMAIL) ?: null,
+            'username' => $this->postString('username'),
+            'password' => $this->postString('password'),
+            'pais' => $this->postInt('pais', 0),
+            'rol' => $this->postInt('rol', 0),
         ];
 
         if(!$data['email'] || !$data['username'] || !$data['password'] || !$data['pais'] || !$data['rol']){
-            $_SESSION['flash_message'] = "Datos incompletos";
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/register");
-            exit;
+            $this->setFlash('Datos incompletos');
+            $this->redirectToRoute('register');
         }
 
-        $nombre_artistico = trim($_POST['nombre_artistico'] ?? '');
+        if(!$this->esEntradaSegura($data['username'])){
+            $this->setFlash('El nombre de usuario contiene caracteres no permitidos.');
+            $this->redirectToRoute('register');
+        }
+
+        $nombre_artistico = $this->postString('nombre_artistico');
 
         if((int)$data['rol'] !== 2 && $nombre_artistico !== ''){
-            $_SESSION['flash_message'] = "Solo los artistas pueden tener nombre artístico. Si quieres ser artista, cambia el rol.";
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/register");
-            exit;
+            $this->setFlash('Solo los artistas pueden tener nombre artístico. Si quieres ser artista, cambia el rol.');
+            $this->redirectToRoute('register');
         }
 
-        // validar unicidad (email y nombre de usuario)
         if($this->user->emailExists($data['email'])){
-            $_SESSION['flash_message'] = "El email ya está registrado";
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/register");
-            exit;
+            $this->setFlash('El email ya está registrado');
+            $this->redirectToRoute('register');
         }
 
         if($this->user->usernameExists($data['username'])){
-            $_SESSION['flash_message'] = "El nombre de usuario ya está en uso";
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/register");
-            exit;
+            $this->setFlash('El nombre de usuario ya está en uso');
+            $this->redirectToRoute('register');
         }
 
-        // crear usuario
         try {
             $user_id = $this->user->register($data);
         } catch(PDOException $e) {
-            // En caso de race condition / duplicado en la DB, mostramos mensaje genérico o específico.
-            if($e->getCode() == 23000){
+            if((int)$e->getCode() === 23000){
                 if(strpos($e->getMessage(), 'email') !== false){
-                    $_SESSION['flash_message'] = "El email ya está registrado";
+                    $this->setFlash('El email ya está registrado');
                 } elseif(strpos($e->getMessage(), 'nombre_usuario') !== false){
-                    $_SESSION['flash_message'] = "El nombre de usuario ya está en uso";
+                    $this->setFlash('El nombre de usuario ya está en uso');
                 } else {
-                    $_SESSION['flash_message'] = "El email o nombre de usuario ya está en uso";
+                    $this->setFlash('El email o nombre de usuario ya está en uso');
                 }
             } else {
-                $_SESSION['flash_message'] = "Ocurrió un error al crear la cuenta. Intenta de nuevo.";
+                $this->setFlash('Ocurrió un error al crear la cuenta. Intenta de nuevo.');
             }
-            $_SESSION['flash_message_type'] = "error";
-            header("Location: /LASK/public/index.php/register");
-            exit;
+
+            $this->redirectToRoute('register');
         }
 
-        // si es artista, crear registro en tabla Artista
-        if($data['rol'] == 2){
+        if((int)$data['rol'] === 2){
 
             if($nombre_artistico === ''){
-                $_SESSION['flash_message'] = "Debes ingresar nombre artístico";
-                $_SESSION['flash_message_type'] = "error";
-                header("Location: /LASK/public/index.php/register");
-                exit;
+                $this->setFlash('Debes ingresar nombre artístico');
+                $this->redirectToRoute('register');
             }
 
             $this->user->createArtist($user_id, $nombre_artistico);
         }
 
-        $_SESSION['flash_message'] = "Cuenta creada correctamente. Por favor inicia sesión.";
-        $_SESSION['flash_message_type'] = "success";
-        header("Location: /LASK/public/index.php/login");
-        exit;
+        $this->setFlash('Cuenta creada correctamente. Por favor inicia sesión.', 'success');
+        $this->redirectToRoute('login');
     }
 
     public function logout(){
-
-    session_destroy();
-
-    header("Location: /LASK/public");
-    exit;
-}
+        session_destroy();
+        $this->redirectToPath($this->publicUrl());
+    }
 }

@@ -21,4 +21,19 @@ class Comment {
 
         return $stmt->execute();
     }
+
+    public function getByArtist($artistId){
+
+        $query = "SELECT C.texto AS comentario, C.fecha_comentario, U.nombre_usuario
+                  FROM Comentarios_Artista C
+                  INNER JOIN Usuarios U ON C.id_usuario = U.id_usuario
+                  WHERE C.id_artista = :id
+                  ORDER BY C.fecha_comentario DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $artistId);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

@@ -6,7 +6,7 @@
     </div>
 <?php endif; ?>
 
-<form action="/LASK/public/index.php/tag/create" method="POST">
+<form action="<?= BASE_URL ?>/tag/create" method="POST">
     <label for="nombre_tag">Nombre del tag:</label><br>
     <input type="text" id="nombre_tag" name="nombre_tag" required maxlength="100"><br><br>
 
@@ -40,7 +40,4 @@
     <p>No hay tags creados aún.</p>
 <?php endif; ?>
 
-<?php
-$profileUrl = '/LASK/public/index.php/profile?id=' . ($_SESSION['user_id'] ?? '');
-?>
 <p><a href="<?= htmlspecialchars($profileUrl) ?>">Volver al perfil</a></p>
