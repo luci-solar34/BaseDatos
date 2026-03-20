@@ -1,21 +1,73 @@
-<h1>Iniciar sesión</h1>
 
-<?php if($flashMessage): ?>
-    <div class="alert <?= $flashMessageType === 'success' ? 'alert-success' : 'alert-error' ?>">
-        <?= htmlspecialchars($flashMessage) ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesión</title>
+
+
+    <!-- FUENTE PIXEL -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+
+    <!-- CSS CORRECTOS -->
+    <link rel="stylesheet" href="/LASK/public/css/styles.css">
+   
+</head>
+
+
+<body>
+
+
+
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo">
+        <img src="/LASK/public/img/logo.png" alt="Logo">
     </div>
-<?php endif; ?>
 
-<form action="<?= htmlspecialchars(BASE_URL . '/login') ?>" method="POST">
 
-<label>Nombre de usuario</label>
-<input type="text" name="username" required>
+    <div class="nav-buttons">
+        <a href="/LASK/public/index.php/register" class="btn">Regístrate</a>
+    </div>
+</div>
 
-<label>Contraseña</label>
-<input type="password" name="password" required>
 
-<button type="submit">Iniciar sesión</button>
+<!-- Login -->
+<div class="contenedor">
+    <div class="login-box">
 
-</form>
 
-<a href="<?= htmlspecialchars(BASE_URL . '/register') ?>">Crear cuenta</a>
+        <h1 class="titulo-pixel">Iniciar sesión</h1>
+
+
+        <form action="/LASK/public/index.php/login" method="POST">
+
+
+            <label>Nombre de usuario</label>
+            <input type="text" name="username" required>
+
+
+            <label>Contraseña</label>
+            <input type="password" name="password" required>
+
+
+            <p>¿No tienes una cuenta?
+                <a href="/LASK/public/index.php/register" class="registro-link">Regístrate.</a>
+            </p>
+
+
+            <button type="submit">Iniciar sesión</button>
+
+
+        </form>
+
+
+    </div>
+</div>
+
+
+</body>
+</html>
+

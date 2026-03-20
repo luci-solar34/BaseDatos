@@ -1,0 +1,171 @@
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background: url('/LASK/public/img/fondoPerfil.jpeg') no-repeat center;
+    background-size: cover;
+    color: white;
+}
+
+
+/* TOP BAR */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: black;
+    padding: 10px 20px;
+}
+
+
+.logo {
+    width: 60px;
+}
+
+
+.top-buttons button {
+    margin-left: 10px;
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: none;
+    cursor: pointer;
+}
+
+
+/* HEADER */
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+
+.pfp {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+
+/* INFO */
+.profile-info {
+    margin-left: 20px;
+}
+
+
+.role {
+    color: #ccc;
+}
+
+
+.stats span {
+    margin-right: 20px;
+}
+
+
+/* ACTIONS */
+.profile-actions {
+    margin-left: auto;
+}
+
+
+.profile-actions button {
+    display: block;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: none;
+    cursor: pointer;
+}
+
+
+/* CONTENT */
+.profile-content {
+    display: flex;
+    padding: 20px;
+}
+
+
+/* BIO */
+.bio-box {
+    width: 250px;
+    background: rgba(0,0,0,0.6);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+
+/* PLAYLISTS */
+.playlists-box {
+    flex: 1;
+    margin-left: 20px;
+    background: rgba(0,0,0,0.6);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+
+.playlist-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+
+.playlist-card {
+    width: 100px;
+    height: 100px;
+    background: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+
+.private {
+    background: darkred;
+}
+
+
+/* STATS PRO */
+.stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 10px;
+}
+
+
+.stat-box {
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    transition: 0.2s;
+}
+
+
+.stat-number {
+    font-size: 18px;
+    font-weight: bold;
+    display: block;
+}
+
+
+.stat-label {
+    font-size: 13px;
+    color: #ccc;
+}
+
+
+.stat-box:hover {
+    transform: scale(1.1);
+    color: #1db954; /* verde tipo Spotify */
+}
+
+
+.email {
+    font-size: 13px;
+    color: #aaa;
+    margin: 2px 0 5px 0;
+}

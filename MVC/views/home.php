@@ -1,153 +1,192 @@
-<h1>LASK</h1>
+<?php $currentPage = 'home'; ?>
 
-<?php if(!$isLoggedIn): ?>
-    <nav>
-        <a href="<?= BASE_URL ?>/login">Iniciar sesión</a>
-        <a href="<?= BASE_URL ?>/register">Registrarse</a>
-    </nav>
+<link rel="stylesheet" href="/LASK/public/css/styles.css">
 
-<?php else: ?>
-    <section class="user-welcome">
-        <p>Bienvenid@ <?= htmlspecialchars($currentUsername) ?></p>
-        <?php if($currentRoleLabel): ?>
-            <p class="user-role"><?= htmlspecialchars($currentRoleLabel) ?></p>
-        <?php endif; ?>
-        <nav>
-            <a href="<?= htmlspecialchars($profileUrl) ?>">Ver perfil</a>
-            <a href="<?= BASE_URL ?>/messages">Mensajes</a>
-            <a href="<?= BASE_URL ?>/logout">Cerrar sesión</a>
-        </nav>
-    </section>
+<div class="app">
 
-<?php endif; ?>
+    <!-- NAVBAR -->
+    <div class="navbar">
 
-
-<section class="search-section">
-    <h2>Buscar</h2>
-
-    <?php if($isLoggedIn): ?>
-        <form action="<?= BASE_URL ?>/search" method="GET">
-            <input type="text" id="search-input" name="q" placeholder="Buscar canciones, artistas, álbumes o tags">
-            <button type="submit">Buscar</button>
-        </form>
-        <div id="suggestions" class="search-suggestions"></div>
-    <?php else: ?>
-        <form data-auth-required-message="Debes iniciar sesión para buscar">
-            <input type="text" placeholder="Buscar canciones, artistas, álbumes o tags" disabled>
-            <button type="submit" disabled>Buscar</button>
-        </form>
-    <?php endif; ?>
-
-</section>
-
-
-<section class="tags-section">
-    <h2>Explora Tags</h2>
-    <p><?= htmlspecialchars($tagDescription) ?></p>
-    <div class="tags-grid">
-        <?php foreach($tags as $tag): ?>
-            <a href="<?= BASE_URL ?>/tag?id=<?= (int)$tag['id_tag'] ?>" class="tag-link">
-                <?= htmlspecialchars($tag['nombre_tag']) ?>
+        <div class="logo">
+            <a href="<?= htmlspecialchars(BASE_URL) ?>">
+                <img src="/LASK/public/img/logo.png" alt="logo">
             </a>
-        <?php endforeach; ?>
+        </div>
+
+        <div class="nav-right">
+            <?php if(!$isLoggedIn): ?>
+                <a href="<?= BASE_URL ?>/register">Registrarse</a>
+                <a href="<?= BASE_URL ?>/login">Iniciar sesión</a>
+            <?php else: ?>
+                <a href="<?= htmlspecialchars($profileUrl) ?>">
+                    <img class="pfp" src="/LASK/photos_pfp/pfp_default.png">
+                </a>
+
+                <a href="<?= BASE_URL ?>/messages">Mensajes</a>
+                <a href="<?= BASE_URL ?>/logout">Cerrar sesión</a>
+            <?php endif; ?>
+        </div>
+
     </div>
-    <p><a href="<?= BASE_URL ?>/tags">Explorar todos los tags</a></p>
-</section>
 
+    <!-- BIENVENIDA -->
+    <div class="welcome-container">
 
-<section class="releases-section">
-    <div class="section-header">
-        <h2>Canciones recientes</h2>
-        <a href="<?= BASE_URL ?>/new-releases">Ver todos →</a>
+        <?php if($isLoggedIn): ?>
+            <h1>Bienvenid@ <?= htmlspecialchars($currentUsername) ?></h1>
+
+            <?php if($currentRoleLabel): ?>
+                <p><?= htmlspecialchars($currentRoleLabel) ?></p>
+            <?php endif; ?>
+
+        <?php else: ?>
+            <h1>Bienvenid@ a LASK</h1>
+        <?php endif; ?>
+
     </div>
 
-    <?php if(!empty($songs)): ?>
-        <div class="carousel">
-            <?php foreach($songs as $song): ?>
-                <div class="carousel-item">
-                    <?php if($song['detail_url']): ?>
-                        <a href="<?= htmlspecialchars($song['detail_url']) ?>" class="media-link">
-                            <img src="/LASK/<?= htmlspecialchars($song['cover_path']) ?>" 
-                                 width="120" height="120"
-                                 alt="Portada de: <?= htmlspecialchars($song['nombre_cancion']) ?>"
-                                 class="media-cover">
-                            <p class="media-title"><?= htmlspecialchars($song['nombre_cancion']) ?></p>
-                            <p class="media-artist"><?= htmlspecialchars($song['artist_name']) ?></p>
-                        </a>
-                    <?php else: ?>
-                        <div class="media-item locked" data-auth-required-message="Debes iniciar sesión">
-                            <img src="/LASK/<?= htmlspecialchars($song['cover_path']) ?>" 
-                                 width="120" height="120"
-                                 alt="Portada de: <?= htmlspecialchars($song['nombre_cancion']) ?>"
-                                 class="media-cover">
-                            <p class="media-title"><?= htmlspecialchars($song['nombre_cancion']) ?></p>
-                            <p class="media-artist"><?= htmlspecialchars($song['artist_name']) ?></p>
-                        </div>
-                    <?php endif; ?>
+    <!-- BUSCADOR -->
+    <div class="search-container">
+
+        <?php if($isLoggedIn): ?>
+            <form action="<?= BASE_URL ?>/search" method="GET">
+                <input type="text" id="search-input" name="q" placeholder="Buscar canciones, artistas, álbumes o tags">
+                <button type="submit">🔍</button>
+            </form>
+
+            <div id="suggestions" class="search-suggestions"></div>
+
+        <?php else: ?>
+            <form data-auth-required-message="Debes iniciar sesión para buscar">
+                <input type="text" placeholder="Buscar canciones..." disabled>
+                <button disabled>🔍</button>
+            </form>
+        <?php endif; ?>
+
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+        <!-- SIDEBAR (TAGS) -->
+        <div class="sidebar">
+
+            <h3>Explora Tags</h3>
+            <p><?= htmlspecialchars($tagDescription) ?></p>
+
+            <?php foreach($tags as $tag): ?>
+                <div class="tag">
+                    <a href="<?= BASE_URL ?>/tag?id=<?= (int)$tag['id_tag'] ?>">
+                        <?= htmlspecialchars($tag['nombre_tag']) ?>
+                    </a>
                 </div>
             <?php endforeach; ?>
+
+            <a href="<?= BASE_URL ?>/tags">Ver todos</a>
+
         </div>
-    <?php else: ?>
-        <p>No hay nuevos lanzamientos disponibles</p>
-    <?php endif; ?>
 
-</section>
+        <!-- MAIN -->
+        <div class="main">
 
+            <!-- CANCIONES -->
+            <div class="section">
 
-<section class="albums-section">
-    <h2>Álbumes recientes</h2>
-    <div class="carousel">
-        <?php foreach($albums as $album): ?>
-            <div class="carousel-item">
-                <?php if($album['detail_url']): ?>
-                    <a href="<?= htmlspecialchars($album['detail_url']) ?>" class="media-link">
-                        <img src="/LASK/<?= htmlspecialchars($album['cover_path']) ?>" 
-                             width="120" height="120"
-                             alt="Portada de: <?= htmlspecialchars($album['display_name']) ?>"
-                             class="media-cover">
-                        <p class="media-title"><?= htmlspecialchars($album['display_name']) ?></p>
-                    </a>
-                <?php else: ?>
-                        <div class="media-item locked" data-auth-required-message="Debes iniciar sesión">
-                        <img src="/LASK/<?= htmlspecialchars($album['cover_path']) ?>" 
-                             width="120" height="120"
-                             alt="Portada de: <?= htmlspecialchars($album['display_name']) ?>"
-                             class="media-cover">
-                        <p class="media-title"><?= htmlspecialchars($album['display_name']) ?></p>
-                    </div>
-                <?php endif; ?>
+                <div class="section-header">
+                    <h2>Canciones recientes</h2>
+                    <a href="<?= BASE_URL ?>/new-releases">Ver todos →</a>
+                </div>
+
+                <div class="scroll">
+                    <?php if(!empty($songs)): ?>
+                        <?php foreach($songs as $song): ?>
+                            <div class="card">
+
+                                <?php if($song['detail_url']): ?>
+                                    <a href="<?= htmlspecialchars($song['detail_url']) ?>">
+                                <?php else: ?>
+                                    <div class="locked" data-auth-required-message="Debes iniciar sesión">
+                                <?php endif; ?>
+
+                                    <img src="/LASK/<?= htmlspecialchars($song['cover_path']) ?>">
+                                    <p><?= htmlspecialchars($song['nombre_cancion']) ?></p>
+                                    <span><?= htmlspecialchars($song['artist_name']) ?></span>
+
+                                <?php if($song['detail_url']): ?>
+                                    </a>
+                                <?php else: ?>
+                                    </div>
+                                <?php endif; ?>
+
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No hay canciones recientes</p>
+                    <?php endif; ?>
+                </div>
+
             </div>
-        <?php endforeach; ?>
-    </div>
-</section>
 
+            <!-- ÁLBUMES -->
+            <div class="section">
+                <h3>Álbumes recientes</h3>
 
-<section class="artists-section">
-    <h2>Nuevos Artistas</h2>
-    <div class="carousel">
-        <?php foreach($artists as $artist): ?>
-            <div class="carousel-item">
-                <?php if($artist['profile_url']): ?>
-                    <a href="<?= htmlspecialchars($artist['profile_url']) ?>" class="media-link artist-link">
-                        <img src="/LASK/<?= htmlspecialchars($artist['pfp']) ?>" 
-                             width="100" height="100"
-                             alt="Foto de perfil: <?= htmlspecialchars($artist['display_name']) ?>"
-                             class="media-cover artist-photo">
-                        <p class="media-title"><?= htmlspecialchars($artist['display_name']) ?></p>
-                    </a>
-                <?php else: ?>
-                    <div class="media-item locked artist-item" data-auth-required-message="Debes iniciar sesión">
-                        <img src="/LASK/<?= htmlspecialchars($artist['pfp']) ?>" 
-                             width="100" height="100"
-                             alt="Foto de perfil: <?= htmlspecialchars($artist['display_name']) ?>"
-                             class="media-cover artist-photo">
-                        <p class="media-title"><?= htmlspecialchars($artist['display_name']) ?></p>
-                    </div>
-                <?php endif; ?>
+                <div class="scroll">
+                    <?php foreach($albums as $album): ?>
+                        <div class="card">
+
+                            <?php if($album['detail_url']): ?>
+                                <a href="<?= htmlspecialchars($album['detail_url']) ?>">
+                            <?php else: ?>
+                                <div class="locked" data-auth-required-message="Debes iniciar sesión">
+                            <?php endif; ?>
+
+                                <img src="/LASK/<?= htmlspecialchars($album['cover_path']) ?>">
+                                <p><?= htmlspecialchars($album['display_name']) ?></p>
+
+                            <?php if($album['detail_url']): ?>
+                                </a>
+                            <?php else: ?>
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
-        <?php endforeach; ?>
+
+            <!-- ARTISTAS -->
+            <div class="section">
+                <h2>Nuevos Artistas</h2>
+
+                <div class="scroll">
+                    <?php foreach($artists as $artist): ?>
+                        <div class="card">
+
+                            <?php if($artist['profile_url']): ?>
+                                <a href="<?= htmlspecialchars($artist['profile_url']) ?>">
+                            <?php else: ?>
+                                <div class="locked" data-auth-required-message="Debes iniciar sesión">
+                            <?php endif; ?>
+
+                                <img src="/LASK/<?= htmlspecialchars($artist['pfp']) ?>">
+                                <p><?= htmlspecialchars($artist['display_name']) ?></p>
+
+                            <?php if($artist['profile_url']): ?>
+                                </a>
+                            <?php else: ?>
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-</section>
+
+</div>
 
 <script src="<?= substr(BASE_URL, 0, strrpos(BASE_URL, '/')) ?>/js/home.js"></script>
-
