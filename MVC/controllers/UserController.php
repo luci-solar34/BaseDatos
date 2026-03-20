@@ -25,6 +25,16 @@ class UserController extends Controller {
         $this->redirectToRoute('profile?id=' . (int)$userId);
     }
 
+    private function hasDangerousSqlPayload($value){
+        if(!is_string($value) || trim($value) === ''){
+            return false;
+        }
+
+        $pattern = '/(--|\/\*|\*\/|;\s*(SELECT|UNION|INSERT|DELETE|UPDATE|DROP|ALTER|TRUNCATE|EXEC|EXECUTE)\b|\bUNION\b\s+\bALL\b\s+\bSELECT\b|\bINTO\b\s+\bOUTFILE\b|\bLOAD_FILE\s*\(|\b(OR|AND)\b\s+\d+\s*=\s*\d+)/i';
+
+        return preg_match($pattern, $value) === 1;
+    }
+
     private function formatPlaylists(array $playlists){
         foreach($playlists as &$playlist){
             $playlist['privacy_label'] = ((int)$playlist['privacidad_playlist'] === 0) ? '(Privada)' : '';
@@ -112,7 +122,7 @@ class UserController extends Controller {
             $this->redirectToProfile($denunciado);
         }
 
-        if(!$this->esEntradaSegura($motivo) || !$this->esEntradaSegura($descripcion)){
+        if($this->hasDangerousSqlPayload($motivo) || $this->hasDangerousSqlPayload($descripcion)){
             $this->setFlash('La denuncia contiene caracteres no permitidos.');
             $this->redirectToProfile($denunciado);
         }
@@ -178,7 +188,7 @@ class UserController extends Controller {
         $id = $this->requireAuthenticatedUser('login');
         $bio = $this->postString('bio');
 
-        if(!$this->esEntradaSegura($bio)){
+        if($this->hasDangerousSqlPayload($bio)){
             $this->setFlash('La biografía contiene caracteres no permitidos.');
             $this->redirectToProfile($id);
         }

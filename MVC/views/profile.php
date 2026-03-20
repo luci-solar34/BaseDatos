@@ -60,9 +60,9 @@
     <?php if(isset($hasReported) && $hasReported): ?>
         <p style="color: #a00;">Ya has enviado una denuncia para este usuario. Espera a que sea revisada.</p>
     <?php else: ?>
-        <button type="button" data-toggle-target="reportForm">Denunciar</button>
+        <button type="button" data-toggle-target="reportForm" onclick="var f=document.getElementById('reportForm'); if(f){f.style.display='block';}">Denunciar</button>
 
-        <form id="reportForm" method="POST" action="<?= htmlspecialchars(BASE_URL . '/report') ?>" style="display:none; margin-top:15px; border:1px solid #ccc; padding: 12px;">
+        <form id="reportForm" method="POST" action="<?= htmlspecialchars(BASE_URL . '/report') ?>" data-sql-guard="off" style="display:none; margin-top:15px; border:1px solid #ccc; padding: 12px;">
             <input type="hidden" name="denunciado_id" value="<?= (int)$user['id_usuario'] ?>">
 
             <label>Tipo de denuncia:</label><br>
@@ -83,7 +83,7 @@
             <br><br>
 
             <button type="submit">Enviar denuncia</button>
-            <button type="button" data-hide-target="reportForm">Cancelar</button>
+            <button type="button" data-hide-target="reportForm" onclick="var f=document.getElementById('reportForm'); if(f){f.style.display='none';}">Cancelar</button>
         </form>
     <?php endif; ?>
 <?php elseif($reportUnavailableMessage): ?>
@@ -100,11 +100,11 @@
 
 <?php if($isOwner): ?>
 
-<button type="button" data-toggle-target="editBio">
+<button type="button" data-toggle-target="editBio" onclick="var f=document.getElementById('editBio'); if(f){f.style.display='block';}">
 Editar bio
 </button>
 
-<form id="editBio" action="<?= htmlspecialchars(BASE_URL . '/update_bio') ?>" method="POST" style="display:none; margin-top:10px;">
+<form id="editBio" action="<?= htmlspecialchars(BASE_URL . '/update_bio') ?>" method="POST" data-sql-guard="off" style="display:none; margin-top:10px;">
 
 <textarea name="bio" rows="4" cols="50" placeholder="Escribe tu bio"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
 

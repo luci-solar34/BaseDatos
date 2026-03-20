@@ -56,10 +56,14 @@
             });
         });
 
-        // Bloquear SQL injection keywords en todos los formularios (capa frontend)
-        var sqlPattern = /\b(SELECT|UNION|INSERT|DELETE|UPDATE|DROP|ALTER|CREATE|TRUNCATE|EXEC|EXECUTE|DECLARE|CAST|CONVERT|SHUTDOWN)\b|--|#|\/\*/i;
+        // Capa frontend: bloqueo de patrones SQL evidentes, evitando falsos positivos en texto libre.
+        var sqlPattern = /(--|\/\*|\*\/|;\s*(SELECT|UNION|INSERT|DELETE|UPDATE|DROP|ALTER|TRUNCATE|EXEC|EXECUTE)\b|\bUNION\b\s+\bALL\b\s+\bSELECT\b|\bINTO\b\s+\bOUTFILE\b|\bLOAD_FILE\s*\(|\b(OR|AND)\b\s+\d+\s*=\s*\d+)/i;
         document.querySelectorAll("form").forEach(function (form) {
             form.addEventListener("submit", function (e) {
+                if (form.getAttribute("data-sql-guard") === "off") {
+                    return;
+                }
+
                 var inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea');
                 inputs.forEach(function (input) {
                     if (sqlPattern.test(input.value)) {

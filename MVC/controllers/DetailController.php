@@ -46,7 +46,7 @@ class DetailController extends Controller {
 
     private function formatPlaylistLabels(array $playlists){
         foreach($playlists as &$playlist){
-            $playlist['privacy_label'] = ((int)$playlist['privacidad_playlist'] === 1) ? '(Privada)' : '';
+            $playlist['privacy_label'] = ((int)$playlist['privacidad_playlist'] === 0) ? '(Privada)' : '';
         }
         unset($playlist);
 
