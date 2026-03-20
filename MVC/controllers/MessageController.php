@@ -64,6 +64,7 @@ class MessageController extends Controller {
         }
 
         $chatPartnerName = $otherUser['nombre_usuario'] ?? 'usuario';
+        $chatPartnerPfp  = $otherUser['pfp'] ?? null;
         $chatRecipientId = $recipientId;
 
         foreach($messages as &$message){
@@ -71,7 +72,7 @@ class MessageController extends Controller {
         }
         unset($message);
 
-        $this->render('chat.php', compact('messages', 'chatPartnerName', 'chatRecipientId'));
+        $this->render('chat.php', compact('messages', 'chatPartnerName', 'chatRecipientId', 'chatPartnerPfp'));
     }
 
     public function send(){
