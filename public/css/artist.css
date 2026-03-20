@@ -1,0 +1,183 @@
+/* FONDO GENERAL */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('/LASK/public/img/fondoPerfil.jpeg') no-repeat center;
+    background-size: cover;
+    color: white;
+}
+
+/* CONTENEDOR */
+.profile-container {
+    background: rgba(0, 0, 0, 0.85);
+    margin: 40px;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+/* HEADER */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* FOTO PERFIL */
+.profile-left img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    cursor: pointer;
+}
+
+/* INFO */
+.profile-info h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.username {
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    gap: 20px;
+    margin: 10px 0;
+}
+
+.stats span {
+    font-size: 14px;
+}
+
+/* BOTONES */
+.actions {
+    margin-top: 10px;
+}
+
+.btn {
+    background: white;
+    color: black;
+    border: none;
+    padding: 8px 16px;
+    margin-right: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background: #ccc;
+}
+
+.btn-danger {
+    background: red;
+    color: white;
+}
+
+/* MENSAJE FLASH */
+.flash-message {
+    margin-top: 15px;
+    padding: 10px;
+    background: #1e4620;
+    border: 1px solid #4caf50;
+    border-radius: 6px;
+}
+
+/* BIO */
+.bio-box {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* SECCIÓN CANCIONES */
+.songs-section {
+    margin-top: 30px;
+}
+
+.songs-section h2 {
+    margin-bottom: 15px;
+}
+
+/* GRID HORIZONTAL */
+.songs-grid {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+/* TARJETA CANCIÓN */
+.song-card {
+    min-width: 130px;
+    height: 130px;
+    background: #2a2a2a;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    transition: 0.3s;
+}
+
+.song-card a {
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
+}
+
+.song-card:hover {
+    background: #444;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* SCROLL BONITO */
+.songs-grid::-webkit-scrollbar {
+    height: 6px;
+}
+
+.songs-grid::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 10px;
+}
+
+/* LISTAS (ÁLBUMES, COMENTARIOS, ETC) */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background: #1a1a1a;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* TEXTAREA */
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-top: 10px;
+    resize: none;
+}
+
+/* LINKS */
+a {
+    color: #ddd;
+}
+
+a:hover {
+    color: white;
+}
