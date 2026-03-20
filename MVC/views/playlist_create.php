@@ -1,20 +1,57 @@
-<h1>Crear Playlist</h1>
+<link rel="stylesheet" href="/LASK/public/css/create-playlist.css">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
-<form action="<?= BASE_URL ?>/playlist/create" method="POST">
+<div class="playlist-container">
 
-<label>Nombre de la playlist</label><br>
-<input type="text" name="name" required><br><br>
+    <h1 class="title">Crear playlist</h1>
 
-<label>Privacidad</label><br>
-<select name="privacy">
-    <option value="1">Pública</option>
-    <option value="0">Privada</option>
-</select><br><br>
+    <div class="card">
 
-<button type="submit">Crear</button>
+        <!-- PORTADA FUNCIONAL -->
+        <div class="left">
+            <label class="cover">
+                <span>+ Insertar portada</span>
+                <input type="file" name="cover" accept="image/*">
+                <img id="preview" class="preview">
+            </label>
+        </div>
 
-</form>
+        <!-- FORM -->
+        <div class="center">
+            <form action="<?= BASE_URL ?>/playlist/create" method="POST" enctype="multipart/form-data">
 
-<br>
+                <label>Nombre de la playlist</label>
+                <input type="text" name="name" required class="input">
 
-<a href="/LASK/public">Volver</a>
+                <label>Privacidad</label>
+                <select name="privacy" class="input">
+                    <option value="1">Pública</option>
+                    <option value="0">Privada</option>
+                </select>
+
+                <button type="submit" class="btn-primary">
+                    Crear playlist
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+
+    <a href="/LASK/public" class="back">Volver</a>
+
+</div>
+
+<!-- PREVIEW DE IMAGEN -->
+<script>
+    const input = document.querySelector('input[name="cover"]');
+    const preview = document.getElementById('preview');
+
+    input.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        }
+    });
+</script>
