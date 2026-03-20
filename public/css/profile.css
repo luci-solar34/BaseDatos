@@ -169,3 +169,104 @@ body {
     color: #aaa;
     margin: 2px 0 5px 0;
 }
+
+/* ALERTAS (flash message) */
+.alert {
+    background: rgba(0, 255, 100, 0.2);
+    border: 1px solid #1db954;
+    padding: 10px;
+    margin: 15px 20px;
+    border-radius: 8px;
+}
+
+
+/* REPORT SECTION */
+.report-section {
+    padding: 0 20px 20px 20px;
+}
+
+.report-section button {
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: none;
+    cursor: pointer;
+    background: #ff4d4d;
+    color: white;
+}
+
+.report-section form {
+    background: rgba(0,0,0,0.7);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+
+/* TEXTAREA */
+textarea {
+    width: 100%;
+    border-radius: 8px;
+    border: none;
+    padding: 8px;
+    margin-top: 5px;
+    resize: none;
+}
+
+
+/* SELECT */
+select {
+    width: 100%;
+    border-radius: 8px;
+    padding: 6px;
+    margin-top: 5px;
+}
+
+
+/* BOTONES GENERALES */
+button {
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+
+/* MEJORAR CARDS */
+.playlist-card {
+    transition: 0.2s;
+}
+
+.playlist-card:hover {
+    transform: scale(1.08);
+    background: #1db954;
+    color: black;
+}
+
+
+/* RESPONSIVE (IMPORTANTE) */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-actions {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .profile-content {
+        flex-direction: column;
+    }
+
+    .bio-box {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .playlists-box {
+        margin-left: 0;
+    }
+}

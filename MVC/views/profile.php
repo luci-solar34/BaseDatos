@@ -17,10 +17,10 @@
         </div>
     </div>
 
-    <!-- HEADER PERFIL -->
+    <!-- HEADER -->
     <div class="profile-header">
 
-        <!-- FOTO + STATS -->
+        <!-- FOTO -->
         <div class="pfp-section">
 
             <?php if($isOwner): ?>
@@ -34,6 +34,7 @@
                 <img src="/LASK/<?= htmlspecialchars($user['pfp']) ?>" class="pfp">
             <?php endif; ?>
 
+            <!-- STATS -->
             <div class="stats">
                 <a href="<?= BASE_URL ?>/profile/following?id=<?= (int)$user['id_usuario'] ?>" class="stat-box">
                     <span class="stat-number"><?= (int)$following ?></span>
@@ -45,19 +46,20 @@
                     <span class="stat-label">Seguidores</span>
                 </a>
             </div>
-
         </div>
 
         <!-- INFO -->
         <div class="profile-info">
             <h2><?= htmlspecialchars($user['nombre_usuario']) ?></h2>
-            <p class="email"><?= htmlspecialchars($user['email']) ?></p>
+            <p><?= htmlspecialchars($user['email']) ?></p>
         </div>
 
         <!-- ACCIONES -->
         <div class="profile-actions">
 
             <?php if($canInteract): ?>
+
+                <!-- FOLLOW -->
                 <form method="POST" action="<?= htmlspecialchars(BASE_URL) ?>">
                     <input type="hidden" name="route" value="<?= htmlspecialchars($isFollowing ? 'unfollow' : 'follow') ?>">
                     <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
@@ -67,6 +69,7 @@
                     </button>
                 </form>
 
+                <!-- BLOCK -->
                 <?php if(isset($hasBlocked) && $hasBlocked): ?>
                     <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/unblock') ?>">
                         <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
@@ -78,25 +81,73 @@
                         <button style="background:red;color:white;">Bloquear</button>
                     </form>
                 <?php endif; ?>
+
             <?php endif; ?>
 
         </div>
 
     </div>
 
-    <!-- FLASH MESSAGE -->
+    <!-- FLASH -->
     <?php if(isset($flashMessage) && $flashMessage): ?>
         <div class="alert alert-success">
             <?= htmlspecialchars($flashMessage) ?>
         </div>
     <?php endif; ?>
 
+    <!-- REPORTES (AQUÍ ESTABA LO QUE FALTABA 🔥) -->
+    <div class="report-section">
+
+        <?php if(isset($canReport) && $canReport): ?>
+
+            <?php if(isset($hasReported) && $hasReported): ?>
+                <p style="color: red;">
+                    Ya has enviado una denuncia para este usuario.
+                </p>
+            <?php else: ?>
+
+                <button onclick="document.getElementById('reportForm').style.display='block'">
+                    Denunciar
+                </button>
+
+                <form id="reportForm"
+                      method="POST"
+                      action="<?= htmlspecialchars(BASE_URL . '/report') ?>"
+                      style="display:none; margin-top:10px;">
+
+                    <input type="hidden" name="denunciado_id" value="<?= (int)$user['id_usuario'] ?>">
+
+                    <label>Motivo</label>
+                    <select name="motivo_denuncia" required>
+                        <option value="">Selecciona</option>
+                        <option value="Contenido inapropiado">Contenido inapropiado</option>
+                        <option value="Acoso">Acoso</option>
+                        <option value="Spam">Spam</option>
+                        <option value="Suplantación de identidad">Suplantación</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+
+                    <textarea name="descripcion_denuncia" required></textarea>
+
+                    <button type="submit">Enviar</button>
+                    <button type="button" onclick="this.parentElement.style.display='none'">Cancelar</button>
+
+                </form>
+
+            <?php endif; ?>
+
+        <?php elseif($reportUnavailableMessage): ?>
+            <p style="color:red;"><?= htmlspecialchars($reportUnavailableMessage) ?></p>
+        <?php endif; ?>
+
+    </div>
+
     <!-- CONTENIDO -->
     <div class="profile-content">
 
         <!-- BIO -->
         <div class="bio-box">
-            <h3>Descripción</h3>
+            <h3>Bio</h3>
             <p><?= htmlspecialchars($bioText) ?></p>
 
             <?php if($isOwner): ?>
@@ -126,6 +177,9 @@
                         <a href="<?= htmlspecialchars(BASE_URL . '/playlist?id=' . (int)$playlist['id_playlist']) ?>">
                             <div class="playlist-card">
                                 <?= htmlspecialchars($playlist['nombre_playlist']) ?>
+                                <?php if($playlist['privacy_label']): ?>
+                                    <small><?= htmlspecialchars($playlist['privacy_label']) ?></small>
+                                <?php endif; ?>
                             </div>
                         </a>
                     <?php endforeach; ?>
