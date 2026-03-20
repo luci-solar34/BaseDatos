@@ -1,5 +1,5 @@
 <div class="profile-container">
-
+<link rel="stylesheet" href="/LASK/public/css/artist.css">
     <div class="profile-header">
 
         <div class="profile-left">
@@ -19,15 +19,14 @@
             <h1><?= htmlspecialchars($artist['nombre_artistico']) ?></h1>
             <p class="username">@<?= htmlspecialchars($artist['nombre_usuario']) ?></p>
 
-      <div class="stats">
-               
+            <div class="stats">
                     <a href="<?= htmlspecialchars(BASE_URL . '/profile/followers?id=' . (int)$artist['id_usuario']) ?>">
                     <strong><?= (int)$followers ?></strong> Seguidores
                     </a>
 
                     <a href="<?= htmlspecialchars(BASE_URL . '/profile/following?id=' . (int)$artist['id_usuario']) ?>">
-                     <strong><?= (int)$following ?></strong> Siguiendo
-                   </a>
+                    <strong><?= (int)$following ?></strong> Siguiendo
+                    </a>
             </div>
 
             <div class="actions">
