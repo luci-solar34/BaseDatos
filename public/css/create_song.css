@@ -1,0 +1,245 @@
+/* ============================================================
+   CREATE SONG - Windows 94 retro, similar to create_album
+   Works with current simple HTML in MVC/views/create_song.php
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+  --bg-base: #1a1a1a;
+  --bg-surface: #2a2a2a;
+  --bg-card: #323232;
+  --bg-input: #3a3a3a;
+
+  --accent: #bec0b0;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+
+  --border: #4a4a4a;
+  --border-light: #5a5a5a;
+
+  --radius-sm: 8px;
+  --radius-lg: 26px;
+
+  --font-main: 'VT323', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  letter-spacing: .02em;
+  background-color: var(--bg-base);
+  background-image:
+    linear-gradient(rgba(20, 20, 20, .76), rgba(20, 20, 20, .86)),
+    url('/LASK/public/img/fondoPerfil.jpeg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Keep navbar aligned with album styles if layout renders one */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 56px;
+  background: rgba(20, 20, 20, .92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar__nav a,
+.navbar__nav button {
+  font-family: var(--font-main);
+  font-size: 1.35rem;
+}
+
+body > h1 {
+  max-width: 980px;
+  margin: 44px auto 22px;
+  font-family: var(--font-main);
+  font-size: 5.3rem;
+  line-height: .92;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .35);
+}
+
+form[action*='/artist/create-song'] {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: linear-gradient(135deg, rgba(62, 62, 62, .92), rgba(34, 34, 34, .9));
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .42);
+}
+
+/* Original view uses many <br> tags for spacing. Disable to avoid double gaps. */
+form[action*='/artist/create-song'] br {
+  display: none;
+}
+
+form[action*='/artist/create-song'] label {
+  display: block;
+  margin: 14px 0 6px;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 1.75rem;
+  letter-spacing: .04em;
+}
+
+form[action*='/artist/create-song'] input[type='text'],
+form[action*='/artist/create-song'] input[type='file'],
+form[action*='/artist/create-song'] textarea,
+form[action*='/artist/create-song'] select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 1.7rem;
+  line-height: 1.2;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+form[action*='/artist/create-song'] input[type='text'] {
+  border-radius: 999px;
+  height: 56px;
+  font-size: 2rem;
+}
+
+form[action*='/artist/create-song'] input[type='file'] {
+  padding: 10px;
+  background: #353535;
+}
+
+form[action*='/artist/create-song'] textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+form[action*='/artist/create-song'] textarea[name='texto_fonetico'] {
+  min-height: 118px;
+}
+
+form[action*='/artist/create-song'] select[multiple] {
+  min-height: 170px;
+}
+
+form[action*='/artist/create-song'] input:focus,
+form[action*='/artist/create-song'] textarea:focus,
+form[action*='/artist/create-song'] select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(190, 192, 176, .22);
+  background: #414141;
+}
+
+form[action*='/artist/create-song'] small {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 1.35rem;
+  letter-spacing: .02em;
+}
+
+form[action*='/artist/create-song'] button[type='submit'] {
+  margin-top: 20px;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 2rem;
+  letter-spacing: .06em;
+  line-height: 1;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s, transform .15s;
+}
+
+form[action*='/artist/create-song'] button[type='submit']:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #111;
+  transform: translateY(-1px);
+}
+
+form[action*='/artist/create-song'] + a {
+  display: block;
+  max-width: 980px;
+  margin: 16px auto 48px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-family: var(--font-main);
+  font-size: 1.65rem;
+  letter-spacing: .04em;
+}
+
+form[action*='/artist/create-song'] + a:hover {
+  color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+  body > h1,
+  form[action*='/artist/create-song'],
+  form[action*='/artist/create-song'] + a {
+    width: calc(100% - 30px);
+    max-width: none;
+  }
+
+  body > h1 {
+    margin-top: 28px;
+    font-size: 4rem;
+  }
+
+  form[action*='/artist/create-song'] {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  form[action*='/artist/create-song'] input[type='text'] {
+    font-size: 1.8rem;
+    height: 52px;
+  }
+}
+
+@media (max-width: 520px) {
+  body > h1 {
+    font-size: 3.1rem;
+  }
+
+  form[action*='/artist/create-song'] label {
+    font-size: 1.45rem;
+  }
+
+  form[action*='/artist/create-song'] input[type='text'],
+  form[action*='/artist/create-song'] input[type='file'],
+  form[action*='/artist/create-song'] textarea,
+  form[action*='/artist/create-song'] select {
+    font-size: 1.35rem;
+  }
+
+  form[action*='/artist/create-song'] button[type='submit'] {
+    width: 100%;
+  }
+}

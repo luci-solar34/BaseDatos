@@ -1,0 +1,170 @@
+/* RESET */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+
+    /* 🔥 TU FONDO ORIGINAL */
+    background: url('/LASK/public/img/fondoPerfil.jpeg') no-repeat center;
+    background-size: cover;
+    background-attachment: fixed;
+
+    color: white;
+}
+
+/* CAPA OSCURA PARA MEJOR CONTRASTE */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+}
+
+/* CONTENEDOR */
+.playlist-container {
+    padding: 60px;
+}
+
+/* TITULO */
+.title {
+    font-family: 'VT323', monospace; /* 🔥 pixel */
+    font-size: 52px;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+
+    /* opcional: efecto glow suave */
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* CARD */
+.card {
+    display: flex;
+    gap: 50px;
+    padding: 40px;
+    border-radius: 30px;
+
+    /* 🔥 AHORA COMBINA CON EL FONDO */
+    background: rgba(20, 20, 20, 0.65);
+    backdrop-filter: blur(25px);
+
+    box-shadow: 
+        0 15px 50px rgba(0,0,0,0.8),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+
+    width: fit-content;
+}
+
+/* PORTADA */
+.cover {
+    width: 220px;
+    height: 220px;
+    border-radius: 20px;
+
+    background: linear-gradient(145deg, #2b2b2b, #1a1a1a);
+    border: 1px solid rgba(255,255,255,0.08);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    transition: all 0.3s ease;
+}
+
+.cover:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+}
+
+.cover span {
+    font-size: 14px;
+    color: #bbb;
+    text-align: center;
+    z-index: 2;
+}
+
+.cover input {
+    display: none;
+}
+
+/* PREVIEW */
+.preview {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    z-index: 1;
+}
+
+/* FORM */
+.center {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* INPUTS */
+.input {
+    padding: 14px 18px;
+    border-radius: 25px;
+    border: none;
+    width: 280px;
+
+    background: rgba(255,255,255,0.08);
+    color: white;
+
+    outline: none;
+    transition: 0.25s;
+}
+
+.input:focus {
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
+}
+
+/* LABEL */
+label {
+    font-size: 13px;
+    color: #ccc;
+}
+
+/* BOTÓN PRINCIPAL (ADAPTADO AL FONDO) */
+.btn-primary {
+    margin-top: 10px;
+    padding: 14px;
+    border-radius: 25px;
+    border: none;
+
+    /* 🔥 PLOMO CLARO BRILLANTE */
+    background: linear-gradient(135deg, #d1d5db, #f3f4f6);
+    color: #111; /* texto oscuro para contraste */
+
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+/* HOVER MÁS PRO */
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255,255,255,0.4);
+    background: linear-gradient(135deg, #e5e7eb, #ffffff);
+}
+
+
+/* VOLVER */
+.back {
+    display: inline-block;
+    margin-top: 25px;
+    color: #ccc;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.back:hover {
+    color: white;
+}

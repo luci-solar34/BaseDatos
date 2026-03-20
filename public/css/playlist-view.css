@@ -1,0 +1,103 @@
+body {
+    margin: 0;
+    font-family: Arial;
+    background: url('/LASK/public/img/fondoPerfil.jpeg') no-repeat center;
+    background-size: cover;
+    color: white;
+}
+
+/* TITULO */
+.playlist-title {
+    text-align: center;
+    font-size: 32px;
+    margin-top: 20px;
+}
+
+/* CONTENEDOR GENERAL */
+.playlist-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 30px;
+}
+
+/* IZQUIERDA */
+.playlist-left {
+    width: 500px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+/* BOTONES */
+.playlist-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    background: #d9d9d9;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background: white;
+}
+
+.finalize {
+    margin-top: 15px;
+}
+
+/* LISTA */
+.songs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* TARJETA DE CANCIÓN */
+.song-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 20px;
+}
+
+/* NOMBRE */
+.song-name {
+    font-size: 14px;
+}
+
+/* AUDIO */
+audio {
+    width: 180px;
+}
+
+/* DERECHA (PLAYER GRANDE) */
+.playlist-right {
+    width: 250px;
+    height: 320px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+}
+
+.playlist-right img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.playlist-right h3 {
+    font-size: 16px;
+}

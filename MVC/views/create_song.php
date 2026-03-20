@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/create_song.css') ?>">
+
 <h1>Crear Canción</h1>
 
 <form action="<?= BASE_URL ?>/artist/create-song?id=<?= (int)$artistId ?>" method="POST" enctype="multipart/form-data">
