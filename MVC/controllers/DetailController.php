@@ -321,12 +321,26 @@ class DetailController extends Controller {
 
         if($this->isPostRequest()){
             $album_id = $this->postInt('album_id', 0);
-            $nombre = $this->postString('nombre');
             $artista = $this->requireAuthenticatedUser('login');
             $album = $this->album->getById($album_id);
+            $existingSongId = $this->postInt('existing_song_id', 0);
+            $nombre = $this->postString('nombre');
 
-            if(!$album_id || !$nombre || !$album || (int)$album['id_artista'] !== (int)$artista){
+            if(!$album_id || !$album || (int)$album['id_artista'] !== (int)$artista){
                 $this->abort('Datos incompletos', 422);
+            }
+
+            if($existingSongId > 0){
+                $moved = $this->song->moveToAlbum($existingSongId, $album_id, $artista);
+                if(!$moved){
+                    $this->abort('No se pudo agregar la canción seleccionada al álbum', 422);
+                }
+
+                $this->redirectToRoute('album?id=' . $album_id);
+            }
+
+            if(!$nombre || empty($_FILES['archivo']['name'] ?? null)){
+                $this->abort('Selecciona una canción existente o sube una nueva canción', 422);
             }
 
             $upload = $this->storeUploadedFile('archivo', ['mp3'], 'music');
@@ -361,7 +375,8 @@ class DetailController extends Controller {
             $this->abort('Sin permisos para editar este álbum', 403);
         }
 
+        $availableSongs = $this->song->getByArtistOutsideAlbum($viewerId, $album_id);
         $artistProfileUrl = $this->routeUrl('artist?id=' . (int)$viewerId);
-        $this->render('add_songs_to_album.php', compact('album_id', 'album', 'artistProfileUrl'));
+        $this->render('add_songs_to_album.php', compact('album_id', 'album', 'artistProfileUrl', 'availableSongs'));
     }
 }
