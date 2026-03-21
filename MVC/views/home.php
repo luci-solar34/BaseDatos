@@ -89,13 +89,15 @@
         <!-- MAIN -->
         <div class="main">
 
-            <!-- CANCIONES -->
+            <!-- NUEVOS LANZAMIENTOS -->
             <div class="section">
 
                 <div class="section-header">
-                    <h2>Canciones recientes</h2>
+                    <h2>Nuevos Lanzamientos</h2>
                     <a href="<?= BASE_URL ?>/new-releases">Ver todos →</a>
                 </div>
+
+                <h3>Canciones recientes</h3>
 
                 <div class="scroll">
                     <?php if(!empty($songs)): ?>
