@@ -1,0 +1,483 @@
+/* ============================================================
+   HOME - Windows 94 retro / Frutiger indie
+   Cards uniformes, VT323, estética oscura
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg-dark: #0f0f0f;
+  --bg-panel: #1a1a1a;
+  --bg-card: #242424;
+  --bg-input: #2e2e2e;
+
+  --text-main: #f0f0ed;
+  --text-soft: #b8b8b4;
+  --text-dim: #888884;
+
+  --line: #404040;
+  --accent: #bec0b0;
+  --accent-dim: #9a9c8f;
+
+  --radius-card: 10px;
+  --radius-btn: 12px;
+  --radius-panel: 20px;
+
+  --font-display: 'VT323', monospace;
+  --font-body: 'Space Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  margin: 0;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  background-color: var(--bg-dark);
+  background-image:
+    radial-gradient(circle at 5% 8%, rgba(255, 255, 255, .04) 0 1px, transparent 2px),
+    linear-gradient(135deg, rgba(15, 15, 15, .9), rgba(25, 25, 25, .95)),
+    url('/LASK/public/img/fondoPerfil.jpeg');
+  background-size: auto, auto, cover;
+  background-attachment: fixed;
+  letter-spacing: .02em;
+}
+
+.app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ========== NAVBAR ========== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+
+.logo img {
+  height: 40px;
+  filter: brightness(1.1);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-right a {
+  background: var(--bg-card);
+  color: var(--text-soft);
+  border: 1px solid var(--line);
+  padding: 6px 14px;
+  border-radius: var(--radius-btn);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  transition: background .15s, border-color .15s;
+}
+
+.nav-right a:hover {
+  background: var(--bg-input);
+  border-color: var(--accent);
+  color: var(--text-main);
+}
+
+.pfp {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+/* ========== BIENVENIDA ========== */
+.welcome-container {
+  text-align: center;
+  margin: 24px 0 28px;
+  padding: 20px;
+  border-radius: var(--radius-panel);
+  border: 1px solid rgba(255, 255, 255, .1);
+  background: linear-gradient(135deg, rgba(36, 36, 36, .5), rgba(30, 30, 30, .6));
+}
+
+.welcome-container h1 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  letter-spacing: 1px;
+  color: var(--text-main);
+}
+
+.welcome-container p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--text-soft);
+}
+
+/* ========== BUSCADOR ========== */
+.search-container {
+  margin: 20px 0 28px;
+  position: relative;
+}
+
+.search-container form {
+  display: flex;
+  gap: 8px;
+}
+
+.search-container input,
+.search-container button {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+  color: var(--text-main);
+  padding: 10px 12px;
+}
+
+.search-container input {
+  flex: 1;
+  outline: none;
+  transition: border-color .15s;
+}
+
+.search-container input:focus {
+  border-color: var(--accent);
+}
+
+.search-container button {
+  padding: 10px 16px;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: background .15s;
+}
+
+.search-container button:hover:not(:disabled) {
+  background: var(--bg-input);
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-btn);
+  z-index: 10;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ========== LAYOUT ========== */
+.layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+}
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  background: linear-gradient(135deg, rgba(36, 36, 36, .4), rgba(30, 30, 30, .5));
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.sidebar h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--accent-dim);
+  letter-spacing: .5px;
+}
+
+.sidebar p {
+  margin: 0 0 12px;
+  font-family: var(--font-body);
+  font-size: .85rem;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+.tag {
+  margin-bottom: 8px;
+}
+
+.tag a {
+  display: inline-block;
+  background: var(--bg-card);
+  color: var(--text-soft);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: .9rem;
+  text-decoration: none;
+  border: 1px solid var(--line);
+  transition: background .15s, border-color .15s;
+}
+
+.tag a:hover {
+  background: var(--bg-input);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sidebar > a {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--text-soft);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  transition: color .15s;
+}
+
+.sidebar > a:hover {
+  color: var(--accent);
+}
+
+/* ========== MAIN ========== */
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ========== SECCIONES ========== */
+.section {
+  margin: 0;
+}
+
+.section h2,
+.section h3 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: .5px;
+  color: var(--accent-dim);
+  background: none;
+  padding: 0;
+  display: block;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+.section-header a {
+  background: var(--bg-card);
+  color: var(--text-soft);
+  padding: 6px 14px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--line);
+  font-size: .95rem;
+  font-family: var(--font-display);
+  text-decoration: none;
+  transition: all .15s;
+}
+
+.section-header a:hover {
+  background: var(--bg-input);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* ========== SCROLL CARDS ========== */
+.scroll {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+}
+
+/* ========== CARD ========== */
+.card {
+  min-width: unset;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: linear-gradient(135deg, rgba(36, 36, 36, .6), rgba(30, 30, 30, .7));
+  transition: all .15s ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(46, 46, 46, .7), rgba(36, 36, 36, .8));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+  transform: translateY(-2px);
+}
+
+/* ========== CARD IMAGE ========== */
+.card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  display: block;
+  transition: transform .15s;
+}
+
+.card:hover img {
+  transform: scale(1.02);
+}
+
+/* ========== CARD TEXT ========== */
+.card a {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: inherit;
+}
+
+.card p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: var(--text-main);
+  line-height: 1;
+  overflow: hidden;
+  line-clamp: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  background: none;
+  padding: 0;
+  text-shadow: none;
+}
+
+.card span {
+  font-family: var(--font-body);
+  font-size: .85rem;
+  color: var(--text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: none;
+  padding: 0;
+  text-shadow: none;
+}
+
+.card a:hover p {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.card a:hover span {
+  color: var(--accent-dim);
+}
+
+/* ========== LOCKED CARDS ========== */
+.card .locked {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card .locked img {
+  opacity: .6;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+  }
+
+  .sidebar {
+    top: auto;
+    position: static;
+  }
+
+  .scroll {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    padding: 12px;
+  }
+
+  .scroll {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .card p {
+    font-size: 1.2rem;
+  }
+
+  .welcome-container h1 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app {
+    padding: 12px;
+  }
+
+  .navbar {
+    padding: 8px 0;
+  }
+
+  .layout {
+    gap: 14px;
+  }
+
+  .scroll {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .card {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .card p {
+    font-size: 1rem;
+  }
+
+  .section h2,
+  .section h3 {
+    font-size: 1.6rem;
+  }
+}

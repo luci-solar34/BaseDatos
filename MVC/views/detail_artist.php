@@ -1,5 +1,6 @@
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/artist.css') ?>">
+
 <div class="profile-container">
-<link rel="stylesheet" href="/LASK/public/css/artist.css">
     <div class="profile-header">
 
         <div class="profile-left">

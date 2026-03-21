@@ -1,6 +1,6 @@
 <?php $currentPage = 'home'; ?>
 
-<link rel="stylesheet" href="/LASK/public/css/styles.css">
+<link rel="stylesheet" href="/LASK/public/css/home.css">
 
 <div class="app">
 

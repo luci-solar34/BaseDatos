@@ -2,6 +2,8 @@
 $pageTitle = $album['nombre_album'] . ' - LASK';
 ?>
 
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/detail_album.css') ?>">
+
 <h1><?= htmlspecialchars($album['nombre_album']) ?></h1>
 
 <?php if(!empty($album['nombre_artistico'])): ?>

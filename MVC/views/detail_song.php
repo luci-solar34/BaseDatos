@@ -1,7 +1,7 @@
 <?php
 $pageTitle = $song['nombre_cancion'] . ' - LASK';
 ?>
-<link rel="stylesheet" href="/LASK/public/css/detail_song.css">
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/detail_song.css') ?>">
  
 <div class="song-page">
  
@@ -88,11 +88,11 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
  
         <!-- VOLVER -->
         <div class="back-link">
-            <a href="<?= substr(BASE_URL, 0, strrpos(BASE_URL, '/')) ?>">← Volver al inicio</a>
+            <a href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\')) ?>">← Volver al inicio</a>
         </div>
  
     </div>
  
 </div>
  
-<script src="<?= substr(BASE_URL, 0, strrpos(BASE_URL, '/')) ?>/js/detail_song.js"></script>
+<script src="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/js/detail_song.js') ?>"></script>

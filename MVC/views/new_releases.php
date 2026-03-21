@@ -76,5 +76,5 @@ $pageTitle = 'Nuevos Lanzamientos - LASK';
         <?php endif; ?>
     </section>
 
-    <a class="back-home" href="/LASK/public">Volver al inicio</a>
+    <a class="back-home" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\')) ?>">Volver al inicio</a>
 </div>
