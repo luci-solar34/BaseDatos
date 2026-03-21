@@ -278,8 +278,6 @@
     <!-- MENU BAR -->
     <div class="win-menubar">
       <a href="<?= BASE_URL ?>/" class="menu-item">← Volver al inicio</a>
-      <span class="menu-item">Ver</span>
-      <span class="menu-item">Ayuda</span>
     </div>
 
     <!-- BODY -->
