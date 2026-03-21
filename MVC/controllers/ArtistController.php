@@ -5,6 +5,10 @@ require_once __DIR__ . "/../models/Song.php";
 require_once __DIR__ . "/../models/Album.php";
 require_once __DIR__ . "/../models/Comment.php";
 require_once __DIR__ . "/../models/Tag.php";
+require_once __DIR__ . "/../models/Follow.php";
+require_once __DIR__ . "/../models/Playlist.php";
+require_once __DIR__ . "/../models/User.php";
+require_once __DIR__ . "/../models/Block.php";
 
 class ArtistController extends Controller {
 
@@ -12,6 +16,10 @@ class ArtistController extends Controller {
     private $album;
     private $comment;
     private $tag;
+    private $follow;
+    private $playlist;
+    private $user;
+    private $block;
 
     public function __construct(){
         $db = $this->connectDatabase();
@@ -19,6 +27,97 @@ class ArtistController extends Controller {
         $this->album = new Album($db);
         $this->comment = new Comment($db);
         $this->tag = new Tag($db);
+        $this->follow = new Follow($db);
+        $this->playlist = new Playlist($db);
+        $this->user = new User($db);
+        $this->block = new Block($db);
+    }
+
+    public function profile($id){
+        $artistId = (int)$id;
+        $artist = $this->user->getById($artistId);
+
+        if(!$artist || (int)$artist['id_rol'] !== 2){
+            $this->abort('Artista no encontrado', 404);
+        }
+
+        $viewerId = $this->sessionInt('user_id');
+        $viewerData = $viewerId ? $this->user->getById($viewerId) : null;
+        $hasBlocked = $viewerId ? $this->block->hasBlocked($viewerId, $artistId) : false;
+        $canReport = $viewerId
+            && $viewerId !== $artistId
+            && $viewerData
+            && (int)$viewerData['id_rol'] !== 1
+            && (int)$artist['id_rol'] !== 1;
+        $hasReported = $canReport ? $this->user->hasDenuncia($viewerId, $artistId) : false;
+        $reportUnavailableMessage = ($viewerId !== null && $viewerId !== $artistId && !$canReport)
+            ? 'No puedes denunciar a administradores ni usar esta función mientras estás en modo administrador.'
+            : null;
+
+        // Lógica equivalente al proyecto de referencia para perfil de artista.
+        if($viewerId && $viewerId !== $artistId && $this->block->isBlockedBy($viewerId, $artistId)){
+            $flash = $this->consumeFlash();
+            $this->render('profile_blocked.php', [
+                'user' => $artist,
+                'flashMessage' => $flash['message'],
+                'canReport' => $canReport,
+                'showReportedMessage' => $canReport && $hasReported,
+                'canUnblock' => $hasBlocked,
+            ]);
+            return;
+        }
+
+        $isOwner = $viewerId !== null && $viewerId === $artistId;
+        $canInteract = $viewerId !== null && $viewerId !== $artistId;
+        $isFollowing = $canInteract ? $this->follow->isFollowing($viewerId, $artistId) : false;
+
+        $songs = $this->song->getByArtist($artistId);
+        $albums = $this->album->getByArtist($artistId);
+        $followers = $this->follow->countFollowers($artistId);
+        $following = $this->follow->countFollowing($artistId);
+        $playlists = $this->playlist->getUserPlaylists($artistId, $viewerId);
+        $comments = $this->comment->getByArtist($artistId);
+
+        $bioText = trim((string)($artist['bio'] ?? ''));
+        $hasBio = $bioText !== '';
+        if(!$hasBio){
+            $bioText = 'Sin bio';
+        }
+
+        $showArtistImageUpload = $isOwner;
+        $showArtistImage = !$isOwner;
+        $canComment = $viewerId !== null;
+        $canSeeEmail = $isOwner;
+        $hasEmail = !empty($artist['email']);
+        $hasCountry = !empty($artist['nombre_pais']);
+
+        $flash = $this->consumeFlash();
+
+        $this->render('detail_artist.php', [
+            'artist' => $artist,
+            'songs' => $songs,
+            'albums' => $albums,
+            'followers' => $followers,
+            'following' => $following,
+            'playlists' => $playlists,
+            'comments' => $comments,
+            'isOwner' => $isOwner,
+            'canInteract' => $canInteract,
+            'isFollowing' => $isFollowing,
+            'hasBlocked' => $hasBlocked,
+            'canReport' => $canReport,
+            'hasReported' => $hasReported,
+            'reportUnavailableMessage' => $reportUnavailableMessage,
+            'hasBio' => $hasBio,
+            'bioText' => $bioText,
+            'showArtistImageUpload' => $showArtistImageUpload,
+            'showArtistImage' => $showArtistImage,
+            'canComment' => $canComment,
+            'canSeeEmail' => $canSeeEmail,
+            'hasEmail' => $hasEmail,
+            'hasCountry' => $hasCountry,
+            'flashMessage' => $flash['message'],
+        ]);
     }
 
     private function requireArtistUserId($expectedArtistId = null){
