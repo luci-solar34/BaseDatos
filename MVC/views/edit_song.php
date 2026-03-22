@@ -1,46 +1,52 @@
-<h1>Editar Canción</h1>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/edit_song.css?v=' . time()) ?>">
 
-<form action="<?= BASE_URL ?>/artist/edit-song?id=<?= (int)$song['id_cancion'] ?>" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="song_id" value="<?= (int)$song['id_cancion'] ?>">
+<div class="edit-song-page">
 
-    <label>Nombre de la Canción:</label>
-    <input type="text" name="nombre" value="<?= htmlspecialchars($song['nombre_cancion']) ?>" required><br>
+    <h1>Editar Canción</h1>
 
-    <label>Álbum:</label>
-    <select name="album_id">
-        <option value="">Sin álbum</option>
-        <?php foreach($albums as $album): ?>
-            <option value="<?= (int)$album['id_album'] ?>" <?= (int) $song['id_album'] === (int) $album['id_album'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($album['nombre_album']) ?>
-            </option>
-        <?php endforeach; ?>
-    </select><br><br>
+    <form class="edit-song-form" action="<?= BASE_URL ?>/artist/edit-song?id=<?= (int)$song['id_cancion'] ?>" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="song_id" value="<?= (int)$song['id_cancion'] ?>">
 
-    <label>Portada actual:</label><br>
-    <img src="/LASK/<?= htmlspecialchars($song['portada_cancion'] ?? 'Photos/banner_default.png') ?>" width="160" style="border-radius:8px;"><br><br>
+        <label>Nombre de la Canción:</label>
+        <input type="text" name="nombre" value="<?= htmlspecialchars($song['nombre_cancion']) ?>" required>
 
-    <label>Nueva portada (jpg/png/webp):</label>
-    <input type="file" name="portada" accept=".jpg,.jpeg,.png,.webp"><br><br>
+        <label>Álbum:</label>
+        <select name="album_id">
+            <option value="">Sin álbum</option>
+            <?php foreach($albums as $album): ?>
+                <option value="<?= (int)$album['id_album'] ?>" <?= (int) $song['id_album'] === (int) $album['id_album'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($album['nombre_album']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
 
-    <label>Tags (puedes elegir varios):</label>
-    <select name="tags[]" multiple size="6">
-        <?php foreach($tags as $tag): ?>
-            <option value="<?= (int)$tag['id_tag'] ?>" <?= in_array((int) $tag['id_tag'], $selectedTagIds, true) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($tag['nombre_tag']) ?>
-            </option>
-        <?php endforeach; ?>
-    </select><br>
-    <small>Tip: Ctrl + click para seleccionar varios.</small><br><br>
+        <label>Portada actual:</label>
+        <img class="current-cover" src="/LASK/<?= htmlspecialchars($song['portada_cancion'] ?? 'Photos/banner_default.png') ?>" width="160" alt="Portada actual">
 
-    <label>Letra de la canción:</label><br>
-    <textarea name="letra_cancion" rows="8" style="width:100%; max-width:520px;"><?= htmlspecialchars($lyrics['letra_cancion'] ?? '') ?></textarea><br><br>
+        <label>Nueva portada (jpg/png/webp):</label>
+        <input type="file" name="portada" accept=".jpg,.jpeg,.png,.webp">
 
-    <label>Texto fonético:</label><br>
-    <textarea name="texto_fonetico" rows="8" style="width:100%; max-width:520px;"><?= htmlspecialchars($lyrics['texto_fonetico'] ?? '') ?></textarea><br><br>
+        <label>Tags (puedes elegir varios):</label>
+        <select name="tags[]" multiple size="6">
+            <?php foreach($tags as $tag): ?>
+                <option value="<?= (int)$tag['id_tag'] ?>" <?= in_array((int) $tag['id_tag'], $selectedTagIds, true) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($tag['nombre_tag']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <small>Tip: Ctrl + click para seleccionar varios.</small>
 
-    <button type="submit">Guardar Cambios</button>
-</form>
+        <label>Letra de la canción:</label>
+        <textarea name="letra_cancion" rows="8"><?= htmlspecialchars($lyrics['letra_cancion'] ?? '') ?></textarea>
 
-<p>Al mover la canción de álbum, se conserva el mismo ID de canción y no se pierden los likes.</p>
+        <label>Texto fonético:</label>
+        <textarea name="texto_fonetico" rows="8"><?= htmlspecialchars($lyrics['texto_fonetico'] ?? '') ?></textarea>
 
-<a href="<?= BASE_URL ?>/song?id=<?= (int)$song['id_cancion'] ?>">Volver a la canción</a>
+        <button type="submit" class="btn">Guardar Cambios</button>
+    </form>
+
+    <p class="edit-song-info">Al mover la canción de álbum, se conserva el mismo ID de canción y no se pierden los likes.</p>
+
+    <a class="link-back-song" href="<?= BASE_URL ?>/song?id=<?= (int)$song['id_cancion'] ?>">← Volver a la canción</a>
+
+</div>

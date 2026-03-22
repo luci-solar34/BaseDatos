@@ -41,9 +41,14 @@ class Playlist {
 
     public function getPlaylistSongs($playlist){
 
-        $query = "SELECT C.*
+        $query = "SELECT C.*,
+                         AR.id_usuario AS id_artista,
+                         AR.nombre_artistico,
+                         AL.portada_album
                   FROM Playlist_Canciones PC
                   INNER JOIN Canciones C ON PC.id_cancion = C.id_cancion
+                  INNER JOIN Artista AR ON C.id_artista = AR.id_usuario
+                  LEFT JOIN Albumes AL ON C.id_album = AL.id_album
                   WHERE PC.id_playlist = :playlist";
 
         $stmt = $this->conn->prepare($query);

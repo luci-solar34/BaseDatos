@@ -1,0 +1,134 @@
+/* ================================================================
+   EDIT SONG PAGE  -  Retro dark theme
+   ================================================================ */
+
+/* -- BACKGROUND ------------------------------------------------ */
+html:has(.edit-song-page),
+body:has(.edit-song-page) {
+    background: url('/LASK/public/img/fondito.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #111;
+}
+
+/* -- PAGE WRAPPER ---------------------------------------------- */
+.edit-song-page {
+    color: #c8c8c8;
+    padding: 28px 24px 48px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* -- PAGE TITLE ------------------------------------------------ */
+.edit-song-page > h1 {
+    font-family: 'VT323', monospace;
+    font-size: 2.8rem;
+    color: #f0f0f0;
+    letter-spacing: 3px;
+    margin: 0 0 22px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+/* -- FORM ------------------------------------------------------ */
+.edit-song-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-song-form label {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 14px;
+    margin-bottom: 5px;
+}
+
+.edit-song-form input[type="text"],
+.edit-song-form input[type="file"],
+.edit-song-form select,
+.edit-song-form textarea {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: #c8c8c8;
+    padding: 7px 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    box-sizing: border-box;
+    border-radius: 0;
+    margin-bottom: 2px;
+    transition: border-color 0.1s;
+}
+
+.edit-song-form input[type="text"]:focus,
+.edit-song-form select:focus,
+.edit-song-form textarea:focus {
+    outline: none;
+    border-color: #888;
+}
+
+.edit-song-form input[type="file"] {
+    padding: 5px 8px;
+    cursor: pointer;
+    color: #888;
+}
+
+/* Tags multiple select */
+.edit-song-form select[multiple] {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Textareas */
+.edit-song-form textarea {
+    resize: vertical;
+    min-height: 130px;
+    max-width: 100%;
+}
+
+/* Current cover image */
+.current-cover {
+    display: block;
+    margin: 6px 0 4px;
+    border: 1.5px solid #3a3a3a;
+    max-width: 160px;
+}
+
+/* Tip text */
+.edit-song-form small {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: #555;
+    display: block;
+    margin-top: 2px;
+}
+
+/* Submit button */
+.edit-song-form .btn {
+    align-self: flex-start;
+    margin-top: 20px;
+}
+
+/* -- INFO PARAGRAPH -------------------------------------------- */
+.edit-song-info {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: #555;
+    margin: 18px 0 6px;
+    border-left: 3px solid #3a3a3a;
+    padding-left: 10px;
+    line-height: 1.5;
+}
+
+/* -- BACK LINK ------------------------------------------------- */
+.link-back-song {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: 'VT323', monospace;
+    font-size: 1.25rem;
+    color: #888;
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.15s;
+}
+.link-back-song:hover { color: #c8c8c8; }

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . "/Controller.php";
 require_once __DIR__ . "/../models/Playlist.php";
@@ -36,7 +36,7 @@ class PlaylistController extends Controller {
         $user = $this->requireAuthenticatedUser('login');
 
         if(!$name || !$user){
-            $this->abort('Datos inválidos', 422);
+            $this->abort('Datos invÃ¡lidos', 422);
         }
 
         $playlist_id = $this->playlist->create($name, $privacy, $user);
@@ -48,14 +48,20 @@ class PlaylistController extends Controller {
         $userId = $this->requireAuthenticatedUser('login');
         $playlistId = (int)$id;
         if($playlistId <= 0){
-            $this->abort('Playlist inválida', 422);
+            $this->abort('Playlist invÃ¡lida', 422);
+        }
+
+        $playlistData = $this->playlist->getPlaylist($playlistId);
+        if(!$playlistData){
+            $this->abort('Playlist no encontrada', 404);
         }
 
         $songs = $this->playlist->getPlaylistSongs($playlistId);
         $playlist_id = $playlistId;
-        $finalizeUrl = $this->routeUrl('profile?id=' . (int)$userId);
+        $isOwner = (int)$playlistData['id_usuario'] === (int)$userId;
+        $finalizeUrl = $this->routeUrl('profile?id=' . (int)$playlistData['id_usuario']);
 
-        $this->render('playlist.php', compact('songs', 'playlist_id', 'finalizeUrl'));
+        $this->render('playlist.php', compact('songs', 'playlist_id', 'finalizeUrl', 'isOwner'));
     }
 
     public function showAddSongForm(){
@@ -92,7 +98,7 @@ class PlaylistController extends Controller {
         $song = $this->postInt('song', 0);
 
         if(!$playlist || !$song){
-            $this->abort('Datos inválidos', 422);
+            $this->abort('Datos invÃ¡lidos', 422);
         }
 
         $this->loadOwnedPlaylist($playlist, $userId);
@@ -111,7 +117,7 @@ class PlaylistController extends Controller {
         $song = $this->postInt('song_id', 0);
 
         if(!$playlist || !$song){
-            $this->abort('Datos inválidos', 422);
+            $this->abort('Datos invÃ¡lidos', 422);
         }
 
         $this->loadOwnedPlaylist($playlist, $userId);
@@ -128,7 +134,7 @@ class PlaylistController extends Controller {
         $privacy = $this->postInt('privacy', 0);
 
         if(!$playlist){
-            $this->abort('Datos inválidos', 422);
+            $this->abort('Datos invÃ¡lidos', 422);
         }
 
         $this->loadOwnedPlaylist($playlist, $userId);

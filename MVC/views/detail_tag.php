@@ -2,8 +2,7 @@
 
 $pageTitle = $tag['nombre_tag'] . ' - LASK';
 ?>
-<link rel="stylesheet" href="/LASK/public/css/tags.css">
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/LASK/public/css/tags.css?v=<?= time() ?>">
 
 <div class="tag-page">
 
@@ -24,26 +23,17 @@ $pageTitle = $tag['nombre_tag'] . ' - LASK';
     <?php if(empty($songs)): ?>
         <p class="no-songs">Todavía no hay canciones asociadas a este tag.</p>
     <?php else: ?>
-        <ul class="songs-list">
+        <div class="songs-grid">
             <?php foreach($songs as $song): ?>
-                <li class="song-item">
-                    <a class="song-link" href="<?= htmlspecialchars(BASE_URL . '/song?id=' . (int)$song['id_cancion']) ?>">
-                        <?= htmlspecialchars($song['nombre_cancion']) ?>
-                    </a>
-                    por
-                    <a class="artist-link" href="<?= htmlspecialchars(BASE_URL . '/artist?id=' . (int)$song['id_artista']) ?>">
-                        <?= htmlspecialchars($song['nombre_artistico']) ?>
-                    </a>
-                    <?php if(!empty($song['nombre_album'])): ?>
-                        (álbum: <a class="album-link" href="<?= htmlspecialchars(BASE_URL . '/album?id=' . (int)$song['id_album']) ?>">
-                            <?= htmlspecialchars($song['nombre_album']) ?>
-                        </a>)
-                    <?php endif; ?>
-                </li>
+                <a class="media-card" href="<?= htmlspecialchars(BASE_URL . '/song?id=' . (int)$song['id_cancion']) ?>">
+                    <img src="/LASK/<?= htmlspecialchars($song['portada_cancion'] ?? 'Photos/banner_default.png') ?>" alt="">
+                    <span><?= htmlspecialchars($song['nombre_cancion']) ?></span>
+                    <small><?= htmlspecialchars($song['nombre_artistico']) ?></small>
+                </a>
             <?php endforeach; ?>
-        </ul>
+        </div>
     <?php endif; ?>
 
-    <a class="back-home" href="<?= htmlspecialchars(BASE_URL) ?>">Volver al home</a>
+    <a class="back-home btn" href="<?= htmlspecialchars(BASE_URL) ?>">← Volver al home</a>
 
 </div>

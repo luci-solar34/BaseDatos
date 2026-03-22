@@ -195,6 +195,7 @@ class DetailController extends Controller {
         $isFollowing = $viewerId && $viewerId !== $artistId
             ? $this->follow->isFollowing($viewerId, $artistId)
             : false;
+        $hasBlocked = $viewerId ? $this->block->hasBlocked($viewerId, $artistId) : false;
         $songs = $this->song->getByArtistWithAlbum($artistId);
         $albums = $this->album->getByArtist($artistId);
         $followers = $this->follow->countFollowers($artistId);
@@ -202,6 +203,10 @@ class DetailController extends Controller {
         $playlists = $this->formatPlaylistLabels($this->playlist->getUserPlaylists($artistId, $viewerId));
         $viewer = $viewerId ? $this->user->getById($viewerId) : null;
         $canReport = $viewerId && $viewerId !== $artistId && $viewer && (int)$viewer['id_rol'] !== 1 && (int)$artist['id_rol'] !== 1;
+        $hasReported = $canReport ? $this->user->hasDenuncia($viewerId, $artistId) : false;
+        $reportUnavailableMessage = ($viewerId && $viewerId !== $artistId && !$canReport)
+            ? 'No puedes denunciar a administradores ni usar esta función mientras estás en modo administrador.'
+            : null;
         $flash = $this->consumeFlash();
         $flashMessage = $flash['message'];
         $comments = $this->comment->getByArtist($artistId);
@@ -220,12 +225,15 @@ class DetailController extends Controller {
         $this->render('detail_artist.php', compact(
             'artist',
             'isFollowing',
+            'hasBlocked',
             'songs',
             'albums',
             'followers',
             'following',
             'playlists',
             'canReport',
+            'hasReported',
+            'reportUnavailableMessage',
             'flashMessage',
             'comments',
             'isOwner',
@@ -352,6 +360,7 @@ class DetailController extends Controller {
                 'nombre' => $nombre,
                 'numero_pista' => null,
                 'path' => $upload['path'] ?? '',
+                'portada' => null,
                 'album' => $album_id,
                 'artista' => $artista,
             ];

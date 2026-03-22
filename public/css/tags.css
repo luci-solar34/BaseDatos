@@ -1,182 +1,164 @@
-/* ============================
-   Fondo y cuerpo general
-   ============================ */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: url('/LASK/public/img/fondito.jpeg?v=2') no-repeat center center;
+﻿/* ================================================================
+   TAG DETAIL PAGE  -  Retro dark theme (VT323 via app_shell.css)
+   ================================================================ */
+
+/* -- BACKGROUND (no override body — use :has to avoid footer bug) */
+html:has(.tag-page),
+body:has(.tag-page) {
+    background: url('/LASK/public/img/fondito.jpeg') no-repeat center center fixed;
     background-size: cover;
-    color: #f0f0f0;
-    min-height: 100vh;
-    padding: 40px 20px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    position: relative;
+    background-color: #111;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4); /* overlay */
-    z-index: -1;
+/* -- CONTAINER ------------------------------------------------- */
+.tag-page {
+    color: #c8c8c8;
+    padding: 24px 20px 40px;
 }
 
-/* ============================
-   Contenedor principal
-   ============================ */
-.search-page {
-    max-width: 800px;
-    width: 100%;
-    background: rgba(50,50,50,0.8);
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    
-    max-height: 80vh;  /* scroll si hay muchos resultados */
-    overflow-y: auto;
-}
-
-/* ============================
-   Título principal
-   ============================ */
-.search-title {
-    font-family: 'VT323', monospace;
-    font-size: 3rem;
-    color: #f0f0f0;
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
-    margin-bottom: 20px;
-}
-
+/* -- TAG TITLE ------------------------------------------------- */
 .tag-title {
     font-family: 'VT323', monospace;
     font-size: 3.5rem;
-    color: #ffffff;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.8), 
-                 6px 6px 0 rgba(200, 200, 200, 0.28);
-    margin-bottom: 25px;
-    text-align: center;
-    letter-spacing: 2px;
-}
-
-/* ============================
-   Mensaje de sin resultados
-   ============================ */
-.no-results {
-    font-size: 1.2rem;
-    color: #c0c0c0;
-    margin-bottom: 20px;
-}
-
-/* ============================
-   Lista de resultados
-   ============================ */
-.results-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.result-item {
-    background: rgba(70,70,70,0.7);
-    padding: 12px 20px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-}
-.result-item:hover {
-    background: rgba(90,90,90,0.9);
-}
-
-.result-link {
-    color: #e0e0e0;
-    text-decoration: none;
-    font-weight: bold;
-    transition: 0.3s;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-}
-.result-link:hover {
-    color: #ffffff;
-}
-
-/* ============================
-   Link volver al home
-   ============================ */
-.back-home {
-    display: inline-block;
-    margin-top: 30px;
-    text-decoration: none;
-    color: #b0b0b0;
-    font-weight: bold;
-    transition: 0.3s;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-}
-.back-home:hover {
-    color: #ffffff;
-    text-decoration: underline;
-}
-
-/* ============================
-   Link Explorar más tags
-   ============================ */
-.explore-tags a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-    transition: 0.3s;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-}
-
-.explore-tags a:visited,
-.explore-tags a:active {
-    color: #ffffff;
-}
-
-.explore-tags a:hover {
     color: #f0f0f0;
-    text-decoration: underline;
+    letter-spacing: 3px;
+    text-align: center;
+    margin: 0 0 8px;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.8);
 }
 
-/* ============================
-   Links de canciones y artistas
-   ============================ */
-.song-link,
-.artist-link,
-.album-link {
-    color: #ffffff;
+/* -- DESCRIPTION ----------------------------------------------- */
+.tag-description {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: #b0b0b0;
+    line-height: 1.6;
+    text-align: center;
+    margin: 0 0 6px;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* -- EXPLORE LINK ---------------------------------------------- */
+.explore-tags {
+    text-align: center;
+    margin: 0 0 28px;
+}
+.explore-tags a {
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    color: #888;
     text-decoration: none;
-    font-weight: bold;
-    transition: 0.3s;
+    letter-spacing: 1px;
+    transition: color 0.15s;
 }
+.explore-tags a:hover { color: #c8c8c8; }
 
-.song-link:visited,
-.artist-link:visited,
-.album-link:visited,
-.song-link:active,
-.artist-link:active,
-.album-link:active {
-    color: #ffffff;
-}
-
-.song-link:hover,
-.artist-link:hover,
-.album-link:hover {
-    color: #d9d9d9;
-    text-decoration: underline;
-}
-
-/* ============================
-   Título "Canciones con esta vibe"
-   ============================ */
+/* -- SECTION TITLE --------------------------------------------- */
 .songs-title {
     font-family: 'VT323', monospace;
-    font-size: 2.5rem;
-    color: #ffffff;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.8), 
-                 6px 6px 0 rgba(200, 200, 200, 0.28);
-    margin-top: 35px;
-    margin-bottom: 20px;
+    font-size: 1.7rem;
+    letter-spacing: 2px;
+    color: #f0f0f0;
+    padding: 4px 12px;
+    margin: 0 0 6px;
+    background: linear-gradient(to right, #3a3a3a, #555);
+    border-bottom: 1px solid #404040;
+    display: block;
+}
+
+/* -- NO SONGS MESSAGE ------------------------------------------ */
+.no-songs {
+    font-family: 'Space Mono', monospace;
+    color: #666;
+    font-size: 0.85rem;
+    padding: 10px 0;
+}
+
+/* -- SONGS GRID (same as artist/profile pages) ----------------- */
+.songs-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 10px 0 20px;
+}
+
+.media-card {
+    display: flex;
+    flex-direction: column;
+    width: 140px;
+    background: #1e1e1e;
+    border: 1.5px solid;
+    border-color: #404040 #c8c8c8 #c8c8c8 #404040;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: background 0.1s;
+    overflow: hidden;
+}
+.media-card:hover {
+    background: #2e2e2e;
+    border-color: #c8c8c8 #404040 #404040 #c8c8c8;
+}
+.media-card img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+}
+.media-card span {
+    display: block;
+    padding: 6px 8px 2px;
+    color: #c8c8c8;
+    font-family: 'VT323', monospace;
+    font-size: 1.15rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+.media-card small {
+    display: block;
+    color: #888;
+    font-size: 0.72rem;
+    text-align: center;
+    padding: 0 8px 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Space Mono', monospace;
+}
+.media-card:hover span { color: #fff; }
+
+/* -- BACK HOME BUTTON ------------------------------------------ */
+.back-home.btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 5px 20px;
+    background: #2a2a2a;
+    border: 1.5px solid;
+    border-color: #c8c8c8 #404040 #404040 #c8c8c8;
+    color: #c8c8c8;
+    font-family: 'VT323', monospace;
+    font-size: 1.25rem;
     letter-spacing: 1px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+    white-space: nowrap;
+}
+.back-home.btn:hover {
+    background: #444;
+    color: #fff;
+    border-color: #fff #333 #333 #fff;
+}
+
+/* -- RESPONSIVE ------------------------------------------------ */
+@media (max-width: 600px) {
+    .tag-title { font-size: 2.4rem; }
+    .songs-grid { gap: 10px; }
+    .media-card { width: 120px; }
+    .media-card img { width: 120px; height: 120px; }
 }

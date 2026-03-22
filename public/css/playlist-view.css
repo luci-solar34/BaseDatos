@@ -23,11 +23,12 @@ body {
 
 /* IZQUIERDA */
 .playlist-left {
-    width: 500px;
+    width: min(820px, 92vw);
+    min-height: 360px;
     background: rgba(0,0,0,0.6);
     backdrop-filter: blur(10px);
     border-radius: 15px;
-    padding: 20px;
+    padding: 24px;
 }
 
 /* BOTONES */
@@ -76,16 +77,58 @@ body {
     background: rgba(255,255,255,0.1);
     padding: 10px;
     border-radius: 20px;
+    gap: 12px;
+}
+
+.song-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.song-cover {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+.song-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 /* NOMBRE */
 .song-name {
     font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-artist {
+    font-size: 12px;
+    color: #cfcfcf;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-artist:hover {
+    color: #ffffff;
+    text-decoration: underline;
 }
 
 /* AUDIO */
 audio {
-    width: 180px;
+    width: 210px;
+    flex-shrink: 0;
 }
 
 /* DERECHA (PLAYER GRANDE) */
@@ -107,4 +150,15 @@ audio {
 
 .playlist-right h3 {
     font-size: 16px;
+}
+
+@media (max-width: 780px) {
+    .song-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    audio {
+        width: 100%;
+    }
 }

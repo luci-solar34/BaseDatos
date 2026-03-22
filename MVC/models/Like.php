@@ -42,7 +42,7 @@ class Like {
         $stmt->bindParam(":song", $song);
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function countLikes($song){

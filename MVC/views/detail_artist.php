@@ -63,15 +63,16 @@
     </div>
 
     <?php if(isset($canReport) && $canReport): ?>
+        <div class="report-section">
         <?php if(isset($hasReported) && $hasReported): ?>
-            <p style="color: #a00;">Ya has enviado una denuncia para este usuario. Espera a que sea revisada.</p>
+            <p>Ya has enviado una denuncia para este usuario. Espera a que sea revisada.</p>
         <?php else: ?>
-            <button type="button" data-toggle-target="reportForm" onclick="var f=document.getElementById('reportForm'); if(f){f.style.display='block';}">Denunciar</button>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('reportForm').style.display='block'">Denunciar</button>
 
-            <form id="reportForm" method="POST" action="<?= htmlspecialchars(BASE_URL . '/report') ?>" data-sql-guard="off" style="display:none; margin-top:15px; border:1px solid #ccc; padding: 12px;">
+            <form id="reportForm" method="POST" action="<?= htmlspecialchars(BASE_URL . '/report') ?>" style="display:none;">
                 <input type="hidden" name="denunciado_id" value="<?= (int)$artist['id_usuario'] ?>">
 
-                <label>Tipo de denuncia:</label><br>
+                <label>Tipo de denuncia:</label>
                 <select name="motivo_denuncia" required>
                     <option value="">Selecciona un motivo</option>
                     <option value="Contenido inapropiado">Contenido inapropiado</option>
@@ -81,19 +82,16 @@
                     <option value="Otro">Otro</option>
                 </select>
 
-                <br><br>
+                <label>Descripción de la denuncia:</label>
+                <textarea name="descripcion_denuncia" placeholder="Describe el motivo de tu denuncia" required></textarea>
 
-                <label>Descripción de la denuncia:</label><br>
-                <textarea name="descripcion_denuncia" rows="4" cols="45" placeholder="Describe el motivo de tu denuncia" required></textarea>
-
-                <br><br>
-
-                <button type="submit">Enviar denuncia</button>
-                <button type="button" data-hide-target="reportForm" onclick="var f=document.getElementById('reportForm'); if(f){f.style.display='none';}">Cancelar</button>
+                <button type="submit" class="btn">Enviar denuncia</button>
+                <button type="button" class="btn" onclick="document.getElementById('reportForm').style.display='none'">Cancelar</button>
             </form>
         <?php endif; ?>
+        </div>
     <?php elseif(isset($reportUnavailableMessage) && $reportUnavailableMessage): ?>
-        <p style="color:red;"><?= htmlspecialchars($reportUnavailableMessage) ?></p>
+        <p><?= htmlspecialchars($reportUnavailableMessage) ?></p>
     <?php endif; ?>
 
     <?php if(isset($flashMessage) && $flashMessage): ?>
@@ -168,7 +166,7 @@
         <div class="songs-grid">
         <?php foreach($playlists as $playlist): ?>
             <a class="media-card" href="<?= htmlspecialchars(BASE_URL . '/playlist?id=' . (int)$playlist['id_playlist']) ?>">
-                <img src="/LASK/Photos/banner_default.png" alt="">
+                <div class="playlist-folder-icon" aria-hidden="true"></div>
                 <span><?= htmlspecialchars($playlist['nombre_playlist']) ?></span>
             </a>
         <?php endforeach; ?>

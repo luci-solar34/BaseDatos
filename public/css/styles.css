@@ -1,11 +1,18 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital@0;1&family=VT323&display=swap');
+
 /* ===================== */
 /* FONDO GENERAL */
 /* ===================== */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Space Mono', monospace;
     background: url('../img/fondo.jpeg') no-repeat center center/cover;
+}
+
+/* Form elements don't inherit font-family by default */
+input, button, select, textarea, label, a {
+    font-family: 'Space Mono', monospace;
 }
 
 

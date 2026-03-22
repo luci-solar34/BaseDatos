@@ -6,8 +6,8 @@
     <title>Iniciar sesión</title>
 
 
-    <!-- FUENTE PIXEL -->
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <!-- FUENTES -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital@0;1&family=VT323&display=swap" rel="stylesheet">
 
 
     <!-- CSS CORRECTOS -->

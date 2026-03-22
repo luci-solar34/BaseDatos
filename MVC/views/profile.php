@@ -166,7 +166,7 @@
                 <?php else: ?>
                     <?php foreach($playlists as $playlist): ?>
                         <a class="media-card" href="<?= htmlspecialchars(BASE_URL . '/playlist?id=' . (int)$playlist['id_playlist']) ?>">
-                            <img src="/LASK/Photos/banner_default.png" alt="">
+                            <div class="playlist-folder-icon" aria-hidden="true"></div>
                             <span><?= htmlspecialchars($playlist['nombre_playlist']) ?></span>
                             <?php if($playlist['privacy_label']): ?>
                                 <small><?= htmlspecialchars($playlist['privacy_label']) ?></small>

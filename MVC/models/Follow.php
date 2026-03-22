@@ -21,7 +21,7 @@ class Follow {
 
     $stmt->execute();
 
-    return $stmt->rowCount() > 0;
+    return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function follow($seguidor,$seguido){
