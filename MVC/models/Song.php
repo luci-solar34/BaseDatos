@@ -197,9 +197,10 @@ class Song {
 
         UNION
 
-        SELECT U.id_usuario AS id, U.nombre_usuario AS resultado,'usuario' AS tipo
-        FROM Usuarios U
-        WHERE U.nombre_usuario LIKE :term
+                SELECT U.id_usuario AS id, U.nombre_usuario AS resultado,'usuario' AS tipo
+                FROM Usuarios U
+                WHERE U.nombre_usuario LIKE :term
+                    AND U.id_rol <> 2
         ";
 
         $stmt = $this->conn->prepare($query);

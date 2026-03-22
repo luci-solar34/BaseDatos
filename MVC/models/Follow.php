@@ -28,7 +28,8 @@ class Follow {
 
         $query = "INSERT INTO Siguen
         (id_seguidor,id_seguido)
-        VALUES (:seguidor,:seguido)";
+        VALUES (:seguidor,:seguido)
+        ON DUPLICATE KEY UPDATE fecha_follow = NOW()";
 
         $stmt = $this->conn->prepare($query);
 

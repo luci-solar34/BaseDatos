@@ -51,8 +51,7 @@
             <?php if($canInteract): ?>
 
                 <!-- FOLLOW -->
-                <form method="POST" action="<?= htmlspecialchars(BASE_URL) ?>">
-                    <input type="hidden" name="route" value="<?= htmlspecialchars($isFollowing ? 'unfollow' : 'follow') ?>">
+                <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/' . ($isFollowing ? 'unfollow' : 'follow')) ?>">
                     <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
                     <input type="hidden" name="redirect_id" value="<?= (int)$user['id_usuario'] ?>">
                     <button>

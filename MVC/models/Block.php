@@ -8,16 +8,30 @@ class Block {
         $this->conn = $db;
     }
 
+    
     public function block($bloqueador, $bloqueado){
 
-        // Inserta el bloqueo (IGNORAR si ya existe) y retorna si el bloqueo está activo.
-        $query = "INSERT IGNORE INTO Bloquea (id_bloqueador,id_bloqueado)
-                  VALUES (:b1,:b2)";
+   
+        $query = "INSERT INTO Bloquea (id_bloqueador, id_bloqueado)
+                  VALUES (:b1, :b2)
+                  ON DUPLICATE KEY UPDATE fecha_bloqueo = NOW()";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":b1",$bloqueador);
-        $stmt->bindParam(":b2",$bloqueado);
-        $stmt->execute();
+
+        if(!$stmt){
+            error_log('[Block] prepare() failed on block(): ' . implode(' | ', $this->conn->errorInfo()));
+            return false;
+        }
+
+        $stmt->bindParam(":b1", $bloqueador, PDO::PARAM_INT);
+        $stmt->bindParam(":b2", $bloqueado, PDO::PARAM_INT);
+
+        $ok = $stmt->execute();
+        
+        if(!$ok){
+            error_log('[Block] execute() failed on block(): ' . implode(' | ', $stmt->errorInfo()));
+            return false;
+        }
 
         return $this->hasBlocked($bloqueador, $bloqueado);
     }
@@ -29,13 +43,19 @@ class Block {
                   AND id_bloqueado = :b2";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":b1",$bloqueador);
-        $stmt->bindParam(":b2",$bloqueado);
+
+        if(!$stmt){
+            error_log('[Block] prepare() failed on unblock(): ' . implode(' | ', $this->conn->errorInfo()));
+            return false;
+        }
+
+        $stmt->bindParam(":b1", $bloqueador, PDO::PARAM_INT);
+        $stmt->bindParam(":b2", $bloqueado, PDO::PARAM_INT);
 
         return $stmt->execute();
     }
 
-    // 🔥 LA MÁS IMPORTANTE
+    // 🔥 VER SI HAY BLOQUEO EN CUALQUIER DIRECCIÓN
     public function isBlocked($user1, $user2){
 
         $query = "SELECT 1 FROM Bloquea
@@ -43,14 +63,16 @@ class Block {
                      OR (id_bloqueador = :u2 AND id_bloqueado = :u1)";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":u1",$user1);
-        $stmt->bindParam(":u2",$user2);
+
+        $stmt->bindParam(":u1", $user1, PDO::PARAM_INT);
+        $stmt->bindParam(":u2", $user2, PDO::PARAM_INT);
+
         $stmt->execute();
 
-        // rowCount() puede ser impreciso en algunos drivers. Usar fetch() es más confiable.
         return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // 🔥 VER SI YO BLOQUEÉ A ALGUIEN
     public function hasBlocked($bloqueador, $bloqueado){
 
         $query = "SELECT 1 FROM Bloquea
@@ -58,19 +80,16 @@ class Block {
                   AND id_bloqueado = :b2";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":b1",$bloqueador);
-        $stmt->bindParam(":b2",$bloqueado);
+
+        $stmt->bindParam(":b1", $bloqueador, PDO::PARAM_INT);
+        $stmt->bindParam(":b2", $bloqueado, PDO::PARAM_INT);
+
         $stmt->execute();
 
         return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Determina si $user está bloqueado por $blockedBy.
-     *
-     * Esto se usa para casos como mensajería: si otro usuario te ha bloqueado, no
-     * deberías poder enviarle mensajes, pero si tú le has bloqueado, aún puedes.
-     */
+    // 🔥 VER SI ME BLOQUEARON
     public function isBlockedBy($user, $blockedBy){
         return $this->hasBlocked($blockedBy, $user);
     }

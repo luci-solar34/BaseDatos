@@ -180,7 +180,7 @@ class DetailController extends Controller {
 
         $viewerId = $this->sessionInt('user_id');
 
-        if($viewerId && $this->block->isBlockedBy($viewerId, $artistId)){
+        if($viewerId && $this->block->isBlocked($viewerId, $artistId)){
             $flash = $this->consumeFlash();
             $this->render('profile_blocked.php', [
                 'user' => $artist,

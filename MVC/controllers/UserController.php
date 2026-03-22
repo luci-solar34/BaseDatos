@@ -280,10 +280,12 @@ class UserController extends Controller {
             $this->abort('No puedes seguir a este usuario', 403);
         }
 
-        if(!$this->follow->isFollowing($seguidor, $seguido)){
-            $this->follow->follow($seguidor, $seguido);
+        $saved = $this->follow->follow($seguidor, $seguido);
+        if(!$saved){
+            $this->abort('No se pudo guardar el seguimiento', 500);
         }
 
+        $this->setFlash('Seguimiento actualizado.', 'success');
         $this->redirectToProfile($seguido);
     }
 
@@ -295,7 +297,12 @@ class UserController extends Controller {
             $this->abort('Datos inválidos', 422);
         }
 
-        $this->follow->unfollow($seguidor, $seguido);
+        $updated = $this->follow->unfollow($seguidor, $seguido);
+        if(!$updated){
+            $this->abort('No se pudo actualizar el seguimiento', 500);
+        }
+
+        $this->setFlash('Seguimiento actualizado.', 'success');
         $this->redirectToProfile($seguido);
     }
 
@@ -307,9 +314,16 @@ class UserController extends Controller {
             $this->abort('Datos inválidos', 422);
         }
 
-        $this->block->block($bloqueador, $bloqueado);
+        $saved = $this->block->block($bloqueador, $bloqueado);
+        if(!$saved){
+            $this->abort('No se pudo guardar el bloqueo', 500);
+        }
+
+        $this->setFlash('Bloqueo actualizado.', 'success');
         $this->redirectToProfile($bloqueado);
+
     }
+   
 
     public function unblock(){
         $bloqueador = $this->requireAuthenticatedUser('login');
@@ -319,7 +333,12 @@ class UserController extends Controller {
             $this->abort('Datos inválidos', 422);
         }
 
-        $this->block->unblock($bloqueador, $bloqueado);
+        $updated = $this->block->unblock($bloqueador, $bloqueado);
+        if(!$updated){
+            $this->abort('No se pudo actualizar el bloqueo', 500);
+        }
+
+        $this->setFlash('Bloqueo actualizado.', 'success');
         $this->redirectToProfile($bloqueado);
     }
 }

@@ -36,8 +36,7 @@
                 <?php endif; ?>
 
                 <?php if($canInteract): ?>
-                    <form method="POST" action="<?= htmlspecialchars(BASE_URL) ?>" style="display:inline;">
-                        <input type="hidden" name="route" value="<?= htmlspecialchars($isFollowing ? 'unfollow' : 'follow') ?>">
+                    <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/' . ($isFollowing ? 'unfollow' : 'follow')) ?>" style="display:inline;">
                         <input type="hidden" name="user_id" value="<?= (int)$artist['id_usuario'] ?>">
                         <input type="hidden" name="redirect_id" value="<?= (int)$artist['id_usuario'] ?>">
                         <button type="submit" class="btn">
