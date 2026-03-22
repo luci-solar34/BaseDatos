@@ -333,22 +333,41 @@ class DetailController extends Controller {
             $album = $this->album->getById($album_id);
             $existingSongId = $this->postInt('existing_song_id', 0);
             $nombre = $this->postString('nombre');
+            $mode = $this->postString('add_mode', 'transfer');
 
             if(!$album_id || !$album || (int)$album['id_artista'] !== (int)$artista){
                 $this->abort('Datos incompletos', 422);
             }
 
-            if($existingSongId > 0){
+            if(!in_array($mode, ['transfer', 'upload'], true)){
+                $this->abort('Modo de agregado inválido', 422);
+            }
+
+            $hasUploadFile = !empty($_FILES['archivo']['name'] ?? null);
+
+            if($mode === 'transfer'){
+                if($hasUploadFile || $nombre !== ''){
+                    $this->abort('En modo transferencia solo puedes seleccionar una canción existente', 422);
+                }
+
+                if($existingSongId <= 0){
+                    $this->abort('Selecciona una canción para transferir al álbum', 422);
+                }
+
                 $moved = $this->song->moveToAlbum($existingSongId, $album_id, $artista);
                 if(!$moved){
                     $this->abort('No se pudo agregar la canción seleccionada al álbum', 422);
                 }
 
-                $this->redirectToRoute('album?id=' . $album_id);
+                $this->redirectToRoute('album/add-songs?id=' . $album_id . '&mode=transfer&added=1&locked=1');
             }
 
-            if(!$nombre || empty($_FILES['archivo']['name'] ?? null)){
-                $this->abort('Selecciona una canción existente o sube una nueva canción', 422);
+            if($existingSongId > 0){
+                $this->abort('En modo subida no puedes transferir canciones existentes', 422);
+            }
+
+            if(!$nombre || !$hasUploadFile){
+                $this->abort('En modo subida debes indicar nombre y archivo mp3', 422);
             }
 
             $upload = $this->storeUploadedFile('archivo', ['mp3'], 'music');
@@ -366,7 +385,7 @@ class DetailController extends Controller {
             ];
 
             $this->song->create($data);
-            $this->redirectToRoute('album?id=' . $album_id);
+            $this->redirectToRoute('album/add-songs?id=' . $album_id . '&mode=upload&added=1&locked=1');
         }
 
         $album_id = $this->getInt('id', 0);
@@ -384,8 +403,31 @@ class DetailController extends Controller {
             $this->abort('Sin permisos para editar este álbum', 403);
         }
 
+        $selectedMode = $this->getString('mode', 'transfer');
+        if(!in_array($selectedMode, ['transfer', 'upload'], true)){
+            $selectedMode = 'transfer';
+        }
+
+        $modeLocked = $this->getInt('locked', 0) === 1;
+        if($this->getInt('unlock', 0) === 1){
+            $modeLocked = false;
+        }
+
+        $songAdded = $this->getInt('added', 0) === 1;
         $availableSongs = $this->song->getByArtistOutsideAlbum($viewerId, $album_id);
+        $albumSongs = $this->song->getByAlbumWithLyrics($album_id);
+        $songCount = count($albumSongs);
         $artistProfileUrl = $this->routeUrl('artist?id=' . (int)$viewerId);
-        $this->render('add_songs_to_album.php', compact('album_id', 'album', 'artistProfileUrl', 'availableSongs'));
+        $this->render('add_songs_to_album.php', compact(
+            'album_id',
+            'album',
+            'artistProfileUrl',
+            'availableSongs',
+            'selectedMode',
+            'modeLocked',
+            'songAdded',
+            'albumSongs',
+            'songCount'
+        ));
     }
 }

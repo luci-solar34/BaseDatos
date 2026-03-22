@@ -33,8 +33,7 @@
             </div>
 
             <div class="form-actions">
-                <button class="btn-insert-songs" type="submit">Insertar canciones</button>
-                <button class="btn-publish" type="submit">Publicar álbum</button>
+                <button class="btn-publish" type="submit">Crear album y agregar canciones</button>
             </div>
         </div>
 
