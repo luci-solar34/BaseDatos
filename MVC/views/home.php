@@ -85,7 +85,9 @@
             <div class="section">
 
                 <div class="section-header">
-                    <h2>Nuevos Lanzamientos</h2>
+                    <h2>
+                        
+                    </h2>
                     <a href="<?= BASE_URL ?>/new-releases">Ver todos →</a>
                 </div>
 
