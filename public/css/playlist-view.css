@@ -44,6 +44,13 @@ body {
     padding: 8px 15px;
     cursor: pointer;
     font-weight: bold;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+}
+
+.btn:focus,
+.btn:active {
+    font-family: 'VT323', monospace;
 }
 
 .btn:hover {

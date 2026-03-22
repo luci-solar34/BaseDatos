@@ -32,6 +32,285 @@ body {
 }
 
 
+/* BOTONES NAV */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+
+.nav-buttons .btn {
+    background: #ddd;
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: black;
+}
+
+
+/* ===================== */
+/* CONTENEDOR */
+/* ===================== */
+.contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+/* ===================== */
+/* CAJAS LOGIN / REGISTER */
+/* ===================== */
+.login-box,
+.register-box {
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    color: white;
+    box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.8);
+}
+
+
+/* LOGIN */
+.login-box {
+    width: 600px;
+    padding: 50px;
+    background: linear-gradient(
+        to right,
+        rgba(20, 20, 20, 0.95),
+        rgba(70, 70, 70, 0.85),
+        rgba(150, 150, 150, 0.6)
+    );
+}
+
+
+/* REGISTER */
+.register-box {
+    width: 850px;
+    padding: 40px;
+    background: linear-gradient(
+        to right,
+        rgba(20, 20, 20, 0.95),
+        rgba(80, 80, 80, 0.8),
+        rgba(150, 150, 150, 0.6)
+    );
+}
+
+
+/* ===================== */
+/* TITULOS */
+/* ===================== */
+.titulo-pixel {
+    font-family: 'VT323', monospace;
+    font-size: 50px;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+
+.login-box .titulo-pixel {
+    text-align: center;
+}
+
+
+.register-box .titulo-pixel {
+    text-align: left;
+}
+
+
+/* ===================== */
+/* FORMULARIOS */
+/* ===================== */
+.login-box label,
+.register-box label {
+    display: block;
+    margin-top: 10px;
+}
+
+
+.login-box input,
+.register-box input,
+.register-box select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+}
+
+
+/* LOGIN TEXT */
+.login-box p {
+    font-size: 14px;
+}
+
+
+/* BOTON LOGIN */
+.login-box button {
+    width: 200px;
+    display: block;
+    margin: 20px auto 0;
+    padding: 12px;
+    border-radius: 20px;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+}
+
+
+.login-box a {
+    color: black;
+    font-weight: bold;
+}
+
+
+/* ===================== */
+/* REGISTER */
+/* ===================== */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+
+.rol-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+
+.rol-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: #ddd;
+    cursor: pointer;
+    color: black;
+}
+
+
+input[type="radio"]:checked + .rol-btn {
+    background: #aaa;
+    transform: scale(1.05);
+}
+
+
+/* CAMPO ARTISTA */
+.campo-artista {
+    display: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+
+.campo-artista.activo {
+    display: block;
+    opacity: 1;
+}
+
+
+/* TERMS */
+.terms {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+
+.terms input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+
+.terms a {
+    color: black;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+
+/* ALERTAS REGISTER */
+.alert {
+    margin: 0 0 18px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-weight: bold;
+}
+
+
+.alert-success {
+    background: rgba(99, 201, 132, 0.24);
+    border: 1px solid rgba(99, 201, 132, 0.55);
+    color: #ebffef;
+}
+
+
+.alert-error {
+    background: rgba(255, 94, 94, 0.24);
+    border: 1px solid rgba(255, 94, 94, 0.5);
+    color: #fff0f0;
+}
+
+
+/* BOTON REGISTER */
+.btn-submit {
+    display: block;
+    margin: auto;
+    padding: 12px 30px;
+    border-radius: 20px;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+}
+
+
+/* ===================== */
+/* MODAL */
+/* ===================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+
+.modal-contenido {
+    display: block;
+    margin: 5% auto;
+    max-width: 80%;
+    border-radius: 10px;
+}
+
+
+.cerrar {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+
 /* BIENVENIDA */
 .welcome-container {
     margin-top: 70px;

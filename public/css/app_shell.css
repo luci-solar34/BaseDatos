@@ -1,0 +1,264 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&display=swap');
+
+body.app-shell-body {
+    margin: 0;
+    color: #f0f0f0;
+    font-family: 'Space Mono', monospace;
+}
+
+/* Safety net: headings always readable across all pages */
+body.app-shell-body h1,
+body.app-shell-body h2,
+body.app-shell-body h3,
+body.app-shell-body h4 {
+    color: #f0f0f0;
+}
+
+body.app-shell-body * {
+    box-sizing: border-box;
+}
+
+.shell-frame {
+    width: min(1020px, calc(100% - 48px));
+    margin: 0 auto;
+}
+
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.app-header-frame {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 92px;
+    padding: 14px 40px;
+    background: rgba(8, 8, 8, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.app-logo-link {
+    display: inline-flex;
+    align-items: center;
+}
+
+.app-logo-image {
+    display: block;
+    width: auto;
+    height: 62px;
+    object-fit: contain;
+}
+
+.app-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.app-header-button {
+    min-width: 178px;
+    padding: 10px 28px;
+    background: #2a2a2a;
+    border: 1.5px solid;
+    border-color: #c8c8c8 #404040 #404040 #c8c8c8;
+    color: #c8c8c8;
+    text-decoration: none;
+    text-align: center;
+    font-family: 'VT323', monospace;
+    font-size: 1.45rem;
+    letter-spacing: 1px;
+    transition: background 0.1s, color 0.1s;
+    border-radius: 0;
+}
+
+.app-header-button:hover {
+    background: #444;
+    color: #fff;
+}
+
+.app-profile-link {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+.app-profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.app-shell-spacer {
+    height: 92px;
+}
+
+.app-main {
+    padding: 10px 0 48px;
+}
+
+.app-main-inner {
+    width: min(1400px, calc(100% - 48px));
+    margin: 0 auto;
+    min-height: calc(100vh - 180px);
+}
+
+.app-footer {
+    padding: 0;
+}
+
+.app-footer-card {
+    background: #1a1a1a;
+    border-top: 1.5px solid #3a3a3a;
+    padding: 12px 40px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.app-footer-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 20px;
+    background: #1a1a1a;
+    border: 1.5px solid;
+    border-color: #c8c8c8 #404040 #404040 #c8c8c8;
+    color: #c8c8c8;
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    border-radius: 0;
+}
+
+.app-footer-grid {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.app-footer-contacts {
+    display: flex;
+    gap: 16px;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    color: #c8c8c8;
+    flex-wrap: wrap;
+}
+
+.app-footer-contacts p {
+    margin: 0;
+}
+
+.app-footer-signature {
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    color: #666;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+@media (max-width: 900px) {
+    .app-header-frame {
+        min-height: 82px;
+        padding: 12px 18px;
+    }
+
+    .app-logo-image {
+        height: 52px;
+    }
+
+    .app-header-button {
+        min-width: 150px;
+        padding: 11px 18px;
+    }
+
+    .app-shell-spacer {
+        height: 122px;
+    }
+
+    .app-main-inner {
+        width: min(1400px, calc(100% - 28px));
+    }
+
+    .app-footer-grid {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .app-footer-signature {
+        text-align: left;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 640px) {
+    .shell-frame {
+        width: calc(100% - 24px);
+    }
+
+    .app-header {
+        top: 12px;
+    }
+
+    .app-header-frame {
+        gap: 12px;
+        min-height: auto;
+        padding: 12px;
+    }
+
+    .app-header-actions {
+        gap: 10px;
+    }
+
+    .app-header-button {
+        min-width: 0;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+    }
+
+    .app-profile-link {
+        width: 52px;
+        height: 52px;
+    }
+
+    .app-shell-spacer {
+        height: 108px;
+    }
+
+    .app-main-inner {
+        width: calc(100% - 24px);
+    }
+
+    .app-footer-card {
+        padding: 20px 18px;
+    }
+
+    .app-footer-pill {
+        min-width: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .app-footer-contacts,
+    .app-footer-signature {
+        font-size: 0.95rem;
+    }
+}

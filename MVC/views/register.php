@@ -5,7 +5,7 @@
     <title>Crear cuenta</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/LASK/public/css/styles.css">
+    <link rel="stylesheet" href="/LASK/public/css/styles.css?v=login-register-fix-1">
 
     <!-- FUENTE PIXEL -->
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">

@@ -1,21 +1,6 @@
-<link rel="stylesheet" href="/LASK/public/css/profile.css">
+<link rel="stylesheet" href="/LASK/public/css/profile.css?v=<?= time() ?>">
 
 <div class="profile-container">
-
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <a href="<?= htmlspecialchars(BASE_URL) ?>">
-            <img src="/LASK/public/img/logo.png" class="logo">
-        </a>
-
-        <div class="top-buttons">
-            <?php if($isOwner): ?>
-                <a href="<?= htmlspecialchars(BASE_URL . '/logout') ?>">
-                    <button>Cerrar Sesión</button>
-                </a>
-            <?php endif; ?>
-        </div>
-    </div>
 
     <!-- HEADER -->
     <div class="profile-header">
@@ -56,6 +41,12 @@
 
         <!-- ACCIONES -->
         <div class="profile-actions">
+
+            <?php if($isOwner): ?>
+                <a href="<?= htmlspecialchars(BASE_URL . '/logout') ?>">
+                    <button>Cerrar sesión</button>
+                </a>
+            <?php endif; ?>
 
             <?php if($canInteract): ?>
 
@@ -174,13 +165,12 @@
                     <p>No hay playlists</p>
                 <?php else: ?>
                     <?php foreach($playlists as $playlist): ?>
-                        <a href="<?= htmlspecialchars(BASE_URL . '/playlist?id=' . (int)$playlist['id_playlist']) ?>">
-                            <div class="playlist-card">
-                                <?= htmlspecialchars($playlist['nombre_playlist']) ?>
-                                <?php if($playlist['privacy_label']): ?>
-                                    <small><?= htmlspecialchars($playlist['privacy_label']) ?></small>
-                                <?php endif; ?>
-                            </div>
+                        <a class="media-card" href="<?= htmlspecialchars(BASE_URL . '/playlist?id=' . (int)$playlist['id_playlist']) ?>">
+                            <img src="/LASK/Photos/banner_default.png" alt="">
+                            <span><?= htmlspecialchars($playlist['nombre_playlist']) ?></span>
+                            <?php if($playlist['privacy_label']): ?>
+                                <small><?= htmlspecialchars($playlist['privacy_label']) ?></small>
+                            <?php endif; ?>
                         </a>
                     <?php endforeach; ?>
                 <?php endif; ?>

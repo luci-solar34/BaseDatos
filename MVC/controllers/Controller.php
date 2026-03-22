@@ -11,7 +11,24 @@ abstract class Controller {
 
     protected function render($view, array $data = []){
         extract($data, EXTR_SKIP);
-        require __DIR__ . "/../views/" . $view;
+        $viewPath = __DIR__ . "/../views/" . $view;
+
+        if(!$this->shouldUseAppShell($view)){
+            require $viewPath;
+            return;
+        }
+
+        ob_start();
+        require $viewPath;
+        $content = ob_get_clean();
+
+        $layoutStylesheets = $this->extractStylesheetLinks($content);
+        $pageTitle = isset($pageTitle) && is_string($pageTitle) && trim($pageTitle) !== ''
+            ? $pageTitle
+            : 'LASK - Musica';
+
+        extract($this->buildAppShellData($pageTitle, $layoutStylesheets), EXTR_SKIP);
+        require __DIR__ . "/../views/layout.php";
     }
 
     protected function routeUrl($route = ''){
@@ -30,6 +47,25 @@ abstract class Controller {
         }
 
         return $publicBase . '/' . ltrim($path, '/');
+    }
+
+    protected function appUrl($path = ''){
+        $appBase = rtrim(dirname(dirname(BASE_URL)), '/\\');
+        if($path === ''){
+            return $appBase;
+        }
+
+        $normalizedPath = str_replace('\\', '/', (string)$path);
+
+        if(strpos($normalizedPath, 'http://') === 0 || strpos($normalizedPath, 'https://') === 0){
+            return $normalizedPath;
+        }
+
+        if(strpos($normalizedPath, $appBase . '/') === 0){
+            return $normalizedPath;
+        }
+
+        return $appBase . '/' . ltrim($normalizedPath, '/');
     }
 
     protected function redirectToRoute($route = ''){
@@ -209,6 +245,48 @@ abstract class Controller {
         }
 
         return ['path' => str_replace('\\', '/', $relativePath), 'error' => null, 'uploaded' => true];
+    }
+
+    private function shouldUseAppShell($view){
+        if($this->sessionInt('user_id') === null){
+            return false;
+        }
+
+        $viewName = basename((string)$view);
+
+        return !in_array($viewName, ['login.php', 'register.php', 'layout.php'], true);
+    }
+
+    private function extractStylesheetLinks(&$content){
+        $stylesheets = [];
+        $pattern = '/<link\\b[^>]*rel=["\']stylesheet["\'][^>]*>/i';
+
+        $content = preg_replace_callback($pattern, function($matches) use (&$stylesheets){
+            $stylesheets[] = trim($matches[0]);
+            return '';
+        }, $content);
+
+        return array_values(array_unique($stylesheets));
+    }
+
+    private function buildAppShellData($pageTitle, array $layoutStylesheets){
+        require_once __DIR__ . '/../models/User.php';
+
+        $userId = $this->sessionInt('user_id');
+        $userModel = new User($this->connectDatabase());
+        $currentUser = $userId ? $userModel->getById($userId) : null;
+        $pfpPath = !empty($currentUser['pfp']) ? $currentUser['pfp'] : 'photos_pfp/pfp_default.png';
+
+        return [
+            'pageTitle' => $pageTitle,
+            'layoutStylesheets' => $layoutStylesheets,
+            'appShellStylesheet' => $this->publicUrl('css/app_shell.css'),
+            'viewActionsScriptUrl' => $this->publicUrl('js/view-actions.js'),
+            'navHomeUrl' => $this->routeUrl(),
+            'navMessagesUrl' => $this->routeUrl('messages'),
+            'navProfileUrl' => $this->routeUrl('profile?id=' . (int)$userId),
+            'navProfileImageUrl' => $this->appUrl($pfpPath),
+        ];
     }
 
     protected function normalizeIdArray(array $values){

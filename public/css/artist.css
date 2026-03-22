@@ -1,183 +1,318 @@
-/* FONDO GENERAL */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: url('/LASK/public/img/fondoPerfil.jpeg') no-repeat center;
+﻿/* ================================================================
+   ARTIST PROFILE  -  Retro dark theme (VT323 via app_shell.css)
+   ================================================================ */
+
+/* -- BACKGROUND ------------------------------------------------ */
+html:has(.profile-container),
+body:has(.profile-container) {
+    background: url('/LASK/public/img/fondoPerfil.jpeg') no-repeat center center fixed;
     background-size: cover;
-    color: white;
+    background-color: #111;
 }
 
-/* CONTENEDOR */
+/* -- CONTAINER ------------------------------------------------- */
 .profile-container {
-    background: rgba(0, 0, 0, 0.85);
-    margin: 40px;
-    padding: 25px;
-    border-radius: 12px;
+    color: #c8c8c8;
+    font-family: 'Space Mono', monospace;
+    margin: 0;
+    padding: 0;
 }
 
-/* HEADER */
+/* -- PROFILE HEADER -------------------------------------------- */
 .profile-header {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
+    padding: 24px 20px 16px;
+    flex-wrap: wrap;
 }
 
-/* FOTO PERFIL */
 .profile-left img {
     width: 130px;
     height: 130px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid white;
+    border: 2px solid;
+    border-color: #404040 #c8c8c8 #c8c8c8 #404040;
     cursor: pointer;
+    display: block;
 }
 
-/* INFO */
+/* -- PROFILE INFO ---------------------------------------------- */
+.profile-info { flex: 1; min-width: 0; }
+
 .profile-info h1 {
-    margin: 0;
-    font-size: 30px;
+    font-family: 'VT323', monospace;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+    color: #f0f0f0;
+    margin: 0 0 4px;
 }
 
 .username {
-    color: #aaa;
-    margin-bottom: 10px;
+    color: #888;
+    font-size: 13px;
+    margin: 0 0 10px;
 }
 
-/* STATS */
+/* -- STATS ----------------------------------------------------- */
 .stats {
     display: flex;
     gap: 20px;
-    margin: 10px 0;
+    margin: 8px 0 12px;
+    flex-wrap: wrap;
 }
 
-.stats span {
-    font-size: 14px;
+.stats a {
+    text-decoration: none;
+    color: #c8c8c8;
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+    transition: color 0.15s;
 }
 
-/* BOTONES */
-.actions {
-    margin-top: 10px;
+.stats a:hover { color: #fff; }
+
+.stats strong {
+    color: #f0f0f0;
+    font-family: 'VT323', monospace;
 }
+
+/* -- ACTION BUTTONS -------------------------------------------- */
+.actions { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
 
 .btn {
-    background: white;
-    color: black;
-    border: none;
-    padding: 8px 16px;
-    margin-right: 10px;
-    border-radius: 20px;
+    display: inline-block;
+    padding: 5px 20px;
+    background: #2a2a2a;
+    border: 1.5px solid;
+    border-color: #c8c8c8 #404040 #404040 #c8c8c8;
+    color: #c8c8c8;
+    font-family: 'VT323', monospace;
+    font-size: 1.25rem;
+    letter-spacing: 1px;
+    border-radius: 0;
     cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
+    text-decoration: none;
+    transition: background 0.1s, color 0.1s;
+    white-space: nowrap;
+    box-sizing: border-box;
 }
-
-.btn:hover {
-    background: #ccc;
-}
+.btn:hover { background: #444; color: #fff; }
 
 .btn-danger {
-    background: red;
-    color: white;
+    background: #4a1a1a;
+    border-color: #ff6666 #550000 #550000 #ff6666;
+    color: #ff9999;
 }
+.btn-danger:hover { background: #6a2222; color: #ffcccc; }
 
-/* MENSAJE FLASH */
+/* -- FLASH MESSAGE --------------------------------------------- */
 .flash-message {
-    margin-top: 15px;
-    padding: 10px;
-    background: #1e4620;
-    border: 1px solid #4caf50;
-    border-radius: 6px;
+    margin: 10px 20px;
+    padding: 10px 14px;
+    background: rgba(0,255,100,0.08);
+    border: 1px solid #3a6b46;
+    color: #a0d8af;
+    font-size: 0.85rem;
 }
 
-/* BIO */
-.bio-box {
-    background: #1a1a1a;
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
-/* SECCIÓN CANCIONES */
-.songs-section {
-    margin-top: 30px;
-}
-
+/* -- SECTION TITLES (h2 outside panels) ----------------------- */
+.profile-container > h2,
 .songs-section h2 {
-    margin-bottom: 15px;
+    font-family: 'VT323', monospace;
+    font-size: 1.7rem;
+    letter-spacing: 2px;
+    color: #f0f0f0;
+    padding: 4px 12px;
+    margin: 20px 20px 6px;
+    background: linear-gradient(to right, #3a3a3a, #555);
+    border-bottom: 1px solid #404040;
+    display: block;
 }
 
-/* GRID HORIZONTAL */
-.songs-grid {
-    display: flex;
-    gap: 15px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-}
-
-/* TARJETA CANCIÓN */
-.song-card {
-    min-width: 130px;
-    height: 130px;
-    background: #2a2a2a;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px;
-    transition: 0.3s;
-}
-
-.song-card a {
-    text-decoration: none;
-    color: white;
-    font-size: 13px;
-}
-
-.song-card:hover {
-    background: #444;
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(255,255,255,0.2);
-}
-
-/* SCROLL BONITO */
-.songs-grid::-webkit-scrollbar {
-    height: 6px;
-}
-
-.songs-grid::-webkit-scrollbar-thumb {
-    background: #666;
-    border-radius: 10px;
-}
-
-/* LISTAS (ÁLBUMES, COMENTARIOS, ETC) */
-ul {
-    list-style: none;
+/* -- BIO BOX --------------------------------------------------- */
+.bio-box {
+    margin: 0 20px 16px;
+    background: rgba(8,8,8,0.88);
+    border: 1.5px solid;
+    border-color: #404040 #c8c8c8 #c8c8c8 #404040;
     padding: 0;
 }
 
-li {
-    background: #1a1a1a;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
+.bio-box h3 {
+    background: linear-gradient(to right, #3a3a3a, #555);
+    color: #f0f0f0;
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    margin: 0;
+    border-bottom: 1px solid #404040;
 }
 
-/* TEXTAREA */
-textarea {
+.bio-box p {
+    color: #b0b0b0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    padding: 10px 12px;
+    margin: 0;
+    font-family: 'Space Mono', monospace;
+}
+
+/* -- EDIT BIO FORM --------------------------------------------- */
+#editBio {
+    margin: 8px 20px;
+    background: #111;
+    border: 1px solid #3a3a3a;
+    padding: 10px 12px;
+}
+#editBio textarea {
     width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    margin-top: 10px;
-    resize: none;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: #c8c8c8;
+    padding: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    resize: vertical;
+    border-radius: 0;
+    box-sizing: border-box;
+    min-height: 70px;
+}
+#editBio .btn {
+    margin-top: 8px;
 }
 
-/* LINKS */
-a {
-    color: #ddd;
+/* -- REPORT FORM ----------------------------------------------- */
+#reportForm {
+    margin: 10px 20px;
+    background: rgba(0,0,0,0.65);
+    border: 1px solid #3a3a3a;
+    padding: 14px;
+}
+#reportForm label {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 4px;
+}
+#reportForm select,
+#reportForm textarea {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: #c8c8c8;
+    padding: 7px 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    box-sizing: border-box;
+    border-radius: 0;
+    margin-bottom: 8px;
+}
+#reportForm textarea { resize: vertical; min-height: 70px; }
+
+/* -- SONGS SECTION --------------------------------------------- */
+/* -- SONGS SECTION --------------------------------------------- */
+.songs-section { margin: 0 0 10px; }
+
+.songs-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 10px 20px 14px;
 }
 
-a:hover {
-    color: white;
+/* Shared card: cover image on top, title below */
+.media-card {
+    display: flex;
+    flex-direction: column;
+    width: 140px;
+    background: #1e1e1e;
+    border: 1.5px solid;
+    border-color: #404040 #c8c8c8 #c8c8c8 #404040;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: background 0.1s;
+    overflow: hidden;
+}
+.media-card:hover { background: #2e2e2e; border-color: #c8c8c8 #404040 #404040 #c8c8c8; }
+
+.media-card img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+}
+
+.media-card span {
+    display: block;
+    padding: 6px 8px 7px;
+    color: #c8c8c8;
+    font-family: 'VT323', monospace;
+    font-size: 1.15rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+.media-card:hover span { color: #fff; }
+
+/* -- LEGACY INLINE LINKS (exclude media cards) ----------------- */
+.profile-container > div > a:not(.media-card) {
+    display: inline-block;
+    color: #c8c8c8;
+    text-decoration: none;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+}
+.profile-container > div > a:not(.media-card):hover { color: #fff; }
+
+/* -- COMMENTS -------------------------------------------------- */
+.profile-container > form textarea {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: #c8c8c8;
+    padding: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    resize: vertical;
+    border-radius: 0;
+    box-sizing: border-box;
+    min-height: 60px;
+    margin-bottom: 8px;
+}
+
+.profile-container p {
+    color: #888;
+    font-size: 0.85rem;
+    padding: 4px 20px;
+    margin: 0;
+}
+
+/* -- BACK LINK ------------------------------------------------- */
+.profile-container > a {
+    display: inline-block;
+    margin: 10px 20px 20px;
+    color: #888;
+    text-decoration: none;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+}
+.profile-container > a:hover { color: #c8c8c8; }
+
+/* -- PADDING WRAPPER FOR ACTIONS INSIDE CONTAINER -------------- */
+.profile-container > .actions {
+    padding: 0 20px 10px;
+}
+
+/* -- RESPONSIVE ------------------------------------------------ */
+@media (max-width: 768px) {
+    .profile-header { flex-direction: column; align-items: flex-start; }
+    .profile-container > h2, .songs-section h2 { margin: 16px 10px 4px; }
+    .bio-box { margin: 0 10px 12px; }
+    .profile-container ul { margin: 0 10px 12px; }
 }

@@ -4,30 +4,22 @@
 
 <div class="app">
 
-    <!-- NAVBAR -->
-    <div class="navbar">
+    <?php if(!$isLoggedIn): ?>
+        <div class="navbar">
 
-        <div class="logo">
-            <a href="<?= htmlspecialchars(BASE_URL) ?>">
-                <img src="/LASK/public/img/logo.png" alt="logo">
-            </a>
-        </div>
+            <div class="logo">
+                <a href="<?= htmlspecialchars(BASE_URL) ?>">
+                    <img src="/LASK/public/img/logo.png" alt="logo">
+                </a>
+            </div>
 
-        <div class="nav-right">
-            <?php if(!$isLoggedIn): ?>
+            <div class="nav-right">
                 <a href="<?= BASE_URL ?>/register">Registrarse</a>
                 <a href="<?= BASE_URL ?>/login">Iniciar sesión</a>
-            <?php else: ?>
-                <a href="<?= htmlspecialchars($profileUrl) ?>">
-                    <img class="pfp" src="/LASK/photos_pfp/pfp_default.png">
-                </a>
+            </div>
 
-                <a href="<?= BASE_URL ?>/messages">Mensajes</a>
-                <a href="<?= BASE_URL ?>/logout">Cerrar sesión</a>
-            <?php endif; ?>
         </div>
-
-    </div>
+    <?php endif; ?>
 
     <!-- BIENVENIDA -->
     <div class="welcome-container">

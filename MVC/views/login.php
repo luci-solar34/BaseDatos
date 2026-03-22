@@ -11,7 +11,7 @@
 
 
     <!-- CSS CORRECTOS -->
-    <link rel="stylesheet" href="/LASK/public/css/styles.css">
+    <link rel="stylesheet" href="/LASK/public/css/styles.css?v=login-register-fix-1">
    
 </head>
 

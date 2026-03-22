@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/artist.css') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/css/artist.css?v=' . time()) ?>">
 
 <div class="profile-container">
     <div class="profile-header">
@@ -31,6 +31,10 @@
             </div>
 
             <div class="actions">
+                <?php if($isOwner): ?>
+                    <a href="<?= htmlspecialchars(BASE_URL . '/logout') ?>" class="btn">Cerrar sesión</a>
+                <?php endif; ?>
+
                 <?php if($canInteract): ?>
                     <form method="POST" action="<?= htmlspecialchars(BASE_URL) ?>" style="display:inline;">
                         <input type="hidden" name="route" value="<?= htmlspecialchars($isFollowing ? 'unfollow' : 'follow') ?>">
@@ -117,17 +121,18 @@
         </form>
     <?php endif; ?>
 
-    <?php if(!empty($albums)): ?>
-        <h2>Álbumes</h2>
-        <ul>
+    <h2>Álbumes</h2>
+    <?php if(empty($albums)): ?>
+        <p>Este artista no tiene álbumes</p>
+    <?php else: ?>
+        <div class="songs-grid albums-grid">
         <?php foreach($albums as $album): ?>
-            <li>
-                <a href="<?= htmlspecialchars(BASE_URL . '/album?id=' . (int)$album['id_album']) ?>">
-                    <?= htmlspecialchars($album['nombre_album']) ?>
-                </a>
-            </li>
+            <a class="media-card" href="<?= htmlspecialchars(BASE_URL . '/album?id=' . (int)$album['id_album']) ?>">
+                <img src="/LASK/<?= htmlspecialchars($album['portada_album'] ?? 'Photos/banner_default.png') ?>" alt="">
+                <span><?= htmlspecialchars($album['nombre_album']) ?></span>
+            </a>
         <?php endforeach; ?>
-        </ul>
+        </div>
     <?php endif; ?>
 
     <div class="songs-section">
@@ -138,11 +143,10 @@
         <?php else: ?>
             <div class="songs-grid">
                 <?php foreach($songs as $song): ?>
-                    <div class="song-card">
-                        <a href="<?= htmlspecialchars(BASE_URL . '/song?id=' . (int)$song['id_cancion']) ?>">
-                            <?= htmlspecialchars($song['nombre_cancion']) ?>
-                        </a>
-                    </div>
+                    <a class="media-card" href="<?= htmlspecialchars(BASE_URL . '/song?id=' . (int)$song['id_cancion']) ?>">
+                        <img src="/LASK/<?= htmlspecialchars($song['portada_cancion'] ?? 'Photos/banner_default.png') ?>" alt="">
+                        <span><?= htmlspecialchars($song['nombre_cancion']) ?></span>
+                    </a>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
@@ -161,13 +165,14 @@
     <?php if(empty($playlists)): ?>
         <p>No hay playlists</p>
     <?php else: ?>
+        <div class="songs-grid">
         <?php foreach($playlists as $playlist): ?>
-            <div>
-                <a href="<?= htmlspecialchars(BASE_URL . '/playlist?id=' . (int)$playlist['id_playlist']) ?>">
-                    <?= htmlspecialchars($playlist['nombre_playlist']) ?>
-                </a>
-            </div>
+            <a class="media-card" href="<?= htmlspecialchars(BASE_URL . '/playlist?id=' . (int)$playlist['id_playlist']) ?>">
+                <img src="/LASK/Photos/banner_default.png" alt="">
+                <span><?= htmlspecialchars($playlist['nombre_playlist']) ?></span>
+            </a>
         <?php endforeach; ?>
+        </div>
     <?php endif; ?>
 
     <h2>Comentarios</h2>

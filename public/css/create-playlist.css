@@ -27,12 +27,11 @@ body::before {
 
 /* TITULO */
 .title {
-    font-family: 'VT323', monospace; /* 🔥 pixel */
+    font-family: 'VT323', monospace;
     font-size: 52px;
     letter-spacing: 2px;
     margin-bottom: 30px;
-
-    /* opcional: efecto glow suave */
+    color: #f0f0f0;
     text-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 

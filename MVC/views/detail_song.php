@@ -5,11 +5,6 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
  
 <div class="song-page">
  
-    <!-- NAVBAR -->
-    <div class="top-bar">
-        <img src="/LASK/public/img/logo.png" class="logo" alt="LASK">
-    </div>
- 
     <!-- CONTENEDOR PRINCIPAL -->
     <div class="song-container">
  

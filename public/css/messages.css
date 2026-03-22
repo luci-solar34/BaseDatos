@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Exo+2:wght@400;500&display=swap');
+
+/* ── Make the whole viewport dark when on messages page ── */
+html:has(.messages-page),
+body:has(.messages-page) {
+  background: #1a1a1a;
+}
+body:has(.messages-page) .app-main {
+  padding: 0;
+}
+body:has(.messages-page) .app-main-inner {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.messages-page {
+  position: relative;
+  min-height: calc(100vh - 92px);
+  padding: 24px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 15px;
+  background-image: url('/LASK/public/img/fondomensajes.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: #1a1a1a;
+}
+
+.messages-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.60);
+  z-index: 0;
+}
+
+.messages-page .win-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 75vh;
+  margin: 0 auto;
+}
+
+.messages-page .win-outer {
+  border: 2px solid;
+  border-color: #d4d0c8 #404040 #404040 #d4d0c8;
+  background: #808080;
+  box-shadow: 4px 4px 0 #000, inset 0 0 0 1px #909090;
+}
+
+.messages-page .win-titlebar {
+  background: linear-gradient(to right, #3a3a3a, #606060);
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+  border-bottom: 1px solid #404040;
+}
+
+.messages-page .win-titlebar-icon { font-size: 14px; }
+
+.messages-page .win-titlebar-text {
+  flex: 1;
+  color: #f0f0f0;
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.messages-page .win-btn {
+  width: 20px;
+  height: 18px;
+  background: #909090;
+  border: 1.5px solid;
+  border-color: #d4d0c8 #404040 #404040 #d4d0c8;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.messages-page .win-btn:hover { background: #b0b0b0; }
+
+.messages-page .win-btn:active {
+  border-color: #404040 #d4d0c8 #d4d0c8 #404040;
+  transform: translate(1px, 1px);
+}
+
+.messages-page .win-menubar {
+  background: #808080;
+  border-bottom: 1px solid #606060;
+  padding: 3px 6px;
+  display: flex;
+  gap: 2px;
+}
+
+.messages-page .menu-item {
+  font-size: 13px;
+  padding: 2px 10px;
+  color: #111;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.messages-page .menu-item:hover {
+  background: #3a3a3a;
+  color: #f0f0f0;
+  border-color: #d4d0c8 #404040 #404040 #d4d0c8;
+}
+
+.messages-page .win-body {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #808080;
+}
+
+.messages-page .win-section {
+  border: 2px solid;
+  border-color: #404040 #d4d0c8 #d4d0c8 #404040;
+}
+
+.messages-page .win-section-title {
+  background: linear-gradient(to right, #3a3a3a, #555555);
+  color: #f0f0f0;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  padding: 3px 10px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #404040;
+}
+
+.messages-page .win-section-body {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #2a2a2a;
+}
+
+.messages-page .empty-msg {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  color: #666;
+  padding: 8px 4px;
+}
+
+.messages-page .conv-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid #3a3a3a;
+  background: #1e1e1e;
+  text-decoration: none;
+  color: #c8c8c8;
+  transition: all 0.1s;
+}
+
+.messages-page .conv-item:hover {
+  background: #3a3a3a;
+  border-color: #d4d0c8;
+  color: #ffffff;
+}
+
+.messages-page .conv-item:hover .conv-preview { color: #aaa; }
+
+.messages-page .conv-item:hover .conv-arrow { color: #fff; }
+
+.messages-page .conv-avatar {
+  width: 38px;
+  height: 38px;
+  border: 2px solid;
+  border-color: #404040 #d4d0c8 #d4d0c8 #404040;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  color: #c8c8c8;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.messages-page .conv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.messages-page .conv-info { flex: 1; min-width: 0; }
+
+.messages-page .conv-name {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.messages-page .conv-preview {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.messages-page .conv-arrow {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  color: #555;
+}
+
+.messages-page .mutual-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid #3a3a3a;
+  background: #1e1e1e;
+}
+
+.messages-page .mutual-info { flex: 1; min-width: 0; }
+
+.messages-page .mutual-name {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  color: #c8c8c8;
+  line-height: 1.1;
+}
+
+.messages-page .start-btn {
+  background: #333;
+  border: 2px solid;
+  border-color: #d4d0c8 #404040 #404040 #d4d0c8;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  padding: 3px 14px;
+  cursor: pointer;
+  color: #c8c8c8;
+  text-decoration: none;
+  white-space: nowrap;
+  display: inline-block;
+  transition: all 0.1s;
+}
+
+.messages-page .start-btn:hover {
+  background: #555;
+  color: #fff;
+  border-color: #f0f0f0 #606060 #606060 #f0f0f0;
+}
+
+.messages-page .start-btn:active {
+  transform: translate(1px, 1px);
+  border-color: #404040 #d4d0c8 #d4d0c8 #404040;
+}
+
+.messages-page .win-statusbar {
+  background: #808080;
+  border-top: 1px solid #606060;
+  padding: 3px 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.messages-page .statusbar-cell {
+  border: 1px solid;
+  border-color: #404040 #d4d0c8 #d4d0c8 #404040;
+  padding: 1px 8px;
+  font-size: 13px;
+  color: #111;
+  background: #909090;
+}
+
+@media (max-width: 640px) {
+  .messages-page .mutual-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .messages-page .start-btn {
+    text-align: center;
+  }
+}

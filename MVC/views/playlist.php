@@ -1,5 +1,5 @@
 <h1 class="playlist-title">Mi Playlist</h1>
-<link rel="stylesheet" href="/LASK/public/css/playlist-view.css">
+<link rel="stylesheet" href="/LASK/public/css/playlist-view.css?v=<?= time() ?>">
 
 <div class="playlist-container">
 

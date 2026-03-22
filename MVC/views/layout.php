@@ -3,130 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle ?? 'LASK - Música') ?></title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #f9f9f9;
-            color: #333;
-        }
-
-        .navbar {
-            background: #1DB954;
-            padding: 15px 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin-right: 20px;
-            font-weight: bold;
-        }
-
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-
-        .navbar .user-info {
-            float: right;
-            color: white;
-        }
-
-        .main-content {
-            min-height: calc(100vh - 60px);
-            padding: 20px;
-        }
-
-        .footer {
-            background-color: #1a1a1a;
-            color: #fff;
-            text-align: center;
-            padding: 15px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #1DB954;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background: #169c46;
-        }
-
-        .btn-secondary {
-            background: #666;
-        }
-
-        .btn-secondary:hover {
-            background: #555;
-        }
-
-        .alert {
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
+    <title><?= htmlspecialchars($pageTitle ?? 'LASK - Musica') ?></title>
+    <link rel="stylesheet" href="<?= htmlspecialchars($appShellStylesheet) ?>">
+    <?php foreach($layoutStylesheets ?? [] as $stylesheetTag): ?>
+        <?= $stylesheetTag . PHP_EOL ?>
+    <?php endforeach; ?>
 </head>
-<body>
-    <?php
-    $navIsLoggedIn = $navIsLoggedIn ?? false;
-    $navProfileUrl = $navProfileUrl ?? '#';
-    $navShowAdmin = $navShowAdmin ?? false;
-    $navUsername = $navUsername ?? '';
-    ?>
-    <nav class="navbar">
-        <a href="<?= htmlspecialchars(BASE_URL) ?>">Inicio</a>
-        <a href="<?= htmlspecialchars(BASE_URL . '/new-releases') ?>">Nuevos Lanzamientos</a>
-        
-        <?php if($navIsLoggedIn): ?>
-            <a href="<?= htmlspecialchars($navProfileUrl) ?>">Mi Perfil</a>
-            <a href="<?= htmlspecialchars(BASE_URL . '/messages') ?>">Mensajes</a>
-            <?php if($navShowAdmin): ?>
-                <a href="<?= htmlspecialchars(BASE_URL . '/admin/denuncias') ?>">Admin</a>
-            <?php endif; ?>
-            <div class="user-info">
-                <span>👤 <?= htmlspecialchars($navUsername) ?></span>
-                <a href="<?= htmlspecialchars(BASE_URL . '/logout') ?>" style="margin-left: 15px;">Cerrar sesión</a>
+<body class="app-shell-body">
+    <header class="app-header">
+        <div class="app-header-frame">
+            <a href="<?= htmlspecialchars($navHomeUrl) ?>" class="app-logo-link" aria-label="Ir al inicio">
+                <img src="<?= htmlspecialchars(rtrim(dirname(BASE_URL), '/\\') . '/img/logo.png') ?>" alt="LASK" class="app-logo-image">
+            </a>
+
+            <div class="app-header-actions">
+                <a href="<?= htmlspecialchars($navMessagesUrl) ?>" class="app-header-button">Mensajes</a>
+                <a href="<?= htmlspecialchars($navProfileUrl) ?>" class="app-profile-link" aria-label="Ir a mi perfil">
+                    <img src="<?= htmlspecialchars($navProfileImageUrl) ?>" alt="Mi perfil" class="app-profile-image">
+                </a>
             </div>
-        <?php else: ?>
-            <div class="user-info">
-                <a href="<?= htmlspecialchars(BASE_URL . '/login') ?>">Iniciar sesión</a>
-                <a href="<?= htmlspecialchars(BASE_URL . '/register') ?>" style="margin-left: 15px;">Registrarse</a>
+        </div>
+    </header>
+
+    <div class="app-shell-spacer"></div>
+
+    <main class="app-main">
+        <div class="app-main-inner">
+            <?= $content ?>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <div class="app-footer-card">
+            <div class="app-footer-pill">Necesitas ayuda? Contactanos a:</div>
+
+            <div class="app-footer-grid">
+                <div class="app-footer-contacts">
+                    <p>L +591 78406569</p>
+                    <p>A +591 60354578</p>
+                    <p>S +591 74457552</p>
+                    <p>K +591 71331522</p>
+                </div>
+
+                <div class="app-footer-signature">UPB SCZ 2026- BDR</div>
             </div>
-        <?php endif; ?>
-    </nav>
+        </div>
+    </footer>
 
-    <div class="main-content">
-        <?= $content ?>
-    </div>
-
-    <script src="<?= htmlspecialchars(BASE_URL . '/../js/view-actions.js') ?>"></script>
-
+    <script src="<?= htmlspecialchars($viewActionsScriptUrl) ?>"></script>
 </body>
 </html>
