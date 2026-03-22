@@ -160,7 +160,7 @@
         </div>
     <?php endif; ?>
 
-    <h2>Playlists públicas</h2>
+    <h2>Playlists</h2>
 
     <?php if(empty($playlists)): ?>
         <p>No hay playlists</p>

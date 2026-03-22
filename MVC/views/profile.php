@@ -158,7 +158,7 @@
         <!-- PLAYLISTS -->
         <div class="playlists-box">
 
-            <h3><?= $isOwner ? 'Mis playlists' : 'Playlists públicas' ?></h3>
+            <h3><?= $isOwner ? 'Mis playlists' : 'Playlists' ?></h3>
 
             <div class="playlist-row">
                 <?php if(empty($playlists)): ?>
