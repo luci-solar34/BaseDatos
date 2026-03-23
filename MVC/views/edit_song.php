@@ -5,6 +5,7 @@
     <h1>Editar Canción</h1>
 
     <form class="edit-song-form" action="<?= BASE_URL ?>/artist/edit-song?id=<?= (int)$song['id_cancion'] ?>" method="POST" enctype="multipart/form-data">
+        <?= $csrfField ?>
         <input type="hidden" name="song_id" value="<?= (int)$song['id_cancion'] ?>">
 
         <label>Nombre de la Canción:</label>

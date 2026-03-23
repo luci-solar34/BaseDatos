@@ -56,6 +56,7 @@
     <div class="input-panel">
       <span class="input-label">></span>
       <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/message/send') ?>" class="message-form">
+        <?= $csrfField ?>
         <input type="hidden" name="user_id" value="<?= (int)$chatRecipientId ?>">
         <input class="msg-input" type="text" name="texto" id="msgInput" placeholder="Escribe un mensaje..." autocomplete="off" required>
         <button type="submit" class="send-btn">> Enviar</button>

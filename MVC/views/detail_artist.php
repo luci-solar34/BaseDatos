@@ -6,6 +6,7 @@
         <div class="profile-left">
             <?php if($showArtistImageUpload): ?>
                 <form action="<?= htmlspecialchars(BASE_URL . '/update_pfp') ?>" method="POST" enctype="multipart/form-data" id="pfpUploadForm">
+                    <?= $csrfField ?>
                     <label for="pfp">
                         <img src="/LASK/<?= htmlspecialchars($artist['pfp']) ?>" alt="Tu foto de perfil">
                     </label>
@@ -37,6 +38,7 @@
 
                 <?php if($canInteract): ?>
                     <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/' . ($isFollowing ? 'unfollow' : 'follow')) ?>" style="display:inline;">
+                        <?= $csrfField ?>
                         <input type="hidden" name="user_id" value="<?= (int)$artist['id_usuario'] ?>">
                         <input type="hidden" name="redirect_id" value="<?= (int)$artist['id_usuario'] ?>">
                         <button type="submit" class="btn">
@@ -46,11 +48,13 @@
 
                     <?php if(isset($hasBlocked) && $hasBlocked): ?>
                         <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/unblock') ?>" style="display:inline;">
+                            <?= $csrfField ?>
                             <input type="hidden" name="user_id" value="<?= (int)$artist['id_usuario'] ?>">
                             <button type="submit" class="btn">Desbloquear</button>
                         </form>
                     <?php else: ?>
                         <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/block') ?>" style="display:inline;">
+                            <?= $csrfField ?>
                             <input type="hidden" name="user_id" value="<?= (int)$artist['id_usuario'] ?>">
                             <button type="submit" class="btn btn-danger">Bloquear</button>
                         </form>
@@ -69,6 +73,7 @@
             <button type="button" class="btn btn-danger" onclick="document.getElementById('reportForm').style.display='block'">Denunciar</button>
 
             <form id="reportForm" method="POST" action="<?= htmlspecialchars(BASE_URL . '/report') ?>" style="display:none;">
+                <?= $csrfField ?>
                 <input type="hidden" name="denunciado_id" value="<?= (int)$artist['id_usuario'] ?>">
 
                 <label>Tipo de denuncia:</label>
@@ -112,6 +117,7 @@
         </button>
 
         <form id="editBio" action="<?= htmlspecialchars(BASE_URL . '/update_bio') ?>" method="POST" style="display:none; margin-top:10px;">
+            <?= $csrfField ?>
             <textarea name="bio"><?= htmlspecialchars($bioText) ?></textarea>
             <br><br>
             <button type="submit" class="btn">Guardar</button>
@@ -176,6 +182,7 @@
 
     <?php if($canComment): ?>
         <form action="<?= htmlspecialchars(BASE_URL . '/artist/add-comment') ?>" method="POST">
+            <?= $csrfField ?>
             <input type="hidden" name="artist_id" value="<?= (int)$artist['id_usuario'] ?>">
             <textarea name="comment" placeholder="Escribe un comentario..." required></textarea>
             <button type="submit" class="btn">Comentar</button>

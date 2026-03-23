@@ -255,6 +255,8 @@ class DetailController extends Controller {
             $this->abort('Método no permitido', 405);
         }
 
+        $this->verifyCsrfToken();
+
         $isAjax = $this->isAjaxRequest();
 
         $userId = $this->sessionInt('user_id');
@@ -328,6 +330,7 @@ class DetailController extends Controller {
     public function addSongToAlbum(){
 
         if($this->isPostRequest()){
+            $this->verifyCsrfToken();
             $album_id = $this->postInt('album_id', 0);
             $artista = $this->requireAuthenticatedUser('login');
             $album = $this->album->getById($album_id);

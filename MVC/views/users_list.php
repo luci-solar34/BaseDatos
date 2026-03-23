@@ -32,6 +32,7 @@
                     <td>*****</td>
                     <td>
                         <form action="<?= htmlspecialchars(BASE_URL . '/admin/user/change-state') ?>" method="POST" style="margin:0;">
+                            <?= $csrfField ?>
                             <input type="hidden" name="user_id" value="<?= htmlspecialchars($user['id_usuario']) ?>">
                             <input type="hidden" name="estado" value="<?= htmlspecialchars($user['next_state']) ?>">
                             <button type="submit" class="btn"><?= htmlspecialchars($user['action_label']) ?></button>

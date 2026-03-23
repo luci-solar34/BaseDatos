@@ -37,6 +37,7 @@ class TagController extends Controller {
     }
 
     public function create(){
+        $this->verifyCsrfToken();
         $this->ensureAdmin();
 
         $nombre = $this->postString('nombre_tag');

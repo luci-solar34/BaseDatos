@@ -43,7 +43,7 @@
         <?php if($isLoggedIn): ?>
             <form action="<?= BASE_URL ?>/search" method="GET">
                 <input type="text" id="search-input" name="q" placeholder="Buscar canciones, artistas, álbumes o tags">
-                <button type="submit">🔍</button>
+                <button type="submit">Buscar</button>
             </form>
 
             <div id="suggestions" class="search-suggestions"></div>
@@ -51,7 +51,7 @@
         <?php else: ?>
             <form data-auth-required-message="Debes iniciar sesión para buscar">
                 <input type="text" placeholder="Buscar canciones..." disabled>
-                <button disabled>🔍</button>
+                <button disabled>Buscar</button>
             </form>
         <?php endif; ?>
 

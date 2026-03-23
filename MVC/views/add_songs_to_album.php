@@ -8,6 +8,7 @@
     <?php endif; ?>
 
     <form class="album-form" action="<?= htmlspecialchars(BASE_URL . '/album/add-songs?id=' . (int)$album['id_album']) ?>" method="POST" enctype="multipart/form-data">
+        <?= $csrfField ?>
         <input type="hidden" name="album_id" value="<?= (int)$album['id_album'] ?>">
         <input type="hidden" id="addModeInput" name="add_mode" value="<?= htmlspecialchars($selectedMode) ?>">
 

@@ -76,6 +76,7 @@ class MessageController extends Controller {
     }
 
     public function send(){
+        $this->verifyCsrfToken();
         $user = $this->requireAuthenticatedUser('login');
         $receptor = $this->postInt('user_id', 0);
         $texto = $this->postString('texto');

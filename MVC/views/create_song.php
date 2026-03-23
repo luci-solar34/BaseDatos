@@ -3,6 +3,7 @@
 <h1>Crear Canción</h1>
 
 <form action="<?= BASE_URL ?>/artist/create-song?id=<?= (int)$artistId ?>" method="POST" enctype="multipart/form-data">
+    <?= $csrfField ?>
     <label>Nombre de la Canción:</label>
     <input type="text" name="nombre" required><br>
 

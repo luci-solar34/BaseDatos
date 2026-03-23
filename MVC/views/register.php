@@ -38,6 +38,7 @@
         <?php endif; ?>
 
         <form action="<?= htmlspecialchars(BASE_URL . '/register') ?>" method="POST">
+            <?= $csrfField ?>
 
             <div class="form-grid">
 

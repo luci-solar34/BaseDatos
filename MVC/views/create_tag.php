@@ -7,6 +7,7 @@
 <?php endif; ?>
 
 <form action="<?= BASE_URL ?>/tag/create" method="POST">
+    <?= $csrfField ?>
     <label for="nombre_tag">Nombre del tag:</label><br>
     <input type="text" id="nombre_tag" name="nombre_tag" required maxlength="100"><br><br>
 

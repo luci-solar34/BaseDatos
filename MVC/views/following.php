@@ -8,7 +8,7 @@ $pageTitle = 'Seguidos de ' . $user['nombre_usuario'] . ' — LASK';
  
     <!-- TITLE BAR -->
     <div class="win-titlebar">
-      <span class="win-titlebar-icon">👤</span>
+      <span class="win-titlebar-icon">USR</span>
       <div class="win-titlebar-text">LASK — Seguidos de <?= htmlspecialchars($user['nombre_usuario']) ?></div>
       <a href="<?= htmlspecialchars($profileUrl) ?>" class="win-btn">_</a>
       <span class="win-btn">□</span>
@@ -25,7 +25,7 @@ $pageTitle = 'Seguidos de ' . $user['nombre_usuario'] . ' — LASK';
  
       <div class="win-section">
         <div class="win-section-title">
-          👤 Seguidos
+          Seguidos
           <?php if(!empty($following)): ?>
             <span class="section-count">(<?= (int)$followingCount ?> <?= htmlspecialchars($followingLabel) ?>)</span>
           <?php endif; ?>

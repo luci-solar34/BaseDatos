@@ -27,7 +27,7 @@ class Block {
         $stmt->bindParam(":b2", $bloqueado, PDO::PARAM_INT);
 
         $ok = $stmt->execute();
-        
+
         if(!$ok){
             error_log('[Block] execute() failed on block(): ' . implode(' | ', $stmt->errorInfo()));
             return false;
@@ -55,7 +55,7 @@ class Block {
         return $stmt->execute();
     }
 
-    // 🔥 VER SI HAY BLOQUEO EN CUALQUIER DIRECCIÓN
+    // Verifica bloqueo bidireccional entre dos usuarios
     public function isBlocked($user1, $user2){
 
         $query = "SELECT 1 FROM Bloquea
@@ -72,7 +72,7 @@ class Block {
         return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // 🔥 VER SI YO BLOQUEÉ A ALGUIEN
+    // Verifica si el usuario A bloqueo al usuario B
     public function hasBlocked($bloqueador, $bloqueado){
 
         $query = "SELECT 1 FROM Bloquea
@@ -89,7 +89,7 @@ class Block {
         return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // 🔥 VER SI ME BLOQUEARON
+    // Verifica si el usuario fue bloqueado por otro
     public function isBlockedBy($user, $blockedBy){
         return $this->hasBlocked($blockedBy, $user);
     }

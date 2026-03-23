@@ -5,6 +5,7 @@
     <!-- FORM PRIVACIDAD -->
     <div class="edit-card">
         <form action="<?= htmlspecialchars(BASE_URL . '/playlist/change-privacy') ?>" method="POST">
+            <?= $csrfField ?>
             <input type="hidden" name="playlist_id" value="<?= (int)$playlist_id ?>">
             
             <h3>Privacidad de la Playlist</h3>
@@ -32,6 +33,7 @@
                 <span><?= htmlspecialchars($song['nombre_cancion']) ?></span>
 
                 <form action="<?= htmlspecialchars(BASE_URL . '/playlist/remove-song') ?>" method="POST">
+                    <?= $csrfField ?>
                     <input type="hidden" name="playlist_id" value="<?= (int)$playlist_id ?>">
                     <input type="hidden" name="song_id" value="<?= (int)$song['id_cancion'] ?>">
                     <button type="submit" class="btn delete">Eliminar</button>

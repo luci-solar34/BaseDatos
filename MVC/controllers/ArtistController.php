@@ -160,6 +160,7 @@ class ArtistController extends Controller {
 
     public function createAlbum(){
 
+        $this->verifyCsrfToken();
         $nombre = $this->postString('nombre');
         $descripcion = $this->postString('descripcion');
         $artista = $this->requireArtistUserId();
@@ -205,6 +206,7 @@ class ArtistController extends Controller {
 
     public function editAlbum(){
 
+        $this->verifyCsrfToken();
         $albumId = $this->postInt('album_id', 0);
         $artistId = $this->requireArtistUserId();
         $album = $this->loadOwnedAlbum($albumId, $artistId);
@@ -240,6 +242,7 @@ class ArtistController extends Controller {
 
     public function createSong(){
 
+        $this->verifyCsrfToken();
         $nombre = $this->postString('nombre');
         $artista = $this->requireArtistUserId();
         $letra = $this->postString('letra_cancion');
@@ -297,6 +300,7 @@ class ArtistController extends Controller {
 
     public function editSong(){
 
+        $this->verifyCsrfToken();
         $songId = $this->postInt('song_id', 0);
         $artistId = $this->requireArtistUserId();
         $song = $this->loadOwnedSong($songId, $artistId);
@@ -343,6 +347,7 @@ class ArtistController extends Controller {
 
     public function addComment(){
 
+        $this->verifyCsrfToken();
         $artista = $this->postInt('artist_id', 0);
         $comentario = $this->postString('comment');
         $usuario = $this->requireAuthenticatedUser('login');

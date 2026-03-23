@@ -4,6 +4,7 @@
     <h1 class="page-title">Crear álbum</h1>
 
     <form class="album-form" action="<?= htmlspecialchars(BASE_URL . '/artist/create-album?id=' . (int)$artistId) ?>" method="POST" enctype="multipart/form-data">
+        <?= $csrfField ?>
         <div class="album-cover">
             <label class="album-cover__label" for="portada">Portada</label>
 

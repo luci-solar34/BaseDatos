@@ -10,6 +10,7 @@
 
             <?php if($isOwner): ?>
                 <form action="<?= htmlspecialchars(BASE_URL . '/update_pfp') ?>" method="POST" enctype="multipart/form-data" id="pfpForm">
+                    <?= $csrfField ?>
                     <label for="pfp">
                         <img id="pfpPreviewImg" src="/LASK/<?= htmlspecialchars($user['pfp']) ?>" class="pfp">
                     </label>
@@ -52,6 +53,7 @@
 
                 <!-- FOLLOW -->
                 <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/' . ($isFollowing ? 'unfollow' : 'follow')) ?>">
+                    <?= $csrfField ?>
                     <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
                     <input type="hidden" name="redirect_id" value="<?= (int)$user['id_usuario'] ?>">
                     <button>
@@ -62,11 +64,13 @@
                 <!-- BLOCK -->
                 <?php if(isset($hasBlocked) && $hasBlocked): ?>
                     <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/unblock') ?>">
+                        <?= $csrfField ?>
                         <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
                         <button style="background:green;color:white;">Desbloquear</button>
                     </form>
                 <?php else: ?>
                     <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/block') ?>">
+                        <?= $csrfField ?>
                         <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
                         <button style="background:red;color:white;">Bloquear</button>
                     </form>
@@ -85,7 +89,7 @@
         </div>
     <?php endif; ?>
 
-    <!-- REPORTES (AQUÍ ESTABA LO QUE FALTABA 🔥) -->
+    <!-- Seccion de denuncias -->
     <div class="report-section">
 
         <?php if(isset($canReport) && $canReport): ?>
@@ -105,6 +109,7 @@
                       action="<?= htmlspecialchars(BASE_URL . '/report') ?>"
                       style="display:none; margin-top:10px;">
 
+                    <?= $csrfField ?>
                     <input type="hidden" name="denunciado_id" value="<?= (int)$user['id_usuario'] ?>">
 
                     <label>Motivo</label>
@@ -144,6 +149,7 @@
                 <button onclick="document.getElementById('editBio').style.display='block'">Editar</button>
 
                 <form id="editBio" action="<?= htmlspecialchars(BASE_URL . '/update_bio') ?>" method="POST" style="display:none;">
+                    <?= $csrfField ?>
                     <textarea name="bio"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
                     <button type="submit">Guardar</button>
                 </form>

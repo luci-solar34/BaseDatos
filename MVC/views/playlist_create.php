@@ -19,6 +19,7 @@
         <!-- FORM -->
         <div class="center">
             <form action="<?= BASE_URL ?>/playlist/create" method="POST" enctype="multipart/form-data">
+                <?= $csrfField ?>
 
                 <label>Nombre de la playlist</label>
                 <input type="text" name="name" required class="input">

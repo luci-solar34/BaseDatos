@@ -31,6 +31,7 @@ class PlaylistController extends Controller {
 
     public function create(){
 
+        $this->verifyCsrfToken();
         $name = $this->postString('name');
         $privacy = $this->postInt('privacy', 0);
         $user = $this->requireAuthenticatedUser('login');
@@ -93,6 +94,7 @@ class PlaylistController extends Controller {
 
     public function addSong(){
 
+        $this->verifyCsrfToken();
         $userId = $this->requireAuthenticatedUser('login');
         $playlist = $this->postInt('playlist', 0);
         $song = $this->postInt('song', 0);
@@ -112,6 +114,7 @@ class PlaylistController extends Controller {
 
     public function removeSong(){
 
+        $this->verifyCsrfToken();
         $userId = $this->requireAuthenticatedUser('login');
         $playlist = $this->postInt('playlist_id', 0);
         $song = $this->postInt('song_id', 0);
@@ -129,6 +132,7 @@ class PlaylistController extends Controller {
 
     public function changePrivacy(){
 
+        $this->verifyCsrfToken();
         $userId = $this->requireAuthenticatedUser('login');
         $playlist = $this->postInt('playlist_id', 0);
         $privacy = $this->postInt('privacy', 0);

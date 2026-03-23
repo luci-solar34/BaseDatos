@@ -3,7 +3,7 @@ body {
     margin: 0;
     font-family: 'Segoe UI', Arial, sans-serif;
 
-    /* 🔥 TU FONDO ORIGINAL */
+    /* Fondo principal de la pagina */
     background: url('/LASK/public/img/fondoPerfil.jpeg') no-repeat center;
     background-size: cover;
     background-attachment: fixed;
@@ -42,7 +42,7 @@ body::before {
     padding: 40px;
     border-radius: 30px;
 
-    /* 🔥 AHORA COMBINA CON EL FONDO */
+    /* Fondo semitransparente para la tarjeta */
     background: rgba(20, 20, 20, 0.65);
     backdrop-filter: blur(25px);
 
@@ -138,7 +138,7 @@ label {
     border-radius: 25px;
     border: none;
 
-    /* 🔥 PLOMO CLARO BRILLANTE */
+    /* Color gris claro con degradado */
     background: linear-gradient(135deg, #d1d5db, #f3f4f6);
     color: #111; /* texto oscuro para contraste */
 

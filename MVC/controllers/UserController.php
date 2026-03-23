@@ -112,6 +112,7 @@ class UserController extends Controller {
     }
 
     public function submitReport(){
+        $this->verifyCsrfToken();
         $denunciante = $this->requireAuthenticatedUser('login');
         $denunciado = $this->postInt('denunciado_id', 0);
         $motivo = $this->postString('motivo_denuncia');
@@ -185,6 +186,7 @@ class UserController extends Controller {
     }
 
     public function updateBio(){
+        $this->verifyCsrfToken();
         $id = $this->requireAuthenticatedUser('login');
         $bio = $this->postString('bio');
 
@@ -199,6 +201,7 @@ class UserController extends Controller {
 
 
     public function updatePfp(){
+        $this->verifyCsrfToken();
         $userId = $this->requireAuthenticatedUser('login');
         $upload = $this->storeUploadedFile('pfp', ['jpg', 'jpeg', 'png', 'webp'], 'photos_pfp');
 
@@ -241,6 +244,7 @@ class UserController extends Controller {
     }
 
     public function changeUserState(){
+        $this->verifyCsrfToken();
         $adminId = $this->requireAdmin('Acceso denegado: solo administradores pueden cambiar estado de usuarios.');
 
         $userId = $this->postInt('user_id', 0);
@@ -269,6 +273,7 @@ class UserController extends Controller {
     }
 
     public function follow(){
+        $this->verifyCsrfToken();
         $seguidor = $this->requireAuthenticatedUser('login');
         $seguido = $this->postInt('user_id', 0);
 
@@ -290,6 +295,7 @@ class UserController extends Controller {
     }
 
     public function unfollow(){
+        $this->verifyCsrfToken();
         $seguidor = $this->requireAuthenticatedUser('login');
         $seguido = $this->postInt('user_id', 0);
 
@@ -307,6 +313,7 @@ class UserController extends Controller {
     }
 
     public function block(){
+        $this->verifyCsrfToken();
         $bloqueador = $this->requireAuthenticatedUser('login');
         $bloqueado = $this->postInt('user_id', 0);
 
@@ -326,6 +333,7 @@ class UserController extends Controller {
    
 
     public function unblock(){
+        $this->verifyCsrfToken();
         $bloqueador = $this->requireAuthenticatedUser('login');
         $bloqueado = $this->postInt('user_id', 0);
 

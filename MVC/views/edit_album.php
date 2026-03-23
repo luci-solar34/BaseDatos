@@ -4,6 +4,7 @@
     <h1 class="page-title">Editar álbum</h1>
 
     <form class="album-form album-form--expanded" action="<?= htmlspecialchars(BASE_URL . '/artist/edit-album?id=' . (int)$album['id_album']) ?>" method="POST" enctype="multipart/form-data">
+        <?= $csrfField ?>
         <input type="hidden" name="album_id" value="<?= (int)$album['id_album'] ?>">
 
         <div class="album-cover">

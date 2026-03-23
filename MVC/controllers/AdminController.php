@@ -31,6 +31,7 @@ class AdminController extends Controller {
 
     public function aceptarDenuncia(){
 
+        $this->verifyCsrfToken();
         $this->ensureAdmin();
 
         $id = $this->postInt('denuncia', 0);
@@ -48,6 +49,7 @@ class AdminController extends Controller {
 
     public function rechazarDenuncia(){
 
+        $this->verifyCsrfToken();
         $this->ensureAdmin();
 
         $id = $this->postInt('denuncia', 0);

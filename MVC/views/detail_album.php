@@ -35,6 +35,7 @@ $pageTitle = $album['nombre_album'] . ' - LASK';
     <img id="nowPlayingCover" src="/LASK/<?= htmlspecialchars($albumCover) ?>" alt="Portada del álbum actual" width="220" style="display:block; margin:0 0 10px; border-radius:8px; object-fit:cover;">
     <audio id="albumAudio" controls style="width:100%; margin-bottom:8px;"></audio>
     <form id="nowPlayingLikeForm" action="<?= htmlspecialchars(BASE_URL . '/like') ?>" method="POST" style="margin:0 0 12px; display:none;">
+        <?= $csrfField ?>
         <input type="hidden" name="song_id" id="nowPlayingSongId" value="">
         <input type="hidden" name="album_id" value="<?= (int)$album['id_album'] ?>">
         <button type="submit" id="nowPlayingLikeButton">♥ Dar like</button>

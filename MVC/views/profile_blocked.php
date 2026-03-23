@@ -18,6 +18,7 @@
                 <button class="btn" type="button" data-toggle-target="reportForm" onclick="var f=document.getElementById('reportForm'); if(f){f.style.display='block';}">Denunciar</button>
 
                 <form id="reportForm" class="report-form" method="POST" action="<?= htmlspecialchars(BASE_URL . '/report') ?>" data-sql-guard="off" style="display:none;">
+                    <?= $csrfField ?>
                     <input type="hidden" name="denunciado_id" value="<?= (int)$user['id_usuario'] ?>">
 
                     <label>Tipo de denuncia:</label>
@@ -44,6 +45,7 @@
         <?php if(isset($canUnblock) && $canUnblock): ?>
 
             <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/unblock') ?>">
+                <?= $csrfField ?>
                 <input type="hidden" name="user_id" value="<?= (int)$user['id_usuario'] ?>">
                 <button type="submit" class="btn btn-danger">Desbloquear</button>
             </form>

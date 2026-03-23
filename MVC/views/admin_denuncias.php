@@ -38,10 +38,12 @@ $pageTitle = 'Gestión de Denuncias - LASK';
                     <td><?= htmlspecialchars($d['fecha_denuncia'] ?? '') ?></td>
                     <td>
                         <form action="<?= BASE_URL ?>/admin/denuncias/accept" method="POST" style="display:inline;">
+                            <?= $csrfField ?>
                             <input type="hidden" name="denuncia" value="<?= (int)($d['id_denuncia'] ?? 0) ?>">
                             <button type="submit">Aceptar</button>
                         </form>
                         <form action="<?= BASE_URL ?>/admin/denuncias/reject" method="POST" style="display:inline; margin-left:6px;">
+                            <?= $csrfField ?>
                             <input type="hidden" name="denuncia" value="<?= (int)($d['id_denuncia'] ?? 0) ?>">
                             <button type="submit">Rechazar</button>
                         </form>

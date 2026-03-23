@@ -43,7 +43,7 @@
 
 
         <form action="/LASK/public/index.php/login" method="POST">
-
+            <?= $csrfField ?>
 
             <label>Nombre de usuario</label>
             <input type="text" name="username" required>

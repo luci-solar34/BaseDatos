@@ -45,6 +45,7 @@ $pageTitle = $song['nombre_cancion'] . ' - LASK';
                 <div class="song-actions">
  
                     <form id="songLikeForm" action="<?= BASE_URL ?>/like" method="POST">
+                        <?= $csrfField ?>
                         <input type="hidden" name="song_id" value="<?= (int)$song['id_cancion'] ?>">
                         <button type="submit" class="btn" id="songLikeButton">
                             <span id="songLikeLabel"><?= htmlspecialchars($songLikeLabel) ?></span>

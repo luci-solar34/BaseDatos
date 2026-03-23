@@ -65,6 +65,7 @@
                 <p class="song-name"><?= htmlspecialchars($song['nombre_cancion']) ?></p>
 
                 <form method="POST" action="<?= htmlspecialchars(BASE_URL . '/playlist/add-song') ?>">
+                    <?= $csrfField ?>
                     <input type="hidden" name="playlist" value="<?= (int)$playlist ?>">
                     <input type="hidden" name="song" value="<?= (int)$song['id_cancion'] ?>">
 

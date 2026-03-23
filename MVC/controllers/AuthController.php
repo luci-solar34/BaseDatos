@@ -30,6 +30,8 @@ class AuthController extends Controller {
 
     public function login(){
 
+        $this->verifyCsrfToken();
+
         $username = $this->postString('username');
         $password = $this->postString('password');
 
@@ -51,6 +53,9 @@ class AuthController extends Controller {
                 $this->redirectToRoute('login');
             }
 
+            // Regenerar ID de sesion para prevenir session fixation
+            session_regenerate_id(true);
+
             $_SESSION['user_id'] = (int)$result['id_usuario'];
             $_SESSION['username'] = $result['nombre_usuario'];
             $_SESSION['role'] = (int)$result['id_rol'];
@@ -63,6 +68,8 @@ class AuthController extends Controller {
     }
 
     public function register(){
+
+        $this->verifyCsrfToken();
 
         if(!$this->postBool('terms')){
             $this->setFlash('Debes aceptar los términos y condiciones');
@@ -79,6 +86,12 @@ class AuthController extends Controller {
 
         if(!$data['email'] || !$data['username'] || !$data['password'] || !$data['pais'] || !$data['rol']){
             $this->setFlash('Datos incompletos');
+            $this->redirectToRoute('register');
+        }
+
+        // Politica de contrasena: minimo 8 caracteres
+        if(strlen($data['password']) < 8){
+            $this->setFlash('La contraseña debe tener al menos 8 caracteres.');
             $this->redirectToRoute('register');
         }
 
