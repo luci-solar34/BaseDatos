@@ -121,9 +121,12 @@ class AuthController extends Controller {
             $user_id = $this->user->register($data);
         } catch(PDOException $e) {
             if((int)$e->getCode() === 23000){
-                if(strpos($e->getMessage(), 'email') !== false){
+                $msg = $e->getMessage();
+                if(stripos($msg, 'foreign key') !== false || stripos($msg, 'a]foreign key constraint fails') !== false){
+                    $this->setFlash('Error de configuración: faltan datos base (Roles o Paises). Contacta al administrador.');
+                } elseif(strpos($msg, 'email') !== false){
                     $this->setFlash('El email ya está registrado');
-                } elseif(strpos($e->getMessage(), 'nombre_usuario') !== false){
+                } elseif(strpos($msg, 'nombre_usuario') !== false){
                     $this->setFlash('El nombre de usuario ya está en uso');
                 } else {
                     $this->setFlash('El email o nombre de usuario ya está en uso');
